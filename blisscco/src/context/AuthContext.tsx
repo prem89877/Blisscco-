@@ -17,6 +17,8 @@ interface AuthCtx {
   requestPasswordReset: (email: string) => Promise<{ error: AuthError | null }>;
   updatePassword: (password: string) => Promise<{ error: AuthError | null }>;
   updateLanguage: (lang: Lang) => Promise<void>;
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>;
+  refreshProfile: () => Promise<void>;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -91,9 +93,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!error) setProfile((p) => (p ? { ...p, language } : p));
   }, [uid]);
 
+  const signInWithGoogle = useCallback(async () => {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback` } });
+    return { error };
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (!uid) return;
+    const { data } = await supabase.from('profiles').select('id, role, full_name, language, is_suspended').eq('id', uid).maybeSingle();
+    setProfile((data as Profile | null) ?? null);
+  }, [uid]);
+
   const value = useMemo(
-    () => ({ session, profile, loading, signIn, signUp, signOut, requestPasswordReset, updatePassword, updateLanguage }),
-    [session, profile, loading, signIn, signUp, signOut, requestPasswordReset, updatePassword, updateLanguage],
+    () => ({ session, profile, loading, signIn, signUp, signOut, requestPasswordReset, updatePassword, updateLanguage, signInWithGoogle, refreshProfile }),
+    [session, profile, loading, signIn, signUp, signOut, requestPasswordReset, updatePassword, updateLanguage, signInWithGoogle, refreshProfile],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

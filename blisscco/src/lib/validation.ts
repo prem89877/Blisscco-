@@ -6,6 +6,7 @@ export function authErrorKey(message: string): string {
   if (m.includes('invalid login credentials')) return 'err.invalidCreds';
   if (m.includes('email not confirmed')) return 'err.emailNotVerified';
   if (m.includes('already registered')) return 'err.emailExists';
+  if (m.includes('rate limit')) return 'err.rateLimit';
   if (m.includes('fetch') || m.includes('network')) return 'err.network';
   return 'err.generic';
 }

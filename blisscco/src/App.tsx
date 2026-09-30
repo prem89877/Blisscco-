@@ -4,6 +4,7 @@ import RequireRole from './components/RequireRole';
 import AdminHome from './pages/admin/AdminHome';
 import Applications from './pages/admin/Applications';
 import Categories from './pages/admin/Categories';
+import AuthCallback from './pages/AuthCallback';
 import BusinessProfile from './pages/BusinessProfile';
 import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/admin/login" element={<Login role="admin" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/post-login" element={<PostLogin />} />
         <Route path="/owner" element={owner(<OwnerDashboard />)} />
         <Route path="/owner/business/new" element={owner(<NewBusiness />)} />

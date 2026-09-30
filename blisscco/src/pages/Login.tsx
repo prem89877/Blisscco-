@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthCard from '../components/AuthCard';
 import Field from '../components/Field';
+import GoogleButton from '../components/GoogleButton';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { authErrorKey, isEmail } from '../lib/validation';
@@ -35,6 +36,7 @@ export default function Login({ role }: { role: 'customer' | 'owner' | 'admin' }
 
   return (
     <AuthCard title={t(`auth.loginTitle.${role}`)}>
+      {role !== 'admin' && <GoogleButton intent={role} />}
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field id="email" label={t('auth.email')} type="email" autoComplete="email" value={email} onChange={setEmail} disabled={busy} />
         <Field id="password" label={t('auth.password')} type="password" autoComplete="current-password" value={password} onChange={setPassword} disabled={busy} />
