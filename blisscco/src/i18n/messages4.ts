@@ -3,6 +3,7 @@ const days = (a: string[]): M => Object.fromEntries(a.map((d, i) => [`day.${i}`,
 
 const en: M = {
   'auth.google': 'Continue with Google', 'auth.or': 'or', 'err.rateLimit': 'Too many emails were sent. Wait an hour or use Google sign-in.',
+  'footer.privacy': 'Privacy Policy', 'footer.terms': 'Terms',
   'common.save': 'Save', 'common.saved': 'Saved', 'common.edit': 'Edit', 'common.cancel': 'Cancel', 'common.add': 'Add', 'common.select': 'Select…',
   'status.draft': 'Draft', 'status.pending_review': 'Pending review', 'status.approved': 'Approved', 'status.rejected': 'Rejected', 'status.suspended': 'Suspended', 'status.inactive': 'Inactive',
   'owner.title': 'My businesses', 'owner.add': 'Add a business', 'owner.empty': "You haven't added a business yet.", 'owner.reason': 'Reason from admin',
@@ -34,6 +35,7 @@ const en: M = {
 
 const hi: M = {
   'auth.google': 'Google से जारी रखें', 'auth.or': 'या', 'err.rateLimit': 'बहुत ज़्यादा ईमेल भेजे जा चुके हैं। एक घंटा रुकें या Google से साइन इन करें।',
+  'footer.privacy': 'गोपनीयता नीति', 'footer.terms': 'शर्तें',
   'common.save': 'सहेजें', 'common.saved': 'सहेजा गया', 'common.edit': 'बदलें', 'common.cancel': 'रद्द करें', 'common.add': 'जोड़ें', 'common.select': 'चुनें…',
   'status.draft': 'ड्राफ़्ट', 'status.pending_review': 'समीक्षा लंबित', 'status.approved': 'स्वीकृत', 'status.rejected': 'अस्वीकृत', 'status.suspended': 'निलंबित', 'status.inactive': 'निष्क्रिय',
   'owner.title': 'मेरे व्यवसाय', 'owner.add': 'व्यवसाय जोड़ें', 'owner.empty': 'आपने अभी तक कोई व्यवसाय नहीं जोड़ा है।', 'owner.reason': 'एडमिन का कारण',
@@ -65,6 +67,7 @@ const hi: M = {
 
 const mr: M = {
   'auth.google': 'Google सह पुढे जा', 'auth.or': 'किंवा', 'err.rateLimit': 'खूप ईमेल पाठवले गेले आहेत. एक तास थांबा किंवा Google ने साइन इन करा.',
+  'footer.privacy': 'गोपनीयता धोरण', 'footer.terms': 'अटी',
   'common.save': 'जतन करा', 'common.saved': 'जतन झाले', 'common.edit': 'बदला', 'common.cancel': 'रद्द करा', 'common.add': 'जोडा', 'common.select': 'निवडा…',
   'status.draft': 'मसुदा', 'status.pending_review': 'पुनरावलोकन प्रलंबित', 'status.approved': 'मंजूर', 'status.rejected': 'नाकारले', 'status.suspended': 'निलंबित', 'status.inactive': 'निष्क्रिय',
   'owner.title': 'माझे व्यवसाय', 'owner.add': 'व्यवसाय जोडा', 'owner.empty': 'तुम्ही अजून कोणताही व्यवसाय जोडलेला नाही.', 'owner.reason': 'अॅडमिनचे कारण',

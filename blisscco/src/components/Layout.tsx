@@ -42,6 +42,10 @@ export default function Layout() {
 
       <footer className="border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70">
         <Link to="/owner/register" className="underline">{t('nav.forBusiness')}</Link>
+        <p className="mt-2 space-x-3">
+          <Link to="/privacy" className="underline">{t('footer.privacy')}</Link>
+          <Link to="/terms" className="underline">{t('footer.terms')}</Link>
+        </p>
         <p className="mt-2">© Blisscco</p>
       </footer>
     </div>

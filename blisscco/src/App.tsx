@@ -12,9 +12,11 @@ import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
 import NewBusiness from './pages/owner/NewBusiness';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
+import Privacy from './pages/Privacy';
 import PostLogin from './pages/PostLogin';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
+import Terms from './pages/Terms';
 
 const owner = (el: JSX.Element) => <RequireRole roles={['owner']}>{el}</RequireRole>;
 const admin = (el: JSX.Element) => <RequireRole roles={['admin']}>{el}</RequireRole>;
@@ -24,6 +26,8 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/b/:id" element={<BusinessProfile />} />
         <Route path="/login" element={<Login role="customer" />} />
         <Route path="/register" element={<Register role="customer" />} />
