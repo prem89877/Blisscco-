@@ -84,3 +84,13 @@ Please run the steps below; if `npm run build` shows any error, send me the exac
 
 ## Not in Phase 3 (coming)
 Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons/manifest/push (10).
+
+---
+# Phase 4 - Onboarding, admin approval, public business page
+- Owner: /owner (dashboard) > /owner/business/new > /owner/business/:id (details, GPS location, photos, hours, services, terms, submit)
+- Admin: /admin > /admin/applications (review photos, services, location; approve / reject with reason; suspend / reactivate), /admin/categories
+- Public: /b/:id (approved businesses only) with services, prices, hours and Get Directions
+- No new SQL in Phase 4.
+- Known limits: material edits to an approved listing (name, location, category) are still locked (change-request flow is a later item);
+  server error text on submit is shown as returned by the database (English).
+- Not tested: I could not run npm/build here. Please run `npm run build` and send any error text.

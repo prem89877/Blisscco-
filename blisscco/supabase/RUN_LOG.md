@@ -14,6 +14,9 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | - | manual/create_first_admin.sql | Promote YOUR account to admin | Run once by hand | Not a migration |
 | - | tests/phase2_rls_tests.sql | Security tests (test project only) | Run by owner | Rolls back; run only on a test project |
 
+## Phase 4
+No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies cover it).
+
 ## Next migrations (planned)
 - 0006 PostGIS discovery + search functions (Phase 5)
 - 0007 bookings, tokens, queue (Phase 6)

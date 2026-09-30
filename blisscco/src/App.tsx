@@ -1,19 +1,29 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import RequireRole from './components/RequireRole';
+import AdminHome from './pages/admin/AdminHome';
+import Applications from './pages/admin/Applications';
+import Categories from './pages/admin/Categories';
+import BusinessProfile from './pages/BusinessProfile';
 import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Placeholder from './pages/Placeholder';
+import BusinessEditor from './pages/owner/BusinessEditor';
+import NewBusiness from './pages/owner/NewBusiness';
+import OwnerDashboard from './pages/owner/OwnerDashboard';
 import PostLogin from './pages/PostLogin';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
+
+const owner = (el: JSX.Element) => <RequireRole roles={['owner']}>{el}</RequireRole>;
+const admin = (el: JSX.Element) => <RequireRole roles={['admin']}>{el}</RequireRole>;
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/b/:id" element={<BusinessProfile />} />
         <Route path="/login" element={<Login role="customer" />} />
         <Route path="/register" element={<Register role="customer" />} />
         <Route path="/owner/login" element={<Login role="owner" />} />
@@ -22,8 +32,12 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/post-login" element={<PostLogin />} />
-        <Route path="/owner" element={<RequireRole roles={['owner']}><Placeholder titleKey="dash.owner" /></RequireRole>} />
-        <Route path="/admin" element={<RequireRole roles={['admin']}><Placeholder titleKey="dash.admin" /></RequireRole>} />
+        <Route path="/owner" element={owner(<OwnerDashboard />)} />
+        <Route path="/owner/business/new" element={owner(<NewBusiness />)} />
+        <Route path="/owner/business/:id" element={owner(<BusinessEditor />)} />
+        <Route path="/admin" element={admin(<AdminHome />)} />
+        <Route path="/admin/applications" element={admin(<Applications />)} />
+        <Route path="/admin/categories" element={admin(<Categories />)} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

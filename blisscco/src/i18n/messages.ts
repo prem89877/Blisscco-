@@ -98,4 +98,7 @@ const mr: Record<string, string> = {
   'lang.label': 'भाषा',
 };
 
-export const messages: Record<Lang, Record<string, string>> = { en, hi, mr };
+import { p4 } from './messages4';
+export const messages: Record<Lang, Record<string, string>> = {
+  en: { ...en, ...p4.en }, hi: { ...hi, ...p4.hi }, mr: { ...mr, ...p4.mr },
+};
