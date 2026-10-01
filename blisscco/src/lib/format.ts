@@ -14,3 +14,9 @@ export const mapsPointUrl = (lat: number, lng: number) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`;
 
 export const hhmm = (v: string | null) => (v ? v.slice(0, 5) : '');
+
+export function localName(en: string, hi: string | null, mr: string | null, lang: Lang): string {
+  return (lang === 'hi' ? hi : lang === 'mr' ? mr : null) || en;
+}
+
+export const distanceLabel = (m: number) => (m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`);

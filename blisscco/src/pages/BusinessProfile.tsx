@@ -74,7 +74,7 @@ export default function BusinessProfile() {
         <ul className="divide-y divide-ink/10">
           {services.map((s) => (
             <li key={s.id} className="flex items-center justify-between gap-3 py-2">
-              <div><p className="font-medium">{s.name}</p><p className="text-sm text-ink/70">{s.duration_minutes} {t('biz.min')}</p></div>
+              <p className="font-medium">{s.name || s.service_category}</p>
               <p className="font-semibold">{rupees(s.price_inr)}</p>
             </li>
           ))}

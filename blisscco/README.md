@@ -94,3 +94,13 @@ Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons
 - Known limits: material edits to an approved listing (name, location, category) are still locked (change-request flow is a later item);
   server error text on submit is shown as returned by the database (English).
 - Not tested: I could not run npm/build here. Please run `npm run build` and send any error text.
+
+---
+# Phase 5 - Discovery
+- `/` shows a welcome page (Browse shops near you / Login as a business + quotes) to visitors without an account; signed-in users go to discovery.
+- `/explore` is public. It asks for GPS only after the user taps the button, keeps it in memory only, and shows shops within 5 km.
+  The 5 km limit is enforced inside the database functions `nearby_businesses` and `search_services` (migration 0008), not in the UI.
+- Search matches service, shop name and category (English/Hindi/Marathi). Filters: category, max price, open now. Sort: nearest or lowest price.
+- "Open now" is computed from saved opening hours in India time. Ratings/reviews and PRO/ELITE badges arrive in later phases (cards say "No reviews yet").
+- Opening hours: pick open days and one time; it applies to all open days (per-day override is optional).
+- Services are now just "service + price" (no name/duration). Appointment length will be a shop-level setting in Phase 6.

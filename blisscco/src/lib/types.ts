@@ -10,7 +10,7 @@ export interface Business {
 export interface BizImage { id: string; business_id: string; storage_path: string; sort_order: number }
 export interface Hour { day_of_week: number; opens_at: string | null; closes_at: string | null; is_closed: boolean }
 export interface Service {
-  id: string; business_id: string; name: string; service_category: string; description: string | null;
-  price_inr: number; duration_minutes: number; is_active: boolean;
+  id: string; business_id: string; name: string | null; service_category: string; description: string | null;
+  price_inr: number; duration_minutes: number | null; is_active: boolean;
 }
 export interface Loaded { business: Business; categories: Category[]; images: BizImage[]; hours: Hour[]; services: Service[] }

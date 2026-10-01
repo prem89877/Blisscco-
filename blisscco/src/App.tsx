@@ -7,7 +7,8 @@ import Categories from './pages/admin/Categories';
 import AuthCallback from './pages/AuthCallback';
 import BusinessProfile from './pages/BusinessProfile';
 import ForgotPassword from './pages/ForgotPassword';
-import Home from './pages/Home';
+import Explore from './pages/Explore';
+import HomeGate from './pages/HomeGate';
 import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
 import NewBusiness from './pages/owner/NewBusiness';
@@ -25,7 +26,8 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomeGate />} />
+        <Route path="/explore" element={<Explore />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/b/:id" element={<BusinessProfile />} />
@@ -44,7 +46,7 @@ export default function App() {
         <Route path="/admin" element={admin(<AdminHome />)} />
         <Route path="/admin/applications" element={admin(<Applications />)} />
         <Route path="/admin/categories" element={admin(<Categories />)} />
-        <Route path="*" element={<Home />} />
+        <Route path="*" element={<HomeGate />} />
       </Route>
     </Routes>
   );

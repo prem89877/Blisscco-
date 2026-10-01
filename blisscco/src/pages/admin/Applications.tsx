@@ -67,7 +67,7 @@ function Detail({ b, onDone }: { b: Business; onDone: () => Promise<void> }) {
           : <div key={im.id} className="aspect-square animate-pulse rounded-lg bg-ink/10" />)}
       </div>
       <ul>{hours.map((h) => <li key={h.day_of_week}>{t(`day.${h.day_of_week}`)}: {h.is_closed ? t('ed.closed') : `${hhmm(h.opens_at)} – ${hhmm(h.closes_at)}`}</li>)}</ul>
-      <ul>{services.map((s) => <li key={s.id}>{s.name} — {rupees(s.price_inr)} · {s.duration_minutes} {t('biz.min')}</li>)}</ul>
+      <ul>{services.map((s) => <li key={s.id}>{s.name || s.service_category} — {rupees(s.price_inr)}</li>)}</ul>
 
       {(b.status === 'pending_review' || b.status === 'approved') && (
         <TextArea id={`r-${b.id}`} label={t('admin.reason')} value={reason} onChange={setReason} disabled={busy} />
