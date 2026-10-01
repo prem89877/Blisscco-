@@ -104,3 +104,13 @@ Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons
 - "Open now" is computed from saved opening hours in India time. Ratings/reviews and PRO/ELITE badges arrive in later phases (cards say "No reviews yet").
 - Opening hours: pick open days and one time; it applies to all open days (per-day override is optional).
 - Services are now just "service + price" (no name/duration). Appointment length will be a shop-level setting in Phase 6.
+
+---
+# Phase 6 - Booking, walk-in tokens, queue (migration 0009)
+- Customers (logged in) book from a shop page: appointment (date + slot) or walk-in token. Free, pay at the shop; free cancellation.
+- Appointments: slots follow the shop's opening hours and the shop's "slot length" and "customers at the same time" settings. Double-booking is blocked in the database (per-shop lock + capacity check).
+- Walk-in tokens: numbered per shop per day (unique in the database). One active token per customer per shop per day. Owners can also issue tokens for people standing in the shop (no account).
+- Queue is maintained by hand by the owner (/owner/business/:id/queue). Customers see counts, next token, estimated wait and the last-updated time; a warning shows if it is older than 1 hour.
+- Status flow (enforced): pending > confirmed > checked in > in service > completed; cancelled / no-show. Customers can only cancel their own booking. Only the shop owner can move other statuses. Every change is logged in booking_status_history.
+- Not in this phase: booking notifications / reminders (Phase 10), admin booking tools (Phase 11), reviews and referral rewards that use "completed" (Phase 7).
+- Time zone is fixed to India (Asia/Kolkata).

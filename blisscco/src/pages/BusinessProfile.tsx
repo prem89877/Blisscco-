@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import BookingPanel from '../components/BookingPanel';
 import Skeleton from '../components/Skeleton';
 import { useI18n } from '../i18n';
 import { directionsUrl, hhmm, rupees } from '../lib/format';
@@ -80,6 +81,8 @@ export default function BusinessProfile() {
           ))}
         </ul>
       </section>
+
+      <BookingPanel businessId={biz.id} services={services} hours={hours} />
 
       <section className="card space-y-2">
         <h2 className="font-display text-xl font-semibold">{t('biz.hours')}</h2>

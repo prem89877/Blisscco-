@@ -100,6 +100,7 @@ const mr: Record<string, string> = {
 
 import { p4 } from './messages4';
 import { p5 } from './messages5';
+import { p6 } from './messages6';
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en }, hi: { ...hi, ...p4.hi, ...p5.hi }, mr: { ...mr, ...p4.mr, ...p5.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en }, hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi }, mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr },
 };

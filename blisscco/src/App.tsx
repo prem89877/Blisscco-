@@ -11,7 +11,9 @@ import Explore from './pages/Explore';
 import HomeGate from './pages/HomeGate';
 import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
+import MyBookings from './pages/MyBookings';
 import NewBusiness from './pages/owner/NewBusiness';
+import OwnerQueue from './pages/owner/OwnerQueue';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
 import Privacy from './pages/Privacy';
 import PostLogin from './pages/PostLogin';
@@ -20,6 +22,7 @@ import ResetPassword from './pages/ResetPassword';
 import Terms from './pages/Terms';
 
 const owner = (el: JSX.Element) => <RequireRole roles={['owner']}>{el}</RequireRole>;
+const anyUser = (el: JSX.Element) => <RequireRole roles={['customer', 'owner', 'admin']}>{el}</RequireRole>;
 const admin = (el: JSX.Element) => <RequireRole roles={['admin']}>{el}</RequireRole>;
 
 export default function App() {
@@ -43,6 +46,8 @@ export default function App() {
         <Route path="/owner" element={owner(<OwnerDashboard />)} />
         <Route path="/owner/business/new" element={owner(<NewBusiness />)} />
         <Route path="/owner/business/:id" element={owner(<BusinessEditor />)} />
+        <Route path="/owner/business/:id/queue" element={owner(<OwnerQueue />)} />
+        <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
         <Route path="/admin" element={admin(<AdminHome />)} />
         <Route path="/admin/applications" element={admin(<Applications />)} />
         <Route path="/admin/categories" element={admin(<Categories />)} />

@@ -24,6 +24,7 @@ export default function Layout() {
             <LanguageSelect />
             {session ? (
               <>
+                <Link to="/my-bookings" className="btn-secondary hidden sm:inline-flex">{t('my.title')}</Link>
                 {home && <Link to={home} className="btn-secondary hidden sm:inline-flex">{t(profile?.role === 'admin' ? 'dash.admin' : 'dash.owner')}</Link>}
                 <button className="btn-secondary" onClick={() => void signOut()}>{t('nav.logout')}</button>
               </>
@@ -41,6 +42,7 @@ export default function Layout() {
       <main className="flex-1"><Outlet /></main>
 
       <footer className="border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70">
+        {session && <Link to="/my-bookings" className="mr-3 underline">{t('my.title')}</Link>}
         <Link to="/owner/register" className="underline">{t('nav.forBusiness')}</Link>
         <p className="mt-2 space-x-3">
           <Link to="/privacy" className="underline">{t('footer.privacy')}</Link>
