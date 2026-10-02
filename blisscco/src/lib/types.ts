@@ -41,3 +41,23 @@ export interface Review {
   id: string; business_id: string; business_name: string; reviewer_name: string | null; rating: number; comment: string | null;
   status: 'published' | 'removed'; owner_response: string | null; created_at: string;
 }
+
+// ---- Phase 8 ----
+export interface Plan {
+  code: string; kind: 'plan' | 'badge' | 'banner_pack'; name: string; amount_paise: number; duration_days: number;
+  banner_credits: number; tier_rank: number; sort_order: number;
+}
+export interface Entitlements {
+  tier_rank: number; plan_code: string | null; plan_expires_at: string | null; verified: boolean;
+  verified_expires_at: string | null; credits: number; verification_status: 'pending' | 'approved' | 'rejected' | null;
+}
+export interface PaymentTxn {
+  id: string; business_id: string; plan_code: string; amount_paise: number; status: string; refunded_paise: number; created_at: string;
+}
+export interface BannerRow {
+  id: string; business_id: string; title: string; image_path: string; status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'expired';
+  rejection_reason: string | null; starts_at: string | null; ends_at: string | null; created_at: string;
+}
+export interface VerificationRow {
+  id: string; business_id: string; doc_type: string; doc_path: string; status: 'pending' | 'approved' | 'rejected'; rejection_reason: string | null; created_at: string;
+}

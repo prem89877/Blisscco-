@@ -102,6 +102,7 @@ import { p4 } from './messages4';
 import { p5 } from './messages5';
 import { p6 } from './messages6';
 import { p7 } from './messages7';
+import { p8 } from './messages8';
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en }, hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi }, mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en }, hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi }, mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr },
 };

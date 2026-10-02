@@ -1,7 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import RequireRole from './components/RequireRole';
+import AdminBanners from './pages/admin/AdminBanners';
 import AdminHome from './pages/admin/AdminHome';
+import AdminPayments from './pages/admin/AdminPayments';
+import AdminVerifications from './pages/admin/AdminVerifications';
 import AdminReferrals from './pages/admin/AdminReferrals';
 import AdminReviews from './pages/admin/AdminReviews';
 import Applications from './pages/admin/Applications';
@@ -15,7 +18,10 @@ import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
 import MyBookings from './pages/MyBookings';
 import NewBusiness from './pages/owner/NewBusiness';
+import OwnerBanners from './pages/owner/OwnerBanners';
 import OwnerCoupons from './pages/owner/OwnerCoupons';
+import OwnerPlans from './pages/owner/OwnerPlans';
+import OwnerVerify from './pages/owner/OwnerVerify';
 import OwnerQueue from './pages/owner/OwnerQueue';
 import OwnerReviews from './pages/owner/OwnerReviews';
 import Refer from './pages/Refer';
@@ -55,6 +61,12 @@ export default function App() {
         <Route path="/owner/business/:id/queue" element={owner(<OwnerQueue />)} />
         <Route path="/owner/business/:id/reviews" element={owner(<OwnerReviews />)} />
         <Route path="/owner/business/:id/coupons" element={owner(<OwnerCoupons />)} />
+        <Route path="/owner/business/:id/plans" element={owner(<OwnerPlans />)} />
+        <Route path="/owner/business/:id/banners" element={owner(<OwnerBanners />)} />
+        <Route path="/owner/business/:id/verify" element={owner(<OwnerVerify />)} />
+        <Route path="/admin/banners" element={admin(<AdminBanners />)} />
+        <Route path="/admin/verifications" element={admin(<AdminVerifications />)} />
+        <Route path="/admin/payments" element={admin(<AdminPayments />)} />
         <Route path="/refer" element={customer(<Refer />)} />
         <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
         <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />

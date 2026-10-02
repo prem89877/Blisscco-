@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Field from '../components/Field';
 import ReferralBanner from '../components/ReferralBanner';
+import BannerStrip from '../components/BannerStrip';
 import { Stars } from '../components/Stars';
+import { TierChip, VerifiedTick } from '../components/TierBadge';
 import { Check, Msg, Select } from '../components/ui';
 import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
@@ -15,19 +17,19 @@ const PAGE = 20;
 
 interface Row {
   bid: string; key: string; to: string; title: string; business: string | null; catEn: string; catHi: string | null; catMr: string | null;
-  city: string | null; services: number | null; price: number | null; isFrom: boolean; distance: number; open: boolean; cover: string | null;
+  city: string | null; services: number | null; price: number | null; isFrom: boolean; distance: number; open: boolean; cover: string | null; tier: number; verified: boolean;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromBiz = (r: any): Row => ({
   bid: r.business_id, key: r.business_id, to: `/b/${r.business_id}`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
   catMr: r.category_name_mr, city: r.city, services: r.service_count, price: r.min_price, isFrom: true, distance: r.distance_m,
-  open: r.is_open_now, cover: r.cover_path,
+  open: r.is_open_now, cover: r.cover_path, tier: r.tier_rank ?? 0, verified: !!r.is_verified,
 });
 const fromSvc = (r: any): Row => ({
   bid: r.business_id, key: r.service_id, to: `/b/${r.business_id}`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
   catHi: r.category_name_hi, catMr: r.category_name_mr, city: r.city, services: null, price: r.price_inr, isFrom: false,
-  distance: r.distance_m, open: r.is_open_now, cover: r.cover_path,
+  distance: r.distance_m, open: r.is_open_now, cover: r.cover_path, tier: r.tier_rank ?? 0, verified: !!r.is_verified,
 });
 
 export default function Explore() {
@@ -112,6 +114,7 @@ export default function Explore() {
       </div>
 
       <ReferralBanner />
+      <BannerStrip lat={coords.lat} lng={coords.lng} />
       <Field id="q" label={t('home.search')} value={q} onChange={setQ} />
       <div className="grid grid-cols-2 gap-3">
         <Select id="cat" label={t('explore.category')} value={category} onChange={setCategory}
@@ -134,8 +137,8 @@ export default function Explore() {
                 ? <img src={urls[r.cover]} alt="" loading="lazy" className="h-24 w-24 flex-none rounded-xl object-cover" />
                 : <div className="h-24 w-24 flex-none rounded-xl bg-ink/10" />}
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{r.title}</p>
-                {r.business && <p className="truncate text-sm">{r.business}</p>}
+                <p className="flex items-center gap-1.5 font-semibold"><span className="truncate">{r.title}</span>{!r.business && r.verified && <VerifiedTick size={16} />}{!r.business && <TierChip rank={r.tier} />}</p>
+                {r.business && <p className="flex items-center gap-1.5 text-sm"><span className="truncate">{r.business}</span>{r.verified && <VerifiedTick size={14} />}<TierChip rank={r.tier} /></p>}
                 <p className="truncate text-xs text-ink/70">{[localName(r.catEn, r.catHi, r.catMr, lang), r.city].filter(Boolean).join(' · ')}</p>
                 <p className="text-xs text-ink/60">{ratings[r.bid] ? <><Stars value={ratings[r.bid].avg_rating} /> {ratings[r.bid].avg_rating} ({ratings[r.bid].review_count})</> : t('biz.noReviews')}{r.services !== null ? ` · ${t('explore.services', { n: r.services })}` : ''}</p>
                 <p className="mt-1 flex items-center gap-2 text-xs">

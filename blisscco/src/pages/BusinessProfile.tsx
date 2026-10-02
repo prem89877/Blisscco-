@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import BookingPanel from '../components/BookingPanel';
 import { RatingLine, ReviewsSection } from '../components/ReviewsSection';
 import Skeleton from '../components/Skeleton';
+import { TierChip, VerifiedTick } from '../components/TierBadge';
 import { useI18n } from '../i18n';
 import { directionsUrl, hhmm, rupees } from '../lib/format';
 import { signedUrlMap } from '../lib/storage';
@@ -23,6 +24,7 @@ export default function BusinessProfile() {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [hours, setHours] = useState<Hour[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [flags, setFlags] = useState<{ tier_rank: number; is_verified: boolean } | null>(null);
 
   useEffect(() => {
     if (!id) { setBiz(null); return; }
@@ -32,6 +34,8 @@ export default function BusinessProfile() {
       if (!alive) return;
       if (b.error || !b.data) { setBiz(null); return; }
       setBiz(b.data as Pub);
+      void supabase.from('public_business_flags').select('tier_rank,is_verified').eq('business_id', id).maybeSingle()
+        .then(({ data }) => { if (alive && data) setFlags(data as { tier_rank: number; is_verified: boolean }); });
       const [i, h, s] = await Promise.all([
         supabase.from('business_images').select('*').eq('business_id', id).order('sort_order'),
         supabase.from('business_hours').select('*').eq('business_id', id).order('day_of_week'),
@@ -61,7 +65,7 @@ export default function BusinessProfile() {
       </div>
       <header>
         <p className="text-sm text-ink/70">{cat}</p>
-        <h1 className="font-display text-3xl font-semibold">{biz.name}</h1>
+        <h1 className="flex flex-wrap items-center gap-2 font-display text-3xl font-semibold">{biz.name}{flags?.is_verified && <VerifiedTick size={26} />}{flags && <TierChip rank={flags.tier_rank} />}</h1>
         <RatingLine businessId={biz.id} />
       </header>
       {desc && <p>{desc}</p>}

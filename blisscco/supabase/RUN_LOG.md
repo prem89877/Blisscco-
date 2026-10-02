@@ -16,6 +16,8 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0008 | migrations/0008_discovery.sql | 5 km nearby_businesses + search_services | Yes | Safe to re-run |
 | 0009 | migrations/0009_bookings_queue.sql | bookings, tokens, queue settings, booking functions | Yes | Safe to re-run |
 | 0010 | migrations/0010_reviews_referrals.sql | reviews, referrals, coupons, redemption | NOT YET - run this | Safe to re-run |
+| 0011 | migrations/0011_subscriptions_payments_banners.sql | plans, payments, webhook idempotency, banners, credits, verification, ranking, pg_cron | NOT YET - run this | Needs pg_cron enabled; drops and recreates nearby_businesses / search_services (2 new columns); safe to re-run |
+| - | tests/phase8_payments_tests.sql | Payment/entitlement/refund tests (test project only) | Run after 0011 | Rolls back |
 | - | manual/create_first_admin.sql | Promote YOUR account to admin | Run once by hand | Not a migration |
 | - | tests/phase7_reviews_referrals_tests.sql | Reviews/referral/coupon tests (test project only) | Run after 0010 | Rolls back |
 | - | tests/phase6_booking_tests.sql | Booking tests (test project only) | Run after 0009 | Rolls back |
@@ -26,4 +28,4 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies cover it).
 
 ## Next migrations (planned)
-- 0011 subscriptions, payments, banners, verified badge (Phase 8)
+- Phase 9+ : analytics screen (uses has_entitlement(..., 'analytics')), notifications / renewal emails (Phase 10)

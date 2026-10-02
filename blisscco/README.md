@@ -126,3 +126,51 @@ Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons
   Shops can opt out ("Accept referral coupons") in Booking settings. UPDATE your listing Terms & Conditions text to mention this.
 - Phone verification needs an SMS provider in Supabase (Authentication > Sign In / Providers > Phone, e.g. Twilio / MSG91). Until then, rewards cannot be earned.
 - Not in this phase: rating sort in search, review photos, campaigns beyond the single global one.
+
+---
+
+# Phase 8 - Plans, Razorpay payments, banners, blue badge (migration 0011 + Vercel API routes)
+
+## Status (honest)
+Written but **not run**: I had no database, npm or network here. A syntax-only TypeScript check passed; a real
+`npm install && npm run build`, the SQL migration and `tests/phase8_payments_tests.sql` still need to be run by you.
+The Razorpay raw-body signature check in particular must be proven with a Razorpay **test** webhook (see step 6).
+
+## Prices (my assumption - please confirm)
+Your four numbers were 499, 799, 99, 599. I mapped them as: **PRO 499/month, ELITE 799/month, Blue badge 99 (valid 365 days), Extra banner 599 (= +1 banner credit)**.
+They live only in `public.plans` (paise). To change: `update public.plans set amount_paise = 59900 where code = 'banner_extra';`
+(also `duration_days`, `banner_credits`). The browser never sends a price.
+
+## How it works
+- **Entitlements:** `has_entitlement(business, 'analytics' | 'banner' | 'priority' | 'blue_badge')` checks expiry live, so an expired plan stops
+  counting at the exact second, even before the job runs. `pg_cron` job `blisscco-expire-subscriptions` runs daily at 00:00 India time and marks rows expired.
+- **Credits:** each paid PRO month grants 2 banner credits, ELITE 5 (ledger table `banner_credits`). A banner uses 1 credit, runs 30 days after admin approval,
+  and the credit comes back if the banner is rejected or cancelled while pending. Creating/showing a banner needs an active PRO/ELITE plan.
+- **Ranking:** inside `nearby_businesses` / `search_services` (still only 5 km): ELITE first, then PRO, then FREE; your chosen sort (distance/price) applies inside each tier.
+  Paid shops carry a PRO/ELITE chip and the blue tick shows next to the name. Banners appear above results, labelled "Sponsored".
+- **Payment flow:** `/api/create-order` checks your login token, calls `create_payment_txn` (ownership, approved shop, amount from DB), creates the Razorpay order,
+  returns it to Checkout. Nothing activates from the browser redirect. `/api/razorpay-webhook` verifies the HMAC-SHA256 signature of the raw body, then
+  `process_razorpay_event` (service-role only) activates inside ONE transaction.
+- **Replay safety (3 layers):** `webhook_events.event_id` is the primary key; a transaction can only be `created -> paid` once; `subscriptions.payment_transaction_id` is unique.
+- **Amount check:** captured amount/currency must equal the amount stored at order time, else status `amount_mismatch` and nothing activates (visible in /admin/payments).
+- **Refunds:** `refund.processed` is handled. Full refund = subscription marked `refunded` (benefit ends at once) and that payment's credits reversed. Partial refund = recorded only; entitlement stays (admin decides).
+- **Blue badge:** owner uploads a GST / shop-licence / Udyam document (private bucket, only owner + admin) > admin approves at /admin/verifications > owner pays the badge fee > tick shows.
+- **Renewals:** no auto-debit yet. Renewing a still-active plan stacks the new period after the current expiry. The plans page shows a reminder banner in the last 7 days.
+  (Email/push reminder arrives with notifications in Phase 10.)
+
+## Setup steps
+1. Supabase > Database > Extensions: enable **pg_cron** (if the migration prints a notice that scheduling was skipped, enable it and re-run 0011).
+2. Run `migrations/0011_subscriptions_payments_banners.sql`, then on a TEST project `tests/phase8_payments_tests.sql` (expect `ALL PHASE 8 TESTS PASSED`).
+   Run 0010 first if you have not (RUN_LOG still shows it as not run).
+3. `npm install` (adds `@vercel/node`), `npm run build`.
+4. Razorpay Dashboard (Test mode): copy Key Id + Key Secret.
+5. Vercel > Settings > Environment Variables: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` (Sensitive), `RAZORPAY_WEBHOOK_SECRET` (Sensitive), `SUPABASE_SERVICE_ROLE_KEY` (Sensitive). Redeploy.
+6. Razorpay > Webhooks > Add: URL `https://YOUR-SITE/api/razorpay-webhook`, your own secret (same as `RAZORPAY_WEBHOOK_SECRET`), events: `payment.captured`, `refund.processed` (others are harmless).
+   Test: buy PRO with a Razorpay test card, check `/admin/payments` shows `activated`. Use the dashboard's "resend" to prove the replay shows `duplicate`.
+7. Go live only after Razorpay KYC is approved: swap to live keys + a live-mode webhook.
+
+## Known limits
+- Search ranking puts paid tiers first even when sorting by price (this is what "ELITE > PRO > FREE" means); the chip makes it visible.
+- Upgrading PRO > ELITE midway is not pro-rated: both periods run, the higher tier wins while both are active.
+- Razorpay Subscriptions (auto-renewal), GST invoices, and the analytics screen itself (only the `analytics` entitlement exists) are not in this phase.
+- Terms & Conditions / refund policy text must mention paid plans before you take live payments.

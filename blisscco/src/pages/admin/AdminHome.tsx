@@ -10,6 +10,9 @@ export default function AdminHome() {
       <Link to="/admin/categories" className="card block font-medium">{t('admin.categories')}</Link>
       <Link to="/admin/reviews" className="card block font-medium">{t('ad.reviews')}</Link>
       <Link to="/admin/referrals" className="card block font-medium">{t('ad.referrals')}</Link>
+      <Link to="/admin/banners" className="card block font-medium">{t('p8.adBanners')}</Link>
+      <Link to="/admin/verifications" className="card block font-medium">{t('p8.adVerify')}</Link>
+      <Link to="/admin/payments" className="card block font-medium">{t('p8.adPayments')}</Link>
     </section>
   );
 }
