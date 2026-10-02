@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BookingPanel from '../components/BookingPanel';
+import { RatingLine, ReviewsSection } from '../components/ReviewsSection';
 import Skeleton from '../components/Skeleton';
 import { useI18n } from '../i18n';
 import { directionsUrl, hhmm, rupees } from '../lib/format';
@@ -61,7 +62,7 @@ export default function BusinessProfile() {
       <header>
         <p className="text-sm text-ink/70">{cat}</p>
         <h1 className="font-display text-3xl font-semibold">{biz.name}</h1>
-        <p className="text-sm text-ink/70">{t('biz.noReviews')}</p>
+        <RatingLine businessId={biz.id} />
       </header>
       {desc && <p>{desc}</p>}
       <p className="text-sm">{[biz.address_line, biz.city, biz.state, biz.pincode].filter(Boolean).join(', ')}</p>
@@ -90,6 +91,7 @@ export default function BusinessProfile() {
           {hours.map((h) => <li key={h.day_of_week} className="flex justify-between py-1"><span>{t(`day.${h.day_of_week}`)}</span><span>{h.is_closed ? t('ed.closed') : `${hhmm(h.opens_at)} – ${hhmm(h.closes_at)}`}</span></li>)}
         </ul>
       </section>
+      <ReviewsSection businessId={biz.id} />
     </article>
   );
 }

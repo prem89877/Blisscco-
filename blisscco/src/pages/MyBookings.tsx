@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ReviewForm from '../components/ReviewForm';
 import { Msg } from '../components/ui';
+import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { bookingErrKey } from '../lib/bookingErrors';
 import { fmtDateTime, rupees } from '../lib/format';
@@ -11,15 +13,24 @@ const ACTIVE = ['pending', 'confirmed', 'checked_in', 'in_service'];
 
 export default function MyBookings() {
   const { t, lang } = useI18n();
+  const { session } = useAuth();
   const [rows, setRows] = useState<Booking[] | null>(null);
+  const [reviewed, setReviewed] = useState<Set<string>>(new Set());
+  const [openReview, setOpenReview] = useState<string | null>(null);
   const [errKey, setErrKey] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const uid = session?.user.id;
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false }).limit(50);
-    if (error) { console.error(error); setErrKey('err.generic'); return; }
-    setRows((data ?? []) as Booking[]);
-  }, []);
+    if (!uid) return;
+    const [b, r] = await Promise.all([
+      supabase.from('bookings').select('*').order('created_at', { ascending: false }).limit(50),
+      supabase.from('reviews').select('booking_id').eq('customer_id', uid),
+    ]);
+    if (b.error) { console.error(b.error); setErrKey('err.generic'); return; }
+    setRows((b.data ?? []) as Booking[]);
+    setReviewed(new Set(((r.data ?? []) as { booking_id: string }[]).map((x) => x.booking_id)));
+  }, [uid]);
   useEffect(() => { void load(); }, [load]);
 
   async function cancel(id: string) {
@@ -45,6 +56,11 @@ export default function MyBookings() {
       {['pending', 'confirmed', 'checked_in'].includes(b.status) && (
         <button className="btn-secondary" disabled={busyId === b.id} onClick={() => void cancel(b.id)}>{t('my.cancel')}</button>
       )}
+      {b.status === 'completed' && (reviewed.has(b.id)
+        ? <p className="text-sm text-green-800">{t('rv.reviewed')}</p>
+        : openReview === b.id
+          ? <ReviewForm bookingId={b.id} onDone={load} />
+          : <button className="btn-secondary" onClick={() => setOpenReview(b.id)}>{t('rv.write')}</button>)}
     </li>
   );
 

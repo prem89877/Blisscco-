@@ -30,5 +30,14 @@ export interface QueueInfo {
 export interface BookingSettings {
   business_id: string; appointments_enabled: boolean; walkin_enabled: boolean; slot_minutes: number; capacity: number;
   max_days_ahead: number; queue_status: 'open' | 'paused' | 'closed'; est_wait_minutes: number | null;
-  temporarily_unavailable: boolean; queue_updated_at: string;
+  temporarily_unavailable: boolean; queue_updated_at: string; accept_coupons: boolean;
+}
+
+export interface Coupon {
+  id: string; code: string; discount_type: 'percent' | 'flat'; discount_value: number; max_discount_inr: number | null;
+  min_spend_inr: number; status: 'active' | 'redeemed' | 'revoked'; expires_at: string; created_at: string;
+}
+export interface Review {
+  id: string; business_id: string; business_name: string; reviewer_name: string | null; rating: number; comment: string | null;
+  status: 'published' | 'removed'; owner_response: string | null; created_at: string;
 }

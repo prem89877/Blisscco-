@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
-import { isSupabaseConfigured } from '../lib/supabase';
+import { clearRef, getStoredRef } from '../lib/referral';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import LanguageSelect from './LanguageSelect';
 import Logo from './Logo';
 
@@ -12,6 +13,14 @@ export default function Layout() {
 
   // Apply the saved language preference once the profile loads
   useEffect(() => { if (profile?.language) setLang(profile.language); }, [profile?.language, setLang]);
+
+  // A new customer who arrived through a referral link is attributed once, by the server
+  useEffect(() => {
+    if (profile?.role !== 'customer') return;
+    const code = getStoredRef();
+    if (!code) return;
+    void supabase.rpc('claim_referral', { p_code: code }).then(() => clearRef());
+  }, [profile?.id, profile?.role]);
 
   const home = profile?.role === 'admin' ? '/admin' : profile?.role === 'owner' ? '/owner' : null;
 
@@ -42,6 +51,7 @@ export default function Layout() {
       <main className="flex-1"><Outlet /></main>
 
       <footer className="border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70">
+        {profile?.role === 'customer' && <Link to="/refer" className="mr-3 underline">{t('ref.title')}</Link>}
         {session && <Link to="/my-bookings" className="mr-3 underline">{t('my.title')}</Link>}
         <Link to="/owner/register" className="underline">{t('nav.forBusiness')}</Link>
         <p className="mt-2 space-x-3">

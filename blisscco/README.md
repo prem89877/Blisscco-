@@ -114,3 +114,15 @@ Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons
 - Status flow (enforced): pending > confirmed > checked in > in service > completed; cancelled / no-show. Customers can only cancel their own booking. Only the shop owner can move other statuses. Every change is logged in booking_status_history.
 - Not in this phase: booking notifications / reminders (Phase 10), admin booking tools (Phase 11), reviews and referral rewards that use "completed" (Phase 7).
 - Time zone is fixed to India (Asia/Kolkata).
+
+---
+# Phase 7 - Reviews, Refer & Earn, business-funded coupons (migration 0010)
+- Reviews: only the customer of a COMPLETED booking can review it, once (enforced in the database). Owners can reply and report; admin removes (audited). Ratings are averaged from real published reviews only. Review photos are NOT included yet.
+- Refer & Earn (/refer): each customer gets a unique code/link (WhatsApp, share, copy). Reward flow, all checked in the database:
+  new customer joins via link (attribution fixed once) > verifies phone (Supabase Auth, never client-supplied) > a shop that is not the referrer's/referred's
+  marks a service completed > one random coupon is issued to the referrer. One reward per verified phone number; self-referral blocked.
+- The campaign is OFF until an admin adds reward options and switches it on (/admin/referrals). No amount is advertised before that.
+- Coupons: unique secure codes, expiry, min spend, discount cap, single use. The shop that redeems funds the discount (/owner/business/:id/coupons).
+  Shops can opt out ("Accept referral coupons") in Booking settings. UPDATE your listing Terms & Conditions text to mention this.
+- Phone verification needs an SMS provider in Supabase (Authentication > Sign In / Providers > Phone, e.g. Twilio / MSG91). Until then, rewards cannot be earned.
+- Not in this phase: rating sort in search, review photos, campaigns beyond the single global one.

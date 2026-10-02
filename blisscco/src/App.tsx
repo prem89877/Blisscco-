@@ -2,6 +2,8 @@ import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import RequireRole from './components/RequireRole';
 import AdminHome from './pages/admin/AdminHome';
+import AdminReferrals from './pages/admin/AdminReferrals';
+import AdminReviews from './pages/admin/AdminReviews';
 import Applications from './pages/admin/Applications';
 import Categories from './pages/admin/Categories';
 import AuthCallback from './pages/AuthCallback';
@@ -13,7 +15,10 @@ import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
 import MyBookings from './pages/MyBookings';
 import NewBusiness from './pages/owner/NewBusiness';
+import OwnerCoupons from './pages/owner/OwnerCoupons';
 import OwnerQueue from './pages/owner/OwnerQueue';
+import OwnerReviews from './pages/owner/OwnerReviews';
+import Refer from './pages/Refer';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
 import Privacy from './pages/Privacy';
 import PostLogin from './pages/PostLogin';
@@ -23,6 +28,7 @@ import Terms from './pages/Terms';
 
 const owner = (el: JSX.Element) => <RequireRole roles={['owner']}>{el}</RequireRole>;
 const anyUser = (el: JSX.Element) => <RequireRole roles={['customer', 'owner', 'admin']}>{el}</RequireRole>;
+const customer = (el: JSX.Element) => <RequireRole roles={['customer']}>{el}</RequireRole>;
 const admin = (el: JSX.Element) => <RequireRole roles={['admin']}>{el}</RequireRole>;
 
 export default function App() {
@@ -47,6 +53,11 @@ export default function App() {
         <Route path="/owner/business/new" element={owner(<NewBusiness />)} />
         <Route path="/owner/business/:id" element={owner(<BusinessEditor />)} />
         <Route path="/owner/business/:id/queue" element={owner(<OwnerQueue />)} />
+        <Route path="/owner/business/:id/reviews" element={owner(<OwnerReviews />)} />
+        <Route path="/owner/business/:id/coupons" element={owner(<OwnerCoupons />)} />
+        <Route path="/refer" element={customer(<Refer />)} />
+        <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
+        <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />
         <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
         <Route path="/admin" element={admin(<AdminHome />)} />
         <Route path="/admin/applications" element={admin(<Applications />)} />

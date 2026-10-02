@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Field from '../components/Field';
+import ReferralBanner from '../components/ReferralBanner';
+import { Stars } from '../components/Stars';
 import { Check, Msg, Select } from '../components/ui';
 import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
@@ -12,18 +14,18 @@ import type { Category } from '../lib/types';
 const PAGE = 20;
 
 interface Row {
-  key: string; to: string; title: string; business: string | null; catEn: string; catHi: string | null; catMr: string | null;
+  bid: string; key: string; to: string; title: string; business: string | null; catEn: string; catHi: string | null; catMr: string | null;
   city: string | null; services: number | null; price: number | null; isFrom: boolean; distance: number; open: boolean; cover: string | null;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromBiz = (r: any): Row => ({
-  key: r.business_id, to: `/b/${r.business_id}`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
+  bid: r.business_id, key: r.business_id, to: `/b/${r.business_id}`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
   catMr: r.category_name_mr, city: r.city, services: r.service_count, price: r.min_price, isFrom: true, distance: r.distance_m,
   open: r.is_open_now, cover: r.cover_path,
 });
 const fromSvc = (r: any): Row => ({
-  key: r.service_id, to: `/b/${r.business_id}`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
+  bid: r.business_id, key: r.service_id, to: `/b/${r.business_id}`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
   catHi: r.category_name_hi, catMr: r.category_name_mr, city: r.city, services: null, price: r.price_inr, isFrom: false,
   distance: r.distance_m, open: r.is_open_now, cover: r.cover_path,
 });
@@ -41,6 +43,7 @@ export default function Explore() {
   const [sort, setSort] = useState('distance');
   const [rows, setRows] = useState<Row[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
+  const [ratings, setRatings] = useState<Record<string, { avg_rating: number; review_count: number }>>({});
   const [loading, setLoading] = useState(false);
   const [errKey, setErrKey] = useState('');
   const [hasMore, setHasMore] = useState(false);
@@ -77,6 +80,12 @@ export default function Explore() {
     setHasMore(mapped.length === PAGE);
     const m = await signedUrlMap(mapped.map((r) => r.cover).filter((x): x is string => !!x));
     if (id === reqId.current) setUrls((prev) => ({ ...prev, ...m }));
+    const ids = [...new Set(mapped.map((r) => r.bid))];
+    if (ids.length > 0) {
+      const rt = await supabase.from('public_business_ratings').select('business_id,avg_rating,review_count').in('business_id', ids);
+      const got = (rt.data ?? []) as { business_id: string; avg_rating: number; review_count: number }[];
+      if (id === reqId.current) setRatings((prev) => ({ ...prev, ...Object.fromEntries(got.map((x) => [x.business_id, x])) }));
+    }
   }, [coords, dq, dm, category, openNow, sort]);
 
   useEffect(() => { void load(0); }, [load]);
@@ -102,6 +111,7 @@ export default function Explore() {
         <p className="text-sm text-ink/70">{t('explore.within')}</p>
       </div>
 
+      <ReferralBanner />
       <Field id="q" label={t('home.search')} value={q} onChange={setQ} />
       <div className="grid grid-cols-2 gap-3">
         <Select id="cat" label={t('explore.category')} value={category} onChange={setCategory}
@@ -127,7 +137,7 @@ export default function Explore() {
                 <p className="truncate font-semibold">{r.title}</p>
                 {r.business && <p className="truncate text-sm">{r.business}</p>}
                 <p className="truncate text-xs text-ink/70">{[localName(r.catEn, r.catHi, r.catMr, lang), r.city].filter(Boolean).join(' · ')}</p>
-                <p className="text-xs text-ink/60">{t('biz.noReviews')}{r.services !== null ? ` · ${t('explore.services', { n: r.services })}` : ''}</p>
+                <p className="text-xs text-ink/60">{ratings[r.bid] ? <><Stars value={ratings[r.bid].avg_rating} /> {ratings[r.bid].avg_rating} ({ratings[r.bid].review_count})</> : t('biz.noReviews')}{r.services !== null ? ` · ${t('explore.services', { n: r.services })}` : ''}</p>
                 <p className="mt-1 flex items-center gap-2 text-xs">
                   <span className={`rounded-full px-2 py-0.5 font-medium ${r.open ? 'bg-green-100 text-green-900' : 'bg-ink/10 text-ink/70'}`}>{r.open ? t('explore.openNow') : t('explore.closedNow')}</span>
                   <span>{distanceLabel(r.distance)}</span>

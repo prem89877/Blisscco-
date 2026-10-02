@@ -8,6 +8,8 @@ export default function AdminHome() {
       <h1 className="font-display text-2xl font-semibold">{t('dash.admin')}</h1>
       <Link to="/admin/applications" className="card block font-medium">{t('admin.applications')}</Link>
       <Link to="/admin/categories" className="card block font-medium">{t('admin.categories')}</Link>
+      <Link to="/admin/reviews" className="card block font-medium">{t('ad.reviews')}</Link>
+      <Link to="/admin/referrals" className="card block font-medium">{t('ad.referrals')}</Link>
     </section>
   );
 }

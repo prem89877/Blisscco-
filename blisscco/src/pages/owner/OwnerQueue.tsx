@@ -36,7 +36,7 @@ export default function OwnerQueue() {
   const [ok, setOk] = useState('');
   const [busy, setBusy] = useState(false);
   const [ctl, setCtl] = useState({ queue_status: 'open', est: '', unavailable: false });
-  const [cfg, setCfg] = useState({ slot: '30', capacity: '1', days: '14', appt: true, walkin: true });
+  const [cfg, setCfg] = useState({ slot: '30', capacity: '1', days: '14', appt: true, walkin: true, coupons: true });
   const [issue, setIssue] = useState({ service: '', guest: '' });
 
   const load = useCallback(async (initial = false) => {
@@ -57,7 +57,7 @@ export default function OwnerQueue() {
     setBookings((bk.data ?? []) as Booking[]);
     if (initial) {
       setCtl({ queue_status: settings.queue_status, est: settings.est_wait_minutes === null ? '' : String(settings.est_wait_minutes), unavailable: settings.temporarily_unavailable });
-      setCfg({ slot: String(settings.slot_minutes), capacity: String(settings.capacity), days: String(settings.max_days_ahead), appt: settings.appointments_enabled, walkin: settings.walkin_enabled });
+      setCfg({ slot: String(settings.slot_minutes), capacity: String(settings.capacity), days: String(settings.max_days_ahead), appt: settings.appointments_enabled, walkin: settings.walkin_enabled, coupons: settings.accept_coupons });
       setIssue((p) => ({ ...p, service: p.service || ((sv.data ?? []) as Service[])[0]?.id || '' }));
     }
   }, [id]);
@@ -85,7 +85,7 @@ export default function OwnerQueue() {
     e.preventDefault();
     const slot = Number(cfg.slot), cap = Number(cfg.capacity), days = Number(cfg.days);
     if (![slot, cap, days].every(Number.isInteger) || slot < 10 || slot > 240 || cap < 1 || cap > 50 || days < 1 || days > 60) { setErrKey('oq.invalid'); return; }
-    void saveSettings({ slot_minutes: slot, capacity: cap, max_days_ahead: days, appointments_enabled: cfg.appt, walkin_enabled: cfg.walkin });
+    void saveSettings({ slot_minutes: slot, capacity: cap, max_days_ahead: days, appointments_enabled: cfg.appt, walkin_enabled: cfg.walkin, accept_coupons: cfg.coupons });
   }
 
   async function setStatus(bid: string, to: BookingStatus) {
@@ -183,6 +183,7 @@ export default function OwnerQueue() {
           <Field id="dy" label={t('oq.daysAhead')} value={cfg.days} onChange={(v) => setCfg({ ...cfg, days: v })} disabled={busy} />
           <Check id="ap" label={t('oq.apptOn')} checked={cfg.appt} onChange={(v) => setCfg({ ...cfg, appt: v })} disabled={busy} />
           <Check id="wk" label={t('oq.walkinOn')} checked={cfg.walkin} onChange={(v) => setCfg({ ...cfg, walkin: v })} disabled={busy} />
+          <Check id="cu" label={t('oq.acceptCoupons')} checked={cfg.coupons} onChange={(v) => setCfg({ ...cfg, coupons: v })} disabled={busy} />
           <button type="submit" className="btn-primary w-full" disabled={busy}>{t('common.save')}</button>
         </form>
       </Section>
