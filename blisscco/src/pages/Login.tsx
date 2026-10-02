@@ -44,14 +44,14 @@ export default function Login({ role }: { role: 'customer' | 'owner' | 'admin' }
         <button type="submit" className="btn-primary w-full" disabled={busy}>{busy ? t('common.loading') : t('auth.login')}</button>
       </form>
       <div className="space-y-2 text-center text-sm">
-        <Link to="/forgot-password" className="underline">{t('auth.forgot')}</Link>
+        <Link to="/forgot-password" className="btn-text">{t('auth.forgot')}</Link>
         {role !== 'admin' && (
           <p>{t('auth.noAccount')}{' '}
-            <Link to={role === 'owner' ? '/owner/register' : '/register'} className="font-medium underline">{t('nav.register')}</Link>
+            <Link to={role === 'owner' ? '/owner/register' : '/register'} className="font-medium btn-text">{t('nav.register')}</Link>
           </p>
         )}
-        {role === 'customer' && <p><Link to="/owner/login" className="underline">{t('auth.iAmOwner')}</Link></p>}
-        {role === 'owner' && <p><Link to="/login" className="underline">{t('auth.iAmCustomer')}</Link></p>}
+        {role === 'customer' && <p><Link to="/owner/login" className="btn-text">{t('auth.iAmOwner')}</Link></p>}
+        {role === 'owner' && <p><Link to="/login" className="btn-text">{t('auth.iAmCustomer')}</Link></p>}
       </div>
     </AuthCard>
   );

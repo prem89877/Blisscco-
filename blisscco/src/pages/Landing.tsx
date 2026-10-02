@@ -23,7 +23,7 @@ export default function Landing() {
       <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3">
         <Link to="/explore" className="btn-primary min-h-[52px] text-base">{t('landing.browse')}</Link>
         <Link to="/owner/login" className="btn min-h-[52px] bg-ink text-base text-cream hover:bg-ink/90">{t('landing.business')}</Link>
-        <Link to="/login" className="text-sm underline">{t('landing.customerLogin')}</Link>
+        <Link to="/login" className="text-sm btn-text">{t('landing.customerLogin')}</Link>
       </div>
 
       <figure className="card mx-auto mt-10 max-w-md space-y-4 p-6">

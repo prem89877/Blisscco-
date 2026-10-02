@@ -32,7 +32,7 @@ export default function AdminReviews() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/admin" className="text-sm underline">← {t('dash.admin')}</Link>
+      <Link to="/admin" className="text-sm btn-text">← {t('dash.admin')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('ad.reviews')}</h1>
       <Msg error={errKey ? t(errKey) : ''} />
       {rows === null && !errKey && <div className="h-24 animate-pulse rounded-2xl bg-ink/10" />}

@@ -46,7 +46,7 @@ export default function MyBookings() {
     <li key={b.id} className="card space-y-2">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <Link to={`/b/${b.business_id}`} className="font-semibold underline">{b.business_name}</Link>
+          <Link to={`/b/${b.business_id}`} className="font-semibold btn-text">{b.business_name}</Link>
           <p className="text-sm">{b.service_label} · {rupees(b.price_inr)}</p>
         </div>
         <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(`bs.${b.status}`)}</span>

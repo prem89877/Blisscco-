@@ -9,7 +9,11 @@
 
 @layer components {
   .btn { @apply inline-flex min-h-[44px] items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60; }
-  .btn-primary { @apply btn bg-blush text-ink shadow-card hover:brightness-95; }
+  /* Text buttons: no background, no border, no underline */
+  .btn-primary { @apply btn font-semibold text-rosedeep hover:text-ink active:opacity-70; }
+  .btn-text { @apply inline-flex min-h-[44px] items-center px-1 font-medium text-rosedeep transition hover:text-ink active:opacity-70; }
+  .btn-text-muted { @apply btn font-medium text-ink/60 hover:text-ink active:opacity-70; }
+  .link-text { @apply font-medium text-rosedeep transition hover:text-ink; }
   .btn-secondary { @apply btn border border-ink/20 text-ink hover:bg-ink/5; }
   .input { @apply min-h-[44px] w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-base text-ink placeholder:text-ink/40 disabled:bg-ink/5; }
   .card { @apply rounded-2xl bg-white p-5 shadow-card; }

@@ -47,7 +47,7 @@ export default function OwnerCoupons() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">← {t('owner.title')}</Link>
+      <Link to="/owner" className="text-sm btn-text">← {t('owner.title')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('oc.title')}</h1>
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t('oc.fundNote')}</p>
       <Section title={t('oc.code')}>

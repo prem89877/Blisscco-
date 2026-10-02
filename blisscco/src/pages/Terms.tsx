@@ -26,7 +26,7 @@ export default function Terms() {
       <H>Governing law</H>
       <p>These terms are governed by the laws of India.</p>
       <H>Contact</H>
-      <p><a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+      <p><a className="link-text" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
     </LegalPage>
   );
 }

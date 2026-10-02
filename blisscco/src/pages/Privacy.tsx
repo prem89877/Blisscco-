@@ -23,7 +23,7 @@ export default function Privacy() {
       <H>Retention and security</H>
       <p>We keep data while your account is active and as required by law. Access to data is restricted by role and database security rules.</p>
       <H>Contact</H>
-      <p>Questions or requests: <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+      <p>Questions or requests: <a className="link-text" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
     </LegalPage>
   );
 }

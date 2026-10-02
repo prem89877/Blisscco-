@@ -98,8 +98,8 @@ export default function BookingPanel({ businessId, services, hours }: { business
         options={services.map((s) => ({ value: s.id, label: `${s.name || s.service_category} · ${rupees(s.price_inr)}` }))} />
 
       <div className="flex gap-2" role="tablist">
-        {info.appointments_enabled && <button role="tab" aria-selected={tab === 'appointment'} className={tab === 'appointment' ? 'btn-primary flex-1' : 'btn-secondary flex-1'} onClick={() => { setTab('appointment'); setErrKey(''); }}>{t('bk.appointment')}</button>}
-        {info.walkin_enabled && <button role="tab" aria-selected={tab === 'walkin'} className={tab === 'walkin' ? 'btn-primary flex-1' : 'btn-secondary flex-1'} onClick={() => { setTab('walkin'); setErrKey(''); }}>{t('bk.walkin')}</button>}
+        {info.appointments_enabled && <button role="tab" aria-selected={tab === 'appointment'} className={tab === 'appointment' ? 'btn-primary flex-1' : 'btn-text-muted flex-1'} onClick={() => { setTab('appointment'); setErrKey(''); }}>{t('bk.appointment')}</button>}
+        {info.walkin_enabled && <button role="tab" aria-selected={tab === 'walkin'} className={tab === 'walkin' ? 'btn-primary flex-1' : 'btn-text-muted flex-1'} onClick={() => { setTab('walkin'); setErrKey(''); }}>{t('bk.walkin')}</button>}
       </div>
 
       {tab === 'appointment' && (apptOk ? (

@@ -49,7 +49,7 @@ export default function OwnerQR() {
 
   return (
     <section className="mx-auto max-w-md space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">{t('p9.back')}</Link>
+      <Link to="/owner" className="text-sm btn-text">{t('p9.back')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('p9.qrTitle')}</h1>
       <Msg error={error} />
       {biz.status !== 'approved' && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm">{t('p9.qrNotLive')}</p>}

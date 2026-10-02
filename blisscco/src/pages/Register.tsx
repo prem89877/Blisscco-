@@ -60,10 +60,10 @@ export default function Register({ role }: { role: 'customer' | 'owner' }) {
       </form>
       <div className="space-y-2 text-center text-sm">
         <p>{t('auth.haveAccount')}{' '}
-          <Link to={role === 'owner' ? '/owner/login' : '/login'} className="font-medium underline">{t('auth.login')}</Link>
+          <Link to={role === 'owner' ? '/owner/login' : '/login'} className="font-medium btn-text">{t('auth.login')}</Link>
         </p>
-        {role === 'customer' && <p><Link to="/owner/register" className="underline">{t('auth.iAmOwner')}</Link></p>}
-        {role === 'owner' && <p><Link to="/register" className="underline">{t('auth.iAmCustomer')}</Link></p>}
+        {role === 'customer' && <p><Link to="/owner/register" className="btn-text">{t('auth.iAmOwner')}</Link></p>}
+        {role === 'owner' && <p><Link to="/register" className="btn-text">{t('auth.iAmCustomer')}</Link></p>}
       </div>
     </AuthCard>
   );

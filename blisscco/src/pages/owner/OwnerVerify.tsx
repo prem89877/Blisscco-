@@ -51,7 +51,7 @@ export default function OwnerVerify() {
   const pending = last?.status === 'pending';
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">← {t('owner.title')}</Link>
+      <Link to="/owner" className="text-sm btn-text">← {t('owner.title')}</Link>
       <h1 className="flex items-center gap-2 font-display text-2xl font-semibold">{t('p8.verifyTitle')} <VerifiedTick size={24} /></h1>
       <p className="text-sm text-ink/80">{t('p8.verifyHow')}</p>
       <Msg error={msg.error} ok={msg.ok} />

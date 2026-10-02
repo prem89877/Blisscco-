@@ -66,14 +66,14 @@ export default function OwnerBanners() {
   const canCreate = (ent?.tier_rank ?? 0) > 0 && (ent?.credits ?? 0) > 0;
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">← {t('owner.title')}</Link>
+      <Link to="/owner" className="text-sm link-text">← {t('owner.title')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('p8.bannersTitle')}</h1>
       <Msg error={msg.error} ok={msg.ok} />
       {ent && (
         <Section title={t('p8.newBanner')}>
           <p className="text-sm">{t('p8.credits', { n: ent.credits })}</p>
-          {ent.tier_rank < 1 && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t('p8.bannerLocked')} <Link to={`/owner/business/${id}/plans`} className="underline">{t('p8.plansTitle')}</Link></p>}
-          {ent.tier_rank > 0 && ent.credits < 1 && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t('p8.err.no_credits')} <Link to={`/owner/business/${id}/plans`} className="underline">{t('p8.extraBanner')}</Link></p>}
+          {ent.tier_rank < 1 && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t('p8.bannerLocked')} <Link to={`/owner/business/${id}/plans`} className="link-text">{t('p8.plansTitle')}</Link></p>}
+          {ent.tier_rank > 0 && ent.credits < 1 && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t('p8.err.no_credits')} <Link to={`/owner/business/${id}/plans`} className="link-text">{t('p8.extraBanner')}</Link></p>}
           <Field id="bt" label={t('p8.bannerTitle')} value={title} onChange={setTitle} disabled={busy || !canCreate} />
           <div className="space-y-1.5">
             <label htmlFor="bf" className="text-sm font-medium">{t('p8.bannerImage')}</label>

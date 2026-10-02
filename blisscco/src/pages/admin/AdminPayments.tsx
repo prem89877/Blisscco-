@@ -27,7 +27,7 @@ export default function AdminPayments() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-4 py-6">
-      <Link to="/admin" className="text-sm underline">← {t('dash.admin')}</Link>
+      <Link to="/admin" className="text-sm btn-text">← {t('dash.admin')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('p8.adPayments')}</h1>
       <Msg error={errKey ? t(errKey) : ''} />
       <Section title={t('p8.adTx')}>

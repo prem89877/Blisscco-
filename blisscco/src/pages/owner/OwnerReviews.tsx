@@ -40,7 +40,7 @@ export default function OwnerReviews() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">← {t('owner.title')}</Link>
+      <Link to="/owner" className="text-sm btn-text">← {t('owner.title')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('rv.title')}</h1>
       <Msg error={msg.error} ok={msg.ok} />
       {rows === null && <div className="h-24 animate-pulse rounded-2xl bg-ink/10" />}

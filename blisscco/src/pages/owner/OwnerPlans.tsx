@@ -94,7 +94,7 @@ export default function OwnerPlans() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">← {t('owner.title')}</Link>
+      <Link to="/owner" className="text-sm link-text">← {t('owner.title')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('p8.plansTitle')}</h1>
       <Msg error={msg.error} ok={msg.ok} />
       {waiting && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t('p8.waiting')}</p>}
@@ -111,7 +111,7 @@ export default function OwnerPlans() {
           <p className="flex items-center gap-2 text-sm">
             {ent.verified ? <><VerifiedTick /> {t('p8.verifiedUntil', { d: ent.verified_expires_at ? day(ent.verified_expires_at) : '' })}</> : t('p8.notVerified')}
           </p>
-          <p className="text-sm">{t('p8.credits', { n: ent.credits })} · <Link to={`/owner/business/${id}/banners`} className="underline">{t('p8.manageBanners')}</Link></p>
+          <p className="text-sm">{t('p8.credits', { n: ent.credits })} · <Link to={`/owner/business/${id}/banners`} className="link-text">{t('p8.manageBanners')}</Link></p>
           <p className="text-xs text-ink/60">{t('p8.noAuto')}</p>
         </Section>
       )}

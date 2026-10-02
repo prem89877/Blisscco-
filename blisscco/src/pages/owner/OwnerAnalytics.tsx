@@ -81,7 +81,7 @@ export default function OwnerAnalytics() {
   if (locked) {
     return (
       <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-        <Link to="/owner" className="text-sm underline">{t('p9.back')}</Link>
+        <Link to="/owner" className="text-sm btn-text">{t('p9.back')}</Link>
         <h1 className="font-display text-2xl font-semibold">{t('p9.title')}</h1>
         <Section title={t('p9.lockedTitle')}><p>{t('p9.lockedText')}</p>{planLink}</Section>
       </section>
@@ -96,11 +96,11 @@ export default function OwnerAnalytics() {
 
   return (
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">{t('p9.back')}</Link>
+      <Link to="/owner" className="text-sm btn-text">{t('p9.back')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('p9.title')}</h1>
       <div className="flex gap-2" role="group" aria-label={t('p9.range')}>
         {RANGES.map((n) => (
-          <button key={n} aria-pressed={days === n} onClick={() => setDays(n)} className={days === n ? 'btn-primary' : 'btn-secondary'}>{t('p9.lastDays', { n })}</button>
+          <button key={n} aria-pressed={days === n} onClick={() => setDays(n)} className={days === n ? 'btn-primary' : 'btn-text-muted'}>{t('p9.lastDays', { n })}</button>
         ))}
       </div>
       <Msg error={error} />

@@ -42,7 +42,7 @@ export default function BusinessEditor() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-      <Link to="/owner" className="text-sm underline">← {t('owner.title')}</Link>
+      <Link to="/owner" className="text-sm btn-text">← {t('owner.title')}</Link>
       <div className="flex items-center justify-between gap-2">
         <h1 className="font-display text-2xl font-semibold">{b.name}</h1>
         <StatusBadge status={b.status} />
