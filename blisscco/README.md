@@ -174,3 +174,45 @@ They live only in `public.plans` (paise). To change: `update public.plans set am
 - Upgrading PRO > ELITE midway is not pro-rated: both periods run, the higher tier wins while both are active.
 - Razorpay Subscriptions (auto-renewal), GST invoices, and the analytics screen itself (only the `analytics` entitlement exists) are not in this phase.
 - Terms & Conditions / refund policy text must mention paid plans before you take live payments.
+
+---
+
+# Phase 9 - Analytics, QR code, ELITE AI insights (migration 0012 + `/api/ai-insights`)
+
+## Status (honest)
+Written but **not run**: no database, npm install or network here. A syntax-only TypeScript check passed for every new/edited file;
+`npm install && npm run build`, migration 0012 and `tests/phase9_analytics_tests.sql` still need to be run by you.
+Two things only a real run can prove: (1) that Supabase passes the browser's `User-Agent` to the database (the bot filter relies on it; step 6),
+(2) your AI provider call (step 5).
+
+## What it does
+- **Tracking (anonymous):** `analytics_events` stores only shop id, event (profile view / search impression / booking), source (qr / search / referral / direct), time,
+  an anonymous session hash and a de-duplication key. No user id, name, phone, email, IP or user-agent. The session hash is `sha256(random per-tab id + India date)`, so it changes daily.
+- **Duplicate filter:** one view or impression per visitor per shop per 30 minutes; one booking event per real booking.
+- **Bot filter:** crawlers / scripts / link-preview fetchers (by user-agent) and automated browsers are dropped; one anonymous session cannot create more than 300 events per hour;
+  the shop's own owner and admins never count; only approved shops count.
+- **Bookings cannot be faked:** `track_event('booking')` only counts for a logged-in customer who really created a booking at that shop in the last 10 minutes.
+- **Source:** `/b/:id?src=qr` (QR), `?src=search` (Explore results and banners), `?src=referral` or a visitor who still carries a Refer & Earn code, otherwise `direct`.
+- **`get_analytics(business, from, to)`:** owner only AND an active PRO/ELITE plan (`has_entitlement(..., 'analytics')`). India-time days, 1-366 day range.
+  Screen: `/owner/business/:id/analytics` (7 / 30 / 90 days, funnel, by source, per-day chart). FREE owners see an upgrade card.
+- **QR:** `/owner/business/:id/qr` (all approved shops, no plan needed): QR of `https://YOUR-SITE/b/:id?src=qr`, made in the browser (library `qrcode`), PNG download, print, copy link.
+- **AI insights (ELITE):** `/api/ai-insights`. Order: login token > key configured (else **503 configuration_required**, no fake answer) > database `claim_ai_insight`
+  (owner + live ELITE + max 10 per 24 h) > `get_analytics` with the owner's own token > AI call with **aggregate numbers only** (no shop name, no ids, no customer data).
+  The route uses only the anon key and the owner's token: no service-role key is needed here.
+- **Retention:** raw events are deleted after 400 days (pg_cron weekly job `blisscco-purge-analytics`). Privacy Policy has a line about this.
+
+## Setup steps
+1. Run `migrations/0012_analytics_ai_qr.sql` in the Supabase SQL Editor (after 0010 and 0011). Then on a TEST project run `tests/phase9_analytics_tests.sql` (expect `ALL PHASE 9 TESTS PASSED`).
+2. `npm install` (adds `qrcode` + `@types/qrcode`) and `npm run build`.
+3. Push to GitHub; Vercel redeploys. `vercel.json` now gives `/api/ai-insights` up to 30 seconds.
+4. QR: open Owner > your approved shop > "Shop QR code", download or print.
+5. AI (only when you have the key): Vercel > Settings > Environment Variables: `AI_API_KEY` (Sensitive). Optional `AI_PROVIDER` (`anthropic` default or `openai`), `AI_MODEL`
+   (required for `openai`), `AI_BASE_URL`. Redeploy. Until then the AI card says "Configuration required".
+6. Check tracking: open a shop link `https://YOUR-SITE/b/<id>?src=qr` in a private window (not logged in as the owner), then in Supabase run
+   `select event_type, source, count(*) from analytics_events group by 1, 2;`. If nothing appears, tell me: the user-agent header may need another route.
+
+## Known limits
+- Counts are approximate by design (anonymous, 30-minute de-duplication). A person using two devices counts twice.
+- Visitors with JavaScript blocked are not counted. Referral attribution is a best effort (the stored referral code stays until signup).
+- A provider failure after `claim_ai_insight` still uses one of the 10 daily tries.
+- No data export, no per-service analytics, no push/email reports (Phase 10).

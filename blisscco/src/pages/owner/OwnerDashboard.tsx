@@ -58,6 +58,8 @@ export default function OwnerDashboard() {
                 <Link to={`/owner/business/${r.id}/plans`} className="btn-secondary">{t('p8.plansTitle')}</Link>
                 <Link to={`/owner/business/${r.id}/banners`} className="btn-secondary">{t('p8.bannersTitle')}</Link>
                 <Link to={`/owner/business/${r.id}/verify`} className="btn-secondary">{t('p8.verifyTitle')}</Link>
+                <Link to={`/owner/business/${r.id}/analytics`} className="btn-secondary">{t('p9.title')}</Link>
+                {r.status === 'approved' && <Link to={`/owner/business/${r.id}/qr`} className="btn-secondary">{t('p9.qrTitle')}</Link>}
                 {r.status === 'approved' && <Link to={`/b/${r.id}`} className="btn-secondary">{t('owner.viewPublic')}</Link>}
                 <button className="btn-secondary" disabled={busyId === r.id} onClick={() => void toggle(r)}>{r.status === 'approved' ? t('owner.hide') : t('owner.show')}</button>
               </>

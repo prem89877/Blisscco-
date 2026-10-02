@@ -18,7 +18,9 @@ import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
 import MyBookings from './pages/MyBookings';
 import NewBusiness from './pages/owner/NewBusiness';
+import OwnerAnalytics from './pages/owner/OwnerAnalytics';
 import OwnerBanners from './pages/owner/OwnerBanners';
+import OwnerQR from './pages/owner/OwnerQR';
 import OwnerCoupons from './pages/owner/OwnerCoupons';
 import OwnerPlans from './pages/owner/OwnerPlans';
 import OwnerVerify from './pages/owner/OwnerVerify';
@@ -64,6 +66,8 @@ export default function App() {
         <Route path="/owner/business/:id/plans" element={owner(<OwnerPlans />)} />
         <Route path="/owner/business/:id/banners" element={owner(<OwnerBanners />)} />
         <Route path="/owner/business/:id/verify" element={owner(<OwnerVerify />)} />
+        <Route path="/owner/business/:id/analytics" element={owner(<OwnerAnalytics />)} />
+        <Route path="/owner/business/:id/qr" element={owner(<OwnerQR />)} />
         <Route path="/admin/banners" element={admin(<AdminBanners />)} />
         <Route path="/admin/verifications" element={admin(<AdminVerifications />)} />
         <Route path="/admin/payments" element={admin(<AdminPayments />)} />

@@ -17,6 +17,8 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0009 | migrations/0009_bookings_queue.sql | bookings, tokens, queue settings, booking functions | Yes | Safe to re-run |
 | 0010 | migrations/0010_reviews_referrals.sql | reviews, referrals, coupons, redemption | NOT YET - run this | Safe to re-run |
 | 0011 | migrations/0011_subscriptions_payments_banners.sql | plans, payments, webhook idempotency, banners, credits, verification, ranking, pg_cron | NOT YET - run this | Needs pg_cron enabled; drops and recreates nearby_businesses / search_services (2 new columns); safe to re-run |
+| 0012 | migrations/0012_analytics_ai_qr.sql | analytics_events, track_event / track_impressions, get_analytics, claim_ai_insight, weekly purge job | NOT YET - run this | Run after 0011; needs pg_cron for the purge job (optional); safe to re-run |
+| - | tests/phase9_analytics_tests.sql | Analytics / bot filter / ELITE quota tests (test project only) | Run after 0012 | Rolls back |
 | - | tests/phase8_payments_tests.sql | Payment/entitlement/refund tests (test project only) | Run after 0011 | Rolls back |
 | - | manual/create_first_admin.sql | Promote YOUR account to admin | Run once by hand | Not a migration |
 | - | tests/phase7_reviews_referrals_tests.sql | Reviews/referral/coupon tests (test project only) | Run after 0010 | Rolls back |
@@ -28,4 +30,5 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies cover it).
 
 ## Next migrations (planned)
-- Phase 9+ : analytics screen (uses has_entitlement(..., 'analytics')), notifications / renewal emails (Phase 10)
+- Phase 10: notifications / renewal emails / PWA push
+- Phase 11: admin booking tools

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import BookingPanel from '../components/BookingPanel';
 import { RatingLine, ReviewsSection } from '../components/ReviewsSection';
 import Skeleton from '../components/Skeleton';
 import { TierChip, VerifiedTick } from '../components/TierBadge';
 import { useI18n } from '../i18n';
+import { sourceFromParam, trackView } from '../lib/analytics';
+import { getStoredRef } from '../lib/referral';
 import { directionsUrl, hhmm, rupees } from '../lib/format';
 import { signedUrlMap } from '../lib/storage';
 import { supabase } from '../lib/supabase';
@@ -18,6 +20,7 @@ interface Pub {
 
 export default function BusinessProfile() {
   const { id } = useParams();
+  const [params] = useSearchParams();
   const { t, lang } = useI18n();
   const [biz, setBiz] = useState<Pub | null | undefined>(undefined);
   const [images, setImages] = useState<BizImage[]>([]);
@@ -34,6 +37,7 @@ export default function BusinessProfile() {
       if (!alive) return;
       if (b.error || !b.data) { setBiz(null); return; }
       setBiz(b.data as Pub);
+      trackView(id, sourceFromParam(params.get('src'), !!getStoredRef()));   // anonymous; counted once per 30 min per visitor
       void supabase.from('public_business_flags').select('tier_rank,is_verified').eq('business_id', id).maybeSingle()
         .then(({ data }) => { if (alive && data) setFlags(data as { tier_rank: number; is_verified: boolean }); });
       const [i, h, s] = await Promise.all([
@@ -48,6 +52,7 @@ export default function BusinessProfile() {
       if (alive) setUrls(m);
     })();
     return () => { alive = false; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- count the visit once per shop, not when other query params change
   }, [id]);
 
   if (biz === undefined) return <Skeleton />;

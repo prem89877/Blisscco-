@@ -30,7 +30,7 @@ export default function BannerStrip({ lat, lng }: { lat: number; lng: number }) 
       <p className="text-xs text-ink/60">{t('p8.sponsored')}</p>
       <div className="flex gap-3 overflow-x-auto pb-1">
         {rows.map((b) => (
-          <Link key={b.banner_id} to={`/b/${b.business_id}`} className="relative block h-32 w-64 flex-none overflow-hidden rounded-2xl bg-ink/10">
+          <Link key={b.banner_id} to={`/b/${b.business_id}?src=search`} className="relative block h-32 w-64 flex-none overflow-hidden rounded-2xl bg-ink/10">
             {urls[b.image_path] && <img src={urls[b.image_path]} alt={b.title} loading="lazy" className="h-full w-full object-cover" />}
             <span className="absolute inset-x-0 bottom-0 truncate bg-ink/60 px-3 py-1.5 text-sm font-medium text-cream">{b.title} · {b.business_name}</span>
           </Link>

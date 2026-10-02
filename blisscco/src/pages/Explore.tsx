@@ -8,6 +8,7 @@ import { TierChip, VerifiedTick } from '../components/TierBadge';
 import { Check, Msg, Select } from '../components/ui';
 import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
+import { trackImpressions } from '../lib/analytics';
 import { distanceLabel, localName, rupees } from '../lib/format';
 import { signedUrlMap } from '../lib/storage';
 import { supabase } from '../lib/supabase';
@@ -22,12 +23,12 @@ interface Row {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromBiz = (r: any): Row => ({
-  bid: r.business_id, key: r.business_id, to: `/b/${r.business_id}`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
+  bid: r.business_id, key: r.business_id, to: `/b/${r.business_id}?src=search`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
   catMr: r.category_name_mr, city: r.city, services: r.service_count, price: r.min_price, isFrom: true, distance: r.distance_m,
   open: r.is_open_now, cover: r.cover_path, tier: r.tier_rank ?? 0, verified: !!r.is_verified,
 });
 const fromSvc = (r: any): Row => ({
-  bid: r.business_id, key: r.service_id, to: `/b/${r.business_id}`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
+  bid: r.business_id, key: r.service_id, to: `/b/${r.business_id}?src=search`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
   catHi: r.category_name_hi, catMr: r.category_name_mr, city: r.city, services: null, price: r.price_inr, isFrom: false,
   distance: r.distance_m, open: r.is_open_now, cover: r.cover_path, tier: r.tier_rank ?? 0, verified: !!r.is_verified,
 });
@@ -80,6 +81,7 @@ export default function Explore() {
     const mapped = ((res.data ?? []) as any[]).map(svc ? fromSvc : fromBiz);
     setRows((prev) => (offset === 0 ? mapped : [...prev, ...mapped]));
     setHasMore(mapped.length === PAGE);
+    trackImpressions(mapped.map((r) => r.bid));   // shops shown on screen; anonymous, de-duplicated by the database
     const m = await signedUrlMap(mapped.map((r) => r.cover).filter((x): x is string => !!x));
     if (id === reqId.current) setUrls((prev) => ({ ...prev, ...m }));
     const ids = [...new Set(mapped.map((r) => r.bid))];

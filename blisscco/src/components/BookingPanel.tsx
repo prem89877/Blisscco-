@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { bookingErrKey, RETURN_KEY } from '../lib/bookingErrors';
 import { addDays, dowOf, fmtDate, istToday, rupees } from '../lib/format';
+import { trackBooking } from '../lib/analytics';
 import { supabase } from '../lib/supabase';
 import type { Hour, QueueInfo, Service } from '../lib/types';
 
@@ -66,11 +67,13 @@ export default function BookingPanel({ businessId, services, hours }: { business
       const { error } = await supabase.rpc('book_appointment', { p_service_id: serviceId, p_date: date, p_time: time });
       setBusy(false);
       if (error) { setErrKey(bookingErrKey(error.message)); return; }
+      trackBooking(businessId);
       setDone({ kind: 'appt' });
     } else {
       const { data, error } = await supabase.rpc('book_walkin', { p_service_id: serviceId });
       setBusy(false);
       if (error) { setErrKey(bookingErrKey(error.message)); return; }
+      trackBooking(businessId);
       setDone({ kind: 'token', n: (data as { token: number }).token });
     }
   }

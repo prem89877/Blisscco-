@@ -14,3 +14,10 @@
   .input { @apply min-h-[44px] w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-base text-ink placeholder:text-ink/40 disabled:bg-ink/5; }
   .card { @apply rounded-2xl bg-white p-5 shadow-card; }
 }
+
+/* Print only the QR poster (owner QR page) */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; }
+}
