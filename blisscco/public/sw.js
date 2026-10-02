@@ -3,7 +3,7 @@
    - Cache: only the offline page, icons and hashed build files (/assets/*, immutable). NEVER /api/*, Supabase,
      or any signed-in data, so nothing private is stored on the device by this worker.
    - Push: shows a notification and opens the right page when it is tapped. */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL_CACHE = 'blisscco-shell-' + VERSION;
 const ASSET_CACHE = 'blisscco-assets-' + VERSION;
 const PRECACHE = ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/badge-96.png', '/logo.svg'];
