@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { clearRef, getStoredRef } from '../lib/referral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import LanguageSelect from './LanguageSelect';
+import HeaderMenu from './HeaderMenu';
 import Logo from './Logo';
 
 export default function Layout() {
-  const { session, profile, signOut } = useAuth();
+  const { session, profile } = useAuth();
   const { t, setLang } = useI18n();
 
   // Apply the saved language preference once the profile loads
@@ -30,16 +30,15 @@ export default function Layout() {
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-2.5">
           <Link to="/" aria-label="Blisscco"><Logo /></Link>
           <div className="flex items-center gap-2">
-            <LanguageSelect />
             {session ? (
               <>
                 <Link to="/my-bookings" className="btn-secondary hidden sm:inline-flex">{t('my.title')}</Link>
                 {home && <Link to={home} className="btn-secondary hidden sm:inline-flex">{t(profile?.role === 'admin' ? 'dash.admin' : 'dash.owner')}</Link>}
-                <button className="btn-secondary" onClick={() => void signOut()}>{t('nav.logout')}</button>
               </>
             ) : (
               <Link to="/login" className="btn-primary">{t('nav.login')}</Link>
             )}
+            <HeaderMenu />
           </div>
         </div>
       </header>

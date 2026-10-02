@@ -1,18 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import Field from '../components/Field';
 import ReferralBanner from '../components/ReferralBanner';
 import BannerStrip from '../components/BannerStrip';
 import { Stars } from '../components/Stars';
 import { TierChip, VerifiedTick } from '../components/TierBadge';
-import { Check, Msg, Select } from '../components/ui';
+import { Check, Msg } from '../components/ui';
 import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
 import { trackImpressions } from '../lib/analytics';
 import { distanceLabel, localName, rupees } from '../lib/format';
 import { signedUrlMap } from '../lib/storage';
 import { supabase } from '../lib/supabase';
-import type { Category } from '../lib/types';
+import { SEARCH_HINTS } from '../lib/searchHints';
 
 const PAGE = 20;
 
@@ -36,14 +35,11 @@ const fromSvc = (r: any): Row => ({
 export default function Explore() {
   const { t, lang } = useI18n();
   const { status, coords, request } = useGeo();
-  const [cats, setCats] = useState<Category[]>([]);
   const [q, setQ] = useState('');
-  const [maxPriceText, setMaxPriceText] = useState('');
   const [dq, setDq] = useState('');
-  const [dm, setDm] = useState('');
-  const [category, setCategory] = useState('');
   const [openNow, setOpenNow] = useState(false);
-  const [sort, setSort] = useState('distance');
+  const [hint, setHint] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [ratings, setRatings] = useState<Record<string, { avg_rating: number; review_count: number }>>({});
@@ -53,25 +49,36 @@ export default function Explore() {
   const reqId = useRef(0);
 
   useEffect(() => {
-    void supabase.from('business_categories').select('*').eq('is_active', true).order('sort_order')
-      .then(({ data }) => setCats((data ?? []) as Category[]));
     // If the browser already remembers permission, skip the button
     void navigator.permissions?.query({ name: 'geolocation' }).then((p) => { if (p.state === 'granted') request(); }).catch(() => undefined);
   }, [request]);
 
   useEffect(() => {
-    const id = setTimeout(() => { setDq(q.trim()); setDm(maxPriceText.trim()); }, 400);
+    const id = setTimeout(() => setDq(q.trim()), 400);
     return () => clearTimeout(id);
-  }, [q, maxPriceText]);
+  }, [q]);
+
+  // Rotate the light example text in the empty search bar every 2 seconds
+  useEffect(() => {
+    if (q) return;
+    const id = setInterval(() => setHint((h) => (h + 1) % SEARCH_HINTS.length), 2000);
+    return () => clearInterval(id);
+  }, [q]);
+
+  // Keyboard "Search" key: search right away and close the keyboard
+  function onSearch(e: FormEvent) {
+    e.preventDefault();
+    setDq(q.trim());
+    inputRef.current?.blur();
+  }
 
   const load = useCallback(async (offset: number) => {
     if (!coords) return;
     const id = ++reqId.current;
     setLoading(true); setErrKey('');
-    const mp = Number(dm);
     const base = {
-      p_lat: coords.lat, p_lng: coords.lng, p_category: category || null, p_max_price: mp > 0 ? mp : null,
-      p_open_now: openNow, p_sort: sort, p_limit: PAGE, p_offset: offset,
+      p_lat: coords.lat, p_lng: coords.lng, p_category: null, p_max_price: null,
+      p_open_now: openNow, p_sort: 'distance', p_limit: PAGE, p_offset: offset,
     };
     const svc = dq.length > 0;
     const res = svc ? await supabase.rpc('search_services', { ...base, p_query: dq }) : await supabase.rpc('nearby_businesses', base);
@@ -90,7 +97,7 @@ export default function Explore() {
       const got = (rt.data ?? []) as { business_id: string; avg_rating: number; review_count: number }[];
       if (id === reqId.current) setRatings((prev) => ({ ...prev, ...Object.fromEntries(got.map((x) => [x.business_id, x])) }));
     }
-  }, [coords, dq, dm, category, openNow, sort]);
+  }, [coords, dq, openNow]);
 
   useEffect(() => { void load(0); }, [load]);
 
@@ -117,15 +124,29 @@ export default function Explore() {
 
       <ReferralBanner />
       <BannerStrip lat={coords.lat} lng={coords.lng} />
-      <Field id="q" label={t('home.search')} value={q} onChange={setQ} />
-      <div className="grid grid-cols-2 gap-3">
-        <Select id="cat" label={t('explore.category')} value={category} onChange={setCategory}
-          options={[{ value: '', label: t('explore.all') }, ...cats.map((c) => ({ value: c.id, label: localName(c.name_en, c.name_hi, c.name_mr, lang) }))]} />
-        <Select id="sort" label={t('explore.sort')} value={sort} onChange={setSort}
-          options={[{ value: 'distance', label: t('explore.sortDistance') }, { value: 'price', label: t('explore.sortPrice') }]} />
-        <Field id="mp" label={t('explore.maxPrice')} value={maxPriceText} onChange={setMaxPriceText} />
-        <div className="flex items-end"><Check id="on" label={t('explore.openNow')} checked={openNow} onChange={setOpenNow} /></div>
-      </div>
+      <form role="search" onSubmit={onSearch} className="relative">
+        <label htmlFor="q" className="sr-only">{t('home.search')}</label>
+        <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/50" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          ref={inputRef}
+          id="q"
+          type="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          autoCorrect="off"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="input pl-11 [&::-webkit-search-cancel-button]:appearance-none"
+        />
+        {!q && (
+          <span key={hint} aria-hidden="true" className="hint-fade pointer-events-none absolute left-11 top-1/2 -translate-y-1/2 truncate pr-4 text-base text-ink/40">
+            {t('explore.eg')} {SEARCH_HINTS[hint]}
+          </span>
+        )}
+      </form>
+      <Check id="on" label={t('explore.openNow')} checked={openNow} onChange={setOpenNow} />
 
       <Msg error={errKey ? t(errKey) : ''} />
       {loading && rows.length === 0 && [0, 1, 2].map((k) => <div key={k} className="h-28 animate-pulse rounded-2xl bg-ink/10" />)}
