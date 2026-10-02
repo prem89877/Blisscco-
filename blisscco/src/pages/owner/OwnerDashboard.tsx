@@ -63,7 +63,7 @@ export default function OwnerDashboard() {
     <section className="mx-auto max-w-3xl space-y-4 px-4 py-6">
       <div className="flex items-center justify-between gap-2">
         <h1 className="font-display text-2xl font-semibold">{t('owner.title')}</h1>
-        <Link to="/owner/business/new" className="btn-primary">{t('owner.add')}</Link>
+        <Link to="/owner/business/new" className="btn-solid">{t('owner.add')}</Link>
       </div>
       <Msg error={error} />
       {rows === null && !error && <div className="h-24 animate-pulse rounded-2xl bg-ink/10" />}
