@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AuthError, Session } from '@supabase/supabase-js';
+import { forgetPushOnThisDevice } from '../lib/push';
 import { supabase } from '../lib/supabase';
 import type { Lang } from '../i18n';
 
@@ -75,7 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signOut = useCallback(async () => { await supabase.auth.signOut(); }, []);
+  const signOut = useCallback(async () => {
+    await forgetPushOnThisDevice();                          // this phone stops receiving the account's push before the session ends
+    await supabase.auth.signOut();
+  }, []);
 
   const requestPasswordReset = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });

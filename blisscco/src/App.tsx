@@ -17,6 +17,8 @@ import HomeGate from './pages/HomeGate';
 import Login from './pages/Login';
 import BusinessEditor from './pages/owner/BusinessEditor';
 import MyBookings from './pages/MyBookings';
+import NotificationSettings from './pages/NotificationSettings';
+import Notifications from './pages/Notifications';
 import NewBusiness from './pages/owner/NewBusiness';
 import OwnerAnalytics from './pages/owner/OwnerAnalytics';
 import OwnerBanners from './pages/owner/OwnerBanners';
@@ -75,6 +77,8 @@ export default function App() {
         <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
         <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />
         <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
+        <Route path="/notifications" element={anyUser(<Notifications />)} />
+        <Route path="/notifications/settings" element={anyUser(<NotificationSettings />)} />
         <Route path="/admin" element={admin(<AdminHome />)} />
         <Route path="/admin/applications" element={admin(<Applications />)} />
         <Route path="/admin/categories" element={admin(<Categories />)} />

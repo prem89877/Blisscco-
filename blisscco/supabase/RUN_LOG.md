@@ -18,6 +18,9 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0010 | migrations/0010_reviews_referrals.sql | reviews, referrals, coupons, redemption | NOT YET - run this | Safe to re-run |
 | 0011 | migrations/0011_subscriptions_payments_banners.sql | plans, payments, webhook idempotency, banners, credits, verification, ranking, pg_cron | NOT YET - run this | Needs pg_cron enabled; drops and recreates nearby_businesses / search_services (2 new columns); safe to re-run |
 | 0012 | migrations/0012_analytics_ai_qr.sql | analytics_events, track_event / track_impressions, get_analytics, claim_ai_insight, weekly purge job | NOT YET - run this | Run after 0011; needs pg_cron for the purge job (optional); safe to re-run |
+| 0013 | migrations/0013_notifications.sql | notifications, notification_preferences, push_subscriptions, notification_deliveries, event triggers, reminders, pg_cron jobs | NOT YET - run this | Run after 0012; needs pg_net + pg_cron enabled; safe to re-run |
+| - | manual/set_notification_config.sql | Stores dispatcher URL + shared secret (notification_config) | Run once by hand, after 0013 | Contains a secret: edit before running, never commit the edited copy |
+| - | tests/phase10_notifications_tests.sql | Notification triggers / prefs / reminders / retry tests (test project only) | Run after 0013 | Rolls back |
 | - | tests/phase9_analytics_tests.sql | Analytics / bot filter / ELITE quota tests (test project only) | Run after 0012 | Rolls back |
 | - | tests/phase8_payments_tests.sql | Payment/entitlement/refund tests (test project only) | Run after 0011 | Rolls back |
 | - | manual/create_first_admin.sql | Promote YOUR account to admin | Run once by hand | Not a migration |
@@ -30,5 +33,5 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies cover it).
 
 ## Next migrations (planned)
-- Phase 10: notifications / renewal emails / PWA push
+- (Phase 10 done: 0013)
 - Phase 11: admin booking tools

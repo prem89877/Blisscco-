@@ -216,3 +216,52 @@ Two things only a real run can prove: (1) that Supabase passes the browser's `Us
 - Visitors with JavaScript blocked are not counted. Referral attribution is a best effort (the stored referral code stays until signup).
 - A provider failure after `claim_ai_insight` still uses one of the 10 daily tries.
 - No data export, no per-service analytics, no push/email reports (Phase 10).
+
+---
+
+# Phase 10 - Notifications (in-app, web-push, email) + PWA (migration 0013, `/api/dispatch-notifications`)
+
+## Status (honest)
+Written but **not run**: no database, npm install or network here. Every TypeScript/JavaScript file passed a syntax-only check;
+the SQL was reviewed by hand but never executed. You still need to: run `0013`, run `tests/phase10_notifications_tests.sql`,
+`npm install && npm run build`, and prove push + email with the **test button** (step 8). Things only a real run can prove:
+(1) `pg_net` can call your Vercel route, (2) your VAPID keys work, (3) Resend accepts your sender domain.
+
+## What it does
+- **In-app:** bell in the header (live unread count), `/notifications` list, `/notifications/settings`.
+- **Events that create notifications (database triggers, so nothing can be skipped by a buggy screen):**
+  - booking: new booking/token (owner + customer), cancelled by shop / by customer, "your turn" (in service), completed (review prompt), no-show
+  - approval: shop approved / rejected (with reason) / suspended / reactivated, banner approved / rejected, blue-badge document approved / rejected; admins are told about new pending shops, banners and documents
+  - review: new review (owner), owner reply (customer), review removed (owner)
+  - payment: payment received, refund (full or partial), amount mismatch (payer + admins)
+- **Reminders (pg_cron):** appointment ~24 h and ~2 h before (every 10 min job); coupon expiring (within 3 days) and plan / badge expiring (7 days, then 1 day) once a day at 10:00 India time. Each reminder has a dedupe key, so it can only be created once.
+- **Push:** `web-push` + VAPID. **Email:** Resend API. Text is written once in `api/_lib/notificationText.ts` (en / hi / mr) and used by the app, push and email.
+- **Preferences:** push on/off, email on/off, mute whole topics (booking, approval, review, payment, reminder). Muted topics stay in the in-app list but send no push/email.
+- **PWA:** `manifest.webmanifest`, icons (192, 512, maskable, Apple touch), `sw.js`, `offline.html`, install banner (Chrome/Android button; iPhone shows "Share > Add to Home Screen").
+
+## "Delivered" is never assumed (your rule)
+Each push/email is a row in `notification_deliveries`: `pending > sending > sent | failed` (or `skipped` when there is nothing to send to).
+- `sent` is written **only after** the provider accepted it (push service 2xx / Resend 2xx with an id). The screen shows exactly this status ("Email sent", "Push failed", "Email retrying", "Push queued").
+- Provider error -> back to `pending`, retry after 2 / 4 / 8 / 16 minutes (5 tries) -> `failed`. A timeout or crash mid-send leaves the row `sending`; after 5 minutes it is picked up again. It is never silently marked sent.
+- "Sent" means the provider accepted it. It does not prove the person read it or that the mail reached the inbox (that would need a Resend delivery webhook; not included).
+- If one person has several devices and at least one accepts the push, the delivery counts as sent; the failing devices are not retried (avoids duplicates on the good ones). Dead subscriptions (404/410) are deleted automatically.
+- **No notification problem can break a booking, review or payment:** every trigger catches its own errors (test T11 proves it with a deliberately broken table).
+
+## Setup steps
+1. Supabase > Database > Extensions: enable **pg_net** and **pg_cron** (pg_cron was already needed in Phase 8).
+2. Run `migrations/0013_notifications.sql`. Then on a TEST project run `tests/phase10_notifications_tests.sql` (expect `ALL PHASE 10 TESTS PASSED`).
+3. Make VAPID keys: `npx web-push generate-vapid-keys` (public key + private key).
+4. Resend: create an account, **verify your sending domain** (Domains), create an API key. Until the domain is verified, Resend only lets you send test mail from `onboarding@resend.dev` to your own account email.
+5. Generate a random secret: `openssl rand -hex 32` (this is `NOTIFY_CRON_SECRET`).
+6. Vercel > Settings > Environment Variables (see `.env.example`): `VITE_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (Sensitive), `VAPID_SUBJECT`, `RESEND_API_KEY` (Sensitive), `RESEND_FROM`, `NOTIFY_CRON_SECRET` (Sensitive), `SITE_URL`. Redeploy (the `VITE_` key is baked in at build time).
+7. Edit and run `supabase/manual/set_notification_config.sql` once (your Vercel URL + the same secret). Optional check query is inside the file (`200` = working, `401` = secret mismatch).
+8. `npm install` (adds `web-push`), push to GitHub, let Vercel deploy. Open the site, log in, **Notifications > Settings > Turn on for this device**, then **Send a test notification**. Within a minute the Notifications list should show "Push sent" and "Email sent". If it shows "failed" or "retrying", Vercel > Logs for `/api/dispatch-notifications` shows the status code (no secrets are logged).
+
+## Known limits
+- iPhone / iPad: web push only works after "Add to Home Screen" (iOS 16.4+). The settings page explains this. Other browsers: Chrome, Edge, Firefox, Samsung Internet on Android and desktop work in the normal tab.
+- The service worker is registered only in the production build (not `npm run dev`), so test push on the Vercel site.
+- Offline: only the offline page and build files are cached. Shops, bookings and queues need internet (the app never stores signed-in data offline).
+- The reminder times use the server clock; an appointment booked less than ~3 h ahead gets no "2 hours" reminder and one booked less than 24 h ahead gets no "24 hours" reminder (they just booked).
+- Push/email text is not editable per shop. Language follows the profile language of the person receiving it.
+- Privacy Policy / Terms text must mention push endpoints, Resend (email) and Supabase/Vercel as processors before launch; I did not rewrite the legal text.
+- Notifications are deleted after 90 days (weekly job `blisscco-purge-notifications`).

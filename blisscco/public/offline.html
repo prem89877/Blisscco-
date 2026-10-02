@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2D2A2E" />
+  <title>Offline - Blisscco</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+           background: #FDF8F5; color: #2D2A2E; font-family: Poppins, system-ui, -apple-system, 'Segoe UI', sans-serif; text-align: center; }
+    main { max-width: 360px; }
+    img { width: 72px; height: 72px; border-radius: 18px; }
+    h1 { font-size: 1.4rem; margin: 20px 0 8px; }
+    p { margin: 0 0 20px; line-height: 1.5; color: rgba(45,42,46,.75); }
+    p.hi { font-size: .95rem; }
+    button { min-height: 44px; border: 0; border-radius: 999px; padding: 10px 28px; font: inherit; font-weight: 500;
+             background: #FF91A4; color: #2D2A2E; cursor: pointer; }
+    button:focus-visible { outline: 2px solid #2D2A2E; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/icons/icon-192.png" alt="" width="72" height="72" />
+    <h1>You're offline</h1>
+    <p>Blisscco needs an internet connection to show shops, bookings and queues. Check your connection and try again.</p>
+    <p class="hi">आप ऑफ़लाइन हैं। इंटरनेट चालू करके फिर कोशिश करें। · तुम्ही ऑफलाइन आहात. इंटरनेट सुरू करून पुन्हा प्रयत्न करा.</p>
+    <button type="button" onclick="location.reload()">Try again</button>
+  </main>
+  <script>window.addEventListener('online', function () { location.reload(); });</script>
+</body>
+</html>

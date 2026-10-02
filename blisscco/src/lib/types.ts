@@ -61,3 +61,13 @@ export interface BannerRow {
 export interface VerificationRow {
   id: string; business_id: string; doc_type: string; doc_path: string; status: 'pending' | 'approved' | 'rejected'; rejection_reason: string | null; created_at: string;
 }
+
+// ---- Phase 10 ----
+export interface DeliveryRow {
+  channel: 'push' | 'email'; status: 'pending' | 'sending' | 'sent' | 'failed' | 'skipped'; attempts: number; last_error: string | null; sent_at: string | null;
+}
+export interface NotificationRow {
+  id: string; type: string; category: string; data: Record<string, unknown>; link: string | null; read_at: string | null; created_at: string;
+  notification_deliveries: DeliveryRow[];
+}
+export interface NotificationPrefs { push_enabled: boolean; email_enabled: boolean; muted_categories: string[] }

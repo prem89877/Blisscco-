@@ -1,4 +1,14 @@
 {
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
-  "functions": { "api/ai-insights.ts": { "maxDuration": 30 } }
+  "rewrites": [{ "source": "/((?!api/|sw\\.js|manifest\\.webmanifest|offline\\.html|icons/).*)", "destination": "/index.html" }],
+  "functions": {
+    "api/ai-insights.ts": { "maxDuration": 30 },
+    "api/dispatch-notifications.ts": { "maxDuration": 30 }
+  },
+  "headers": [
+    { "source": "/sw.js", "headers": [
+      { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+      { "key": "Service-Worker-Allowed", "value": "/" }
+    ] },
+    { "source": "/manifest.webmanifest", "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }] }
+  ]
 }
