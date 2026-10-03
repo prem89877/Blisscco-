@@ -32,7 +32,7 @@ export default function AdminReports() {
     <div className="mx-auto max-w-3xl space-y-4 px-4 py-6">
       <Link to="/admin" className="text-sm btn-text">← Admin</Link>
       <h1 className="font-display text-2xl font-semibold">Blisscco earnings</h1>
-      <p className="text-sm text-ink/70">Only Blisscco&apos;s own income: plan, badge and banner payments received through Razorpay, minus refunds. Shop bookings and prices are never counted.</p>
+      <p className="text-sm text-ink/70">Only Blisscco&apos;s own income: blue badge and banner payments received through Razorpay, minus refunds. Shop bookings and prices are never counted.</p>
       <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => { e.preventDefault(); void run(); }}>
         <div className="space-y-1.5"><label htmlFor="rp-from" className="text-sm font-medium">From</label><input id="rp-from" type="date" className="input" value={from} max={to} onChange={(e) => setFrom(e.target.value)} /></div>
         <div className="space-y-1.5"><label htmlFor="rp-to" className="text-sm font-medium">To</label><input id="rp-to" type="date" className="input" value={to} min={from} onChange={(e) => setTo(e.target.value)} /></div>

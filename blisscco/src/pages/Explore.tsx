@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ReferralBanner from '../components/ReferralBanner';
 import BannerStrip from '../components/BannerStrip';
 import { Stars } from '../components/Stars';
-import { TierChip, VerifiedTick } from '../components/TierBadge';
+import { VerifiedTick } from '../components/TierBadge';
 import { Check, Msg } from '../components/ui';
 import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
@@ -160,8 +160,8 @@ export default function Explore() {
                 ? <img src={urls[r.cover]} alt="" loading="lazy" className="h-24 w-24 flex-none rounded-xl object-cover" />
                 : <div className="h-24 w-24 flex-none rounded-xl bg-ink/10" />}
               <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1.5 font-semibold"><span className="truncate">{r.title}</span>{!r.business && r.verified && <VerifiedTick size={16} />}{!r.business && <TierChip rank={r.tier} />}</p>
-                {r.business && <p className="flex items-center gap-1.5 text-sm"><span className="truncate">{r.business}</span>{r.verified && <VerifiedTick size={14} />}<TierChip rank={r.tier} /></p>}
+                <p className="flex items-center gap-1.5 font-semibold"><span className="truncate">{r.title}</span>{!r.business && r.verified && <VerifiedTick size={16} />}</p>
+                {r.business && <p className="flex items-center gap-1.5 text-sm"><span className="truncate">{r.business}</span>{r.verified && <VerifiedTick size={14} />}</p>}
                 <p className="truncate text-xs text-ink/70">{[localName(r.catEn, r.catHi, r.catMr, lang), r.city].filter(Boolean).join(' · ')}</p>
                 <p className="text-xs text-ink/60">{ratings[r.bid] ? <><Stars value={ratings[r.bid].avg_rating} /> {ratings[r.bid].avg_rating} ({ratings[r.bid].review_count})</> : t('biz.noReviews')}{r.services !== null ? ` · ${t('explore.services', { n: r.services })}` : ''}</p>
                 <p className="mt-1 flex items-center gap-2 text-xs">

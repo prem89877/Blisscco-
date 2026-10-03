@@ -17,7 +17,7 @@ export default function Privacy() {
       <H>How we use it</H>
       <p>To create and secure your account, show nearby businesses, manage bookings and queues, prevent fraud and abuse, send service notifications, and improve Blisscco.</p>
       <H>Who we share it with</H>
-      <p>Business owners see only what they need to serve your booking. We use service providers to run the app (hosting and database, sign-in, email, and payments for business subscriptions). We do not sell your personal data.</p>
+      <p>Business owners see only what they need to serve your booking. We use service providers to run the app (hosting and database, sign-in, email, and payments for paid services such as banners and the blue badge). We do not sell your personal data.</p>
       <H>Your choices</H>
       <p>You can change your language and notification settings, deny location access, and ask us to correct or delete your account data by emailing us.</p>
       <H>Retention and security</H>

@@ -5,7 +5,6 @@ import AdminAudit from './pages/admin/AdminAudit';
 import AdminDisputes from './pages/admin/AdminDisputes';
 import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminReports from './pages/admin/AdminReports';
-import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminHome from './pages/admin/AdminHome';
@@ -78,7 +77,6 @@ export default function App() {
         <Route path="/owner/business/:id/qr" element={owner(<OwnerQR />)} />
         <Route path="/admin/users" element={admin(<AdminUsers />)} />
         <Route path="/admin/disputes" element={admin(<AdminDisputes />)} />
-        <Route path="/admin/subscriptions" element={admin(<AdminSubscriptions />)} />
         <Route path="/admin/promotions" element={admin(<AdminPromotions />)} />
         <Route path="/admin/reports" element={admin(<AdminReports />)} />
         <Route path="/admin/audit" element={admin(<AdminAudit />)} />

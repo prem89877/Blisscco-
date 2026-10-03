@@ -10,12 +10,3 @@ export function VerifiedTick({ size = 18 }: { size?: number }) {
     </svg>
   );
 }
-
-export function TierChip({ rank }: { rank: number }) {
-  if (rank < 1) return null;
-  return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide ${rank >= 2 ? 'bg-ink text-amber-300' : 'bg-blush/40 text-ink'}`}>
-      {rank >= 2 ? 'ELITE' : 'PRO'}
-    </span>
-  );
-}

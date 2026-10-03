@@ -92,7 +92,7 @@ export default function OwnerAnalytics() {
   const maxDay = Math.max(1, ...(data?.daily.map((d) => d.profile_view) ?? [1]));
   const srcTotal = Math.max(1, ...(data?.by_source.map((s) => s.profile_view) ?? [1]));
   const empty = !!tot && tot.profile_view + tot.search_impression + tot.booking === 0;
-  const isElite = (ent?.tier_rank ?? 0) >= 2;
+  const isElite = true;   // subscriptions removed: AI insights are open to every shop owner
 
   return (
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
@@ -140,8 +140,7 @@ export default function OwnerAnalytics() {
 
           <Section title={t('p9.aiTitle')}>
             {ent === undefined && <div className="h-10 animate-pulse rounded-xl bg-ink/10" />}
-            {ent !== undefined && !isElite && <><p className="text-sm">{t('p9.aiEliteOnly')}</p>{planLink}</>}
-            {isElite && (
+                        {isElite && (
               <>
                 <p className="text-sm text-ink/70">{t('p9.aiHint')}</p>
                 <button className="btn-primary" disabled={aiBusy} onClick={() => void askAi()}>{aiBusy ? t('p9.aiWorking') : t('p9.aiButton')}</button>
