@@ -35,15 +35,24 @@ function limited(userId: string): boolean {
 }
 
 // Accept only three sane, ascending whole numbers. Anything else is rejected (no half answers).
-function parsePrices(raw: string): { basic: number; standard: number; premium: number } | null {
-  const m = raw.match(/\{[\s\S]*\}/);
-  if (!m) return null;
-  try {
-    const j = JSON.parse(m[0]) as Record<string, unknown>;
-    const [basic, standard, premium] = [j.basic, j.standard, j.premium].map((v) => Math.round(Number(v)));
-    const ok = [basic, standard, premium].every((n) => Number.isFinite(n) && n > 0 && n <= 100000);
-    return ok && basic <= standard && standard <= premium ? { basic, standard, premium } : null;
-  } catch { return null; }
+type Prices = { basic: number; standard: number; premium: number };
+function valid(a: number, b: number, c: number): Prices | null {
+  const ok = [a, b, c].every((n) => Number.isFinite(n) && n > 0 && n <= 100000);
+  return ok && a <= b && b <= c ? { basic: a, standard: b, premium: c } : null;
+}
+function parsePrices(raw: string): Prices | null {
+  const text = raw.replace(/```(?:json)?/gi, '');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (m) {
+    try {
+      const j = JSON.parse(m[0]) as Record<string, unknown>;
+      const r = valid(...([j.basic, j.standard, j.premium].map((v) => Math.round(Number(v))) as [number, number, number]));
+      if (r) return r;
+    } catch { /* fall through to number scan */ }
+  }
+  // Fallback: the first three numbers in the reply (e.g. "Basic 400, Standard 700, Premium 1200")
+  const nums = (text.replace(/(\d),(\d)/g, '$1$2').match(/\d+(?:\.\d+)?/g) ?? []).map((n) => Math.round(Number(n)));
+  return nums.length >= 3 ? valid(nums[0], nums[1], nums[2]) : null;
 }
 
 async function askAI(prompt: string): Promise<string> {
@@ -57,9 +66,9 @@ async function askAI(prompt: string): Promise<string> {
       const r = await fetch(`${base}/v1/messages`, {
         method: 'POST', signal: ctl.signal,
         headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: process.env.AI_MODEL || DEFAULT_ANTHROPIC_MODEL, max_tokens: 120, system: SYSTEM, messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: process.env.AI_MODEL || DEFAULT_ANTHROPIC_MODEL, max_tokens: 700, system: SYSTEM, messages: [{ role: 'user', content: prompt }] }),
       });
-      if (!r.ok) throw new Error(`provider ${r.status}`);
+      if (!r.ok) throw new Error(`provider ${r.status} ${(await r.text().catch(() => '')).slice(0, 300)}`);
       const j = (await r.json()) as { content?: { type: string; text?: string }[] };
       return (j.content ?? []).filter((c) => c.type === 'text').map((c) => c.text ?? '').join(' ').trim();
     }
@@ -67,9 +76,9 @@ async function askAI(prompt: string): Promise<string> {
     const r = await fetch(`${base}/chat/completions`, {
       method: 'POST', signal: ctl.signal,
       headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
-      body: JSON.stringify({ model: process.env.AI_MODEL, max_tokens: 120, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: prompt }] }),
+      body: JSON.stringify({ model: process.env.AI_MODEL, max_tokens: 700, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: prompt }] }),
     });
-    if (!r.ok) throw new Error(`provider ${r.status}`);
+    if (!r.ok) throw new Error(`provider ${r.status} ${(await r.text().catch(() => '')).slice(0, 300)}`);
     const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
     return (j.choices?.[0]?.message?.content ?? '').trim();
   } finally { clearTimeout(timer); }
@@ -117,11 +126,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const prompt = `Data (JSON):\n${JSON.stringify({ service, location: place, owner_other_services: mine })}`;
 
   try {
-    const prices = parsePrices(await askAI(prompt));
-    if (!prices) throw new Error('bad answer');
+    const raw = await askAI(prompt);
+    const prices = parsePrices(raw);
+    if (!prices) throw new Error(`bad answer: ${raw.slice(0, 200)}`);
     return res.status(200).json(prices);
   } catch (e) {
-    console.error('ai price suggest failed', e instanceof Error ? e.message : 'unknown');
-    return res.status(502).json({ error: 'ai_unavailable' });
+    const msg = e instanceof Error ? e.message : 'unknown';
+    console.error('ai price suggest failed', msg);   // full reason is in Vercel > Logs
+    const detail = /^provider (\d+)/.exec(msg)?.[1] ? `provider ${/^provider (\d+)/.exec(msg)?.[1]}` : msg.startsWith('bad answer') ? 'bad answer' : /abort/i.test(msg) ? 'timeout' : 'network';
+    return res.status(502).json({ error: 'ai_unavailable', detail });
   }
 }

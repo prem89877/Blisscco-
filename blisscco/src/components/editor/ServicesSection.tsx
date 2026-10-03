@@ -35,9 +35,9 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ business_id: data.business.id, service, lang }),
       });
-      const j = (await r.json().catch(() => ({}))) as { basic?: number; standard?: number; premium?: number; error?: string };
+      const j = (await r.json().catch(() => ({}))) as { basic?: number; standard?: number; premium?: number; error?: string; detail?: string };
       if (r.ok && j.basic && j.standard && j.premium) setTip({ basic: j.basic, standard: j.standard, premium: j.premium });
-      else setTipErr(t(j.error && TIP_ERR.includes(j.error) ? `ps.err.${j.error}` : 'err.generic'));
+      else setTipErr(t(j.error && TIP_ERR.includes(j.error) ? `ps.err.${j.error}` : 'err.generic') + (j.detail ? ` (${j.detail})` : ''));
     } catch { setTipErr(t('err.generic')); }
     finally { setTipBusy(false); }
   }
