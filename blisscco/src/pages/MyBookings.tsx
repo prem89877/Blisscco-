@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import DisputeButton from '../components/DisputeButton';
 import ReviewForm from '../components/ReviewForm';
 import { Msg } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
@@ -61,6 +62,7 @@ export default function MyBookings() {
         : openReview === b.id
           ? <ReviewForm bookingId={b.id} onDone={load} />
           : <button className="btn-secondary" onClick={() => setOpenReview(b.id)}>{t('rv.write')}</button>)}
+      {['completed', 'cancelled', 'no_show'].includes(b.status) && <DisputeButton bookingId={b.id} />}
     </li>
   );
 

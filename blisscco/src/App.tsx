@@ -1,6 +1,12 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import RequireRole from './components/RequireRole';
+import AdminAudit from './pages/admin/AdminAudit';
+import AdminDisputes from './pages/admin/AdminDisputes';
+import AdminPromotions from './pages/admin/AdminPromotions';
+import AdminReports from './pages/admin/AdminReports';
+import AdminSubscriptions from './pages/admin/AdminSubscriptions';
+import AdminUsers from './pages/admin/AdminUsers';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminHome from './pages/admin/AdminHome';
 import AdminPayments from './pages/admin/AdminPayments';
@@ -70,6 +76,12 @@ export default function App() {
         <Route path="/owner/business/:id/verify" element={owner(<OwnerVerify />)} />
         <Route path="/owner/business/:id/analytics" element={owner(<OwnerAnalytics />)} />
         <Route path="/owner/business/:id/qr" element={owner(<OwnerQR />)} />
+        <Route path="/admin/users" element={admin(<AdminUsers />)} />
+        <Route path="/admin/disputes" element={admin(<AdminDisputes />)} />
+        <Route path="/admin/subscriptions" element={admin(<AdminSubscriptions />)} />
+        <Route path="/admin/promotions" element={admin(<AdminPromotions />)} />
+        <Route path="/admin/reports" element={admin(<AdminReports />)} />
+        <Route path="/admin/audit" element={admin(<AdminAudit />)} />
         <Route path="/admin/banners" element={admin(<AdminBanners />)} />
         <Route path="/admin/verifications" element={admin(<AdminVerifications />)} />
         <Route path="/admin/payments" element={admin(<AdminPayments />)} />
