@@ -8,7 +8,7 @@ import { BANNER_BUCKET, EXT, MAX_BYTES, signedUrlMap } from '../../lib/storage';
 import { supabase } from '../../lib/supabase';
 import type { BannerRow, Entitlements } from '../../lib/types';
 
-const KNOWN = ['not_owner', 'business_not_approved', 'plan_required', 'invalid_title', 'invalid_image', 'no_credits', 'invalid_state', 'not_found'];
+const KNOWN = ['not_owner', 'business_not_approved', 'invalid_title', 'invalid_image', 'no_credits', 'invalid_state', 'not_found'];
 
 export default function OwnerBanners() {
   const { id } = useParams();

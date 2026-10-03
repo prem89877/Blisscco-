@@ -5,10 +5,10 @@ export { LANGS } from './messages';
 export type { Lang } from './messages';
 
 const KEY = 'blisscco.lang';
-type TFn = (key: string, vars?: Record<string, string | number>) => string;
-interface I18nCtx { lang: Lang; setLang: (l: Lang) => void; t: TFn }
+type TFn = (key: string, vars ? : Record < string, string | number > ) => string;
+interface I18nCtx { lang: Lang;setLang: (l: Lang) => void;t: TFn }
 
-const Ctx = createContext<I18nCtx | null>(null);
+const Ctx = createContext < I18nCtx | null > (null);
 
 function initialLang(): Lang {
   try {
@@ -19,21 +19,22 @@ function initialLang(): Lang {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang);
-
+  const [lang, setLangState] = useState < Lang > (initialLang);
+  
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
-
+  
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     try { localStorage.setItem(KEY, l); } catch { /* ignore */ }
   }, []);
-
-  const t = useCallback<TFn>((key, vars) => {
+  
+  const t = useCallback < TFn > ((key, vars) => {
     let s = messages[lang][key] ?? messages.en[key] ?? key;
-    if (vars) for (const [k, v] of Object.entries(vars)) s = s.replace(`{${k}}`, String(v));
+    if (vars)
+      for (const [k, v] of Object.entries(vars)) s = s.replace(`{${k}}`, String(v));
     return s;
   }, [lang]);
-
+  
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

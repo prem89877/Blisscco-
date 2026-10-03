@@ -5,11 +5,10 @@ import { useI18n } from '../../i18n';
 import type { AnalyticsData, Counts } from '../../lib/analytics';
 import { addDays, fmtDate, istToday } from '../../lib/format';
 import { supabase } from '../../lib/supabase';
-import type { Entitlements } from '../../lib/types';
 
 const RANGES = [7, 30, 90] as const;
-const DB_ERR = ['not_owner', 'plan_required', 'invalid_range'];
-const AI_ERR = ['unauthorized', 'bad_request', 'configuration_required', 'elite_required', 'not_owner', 'plan_required', 'rate_limited', 'ai_unavailable', 'invalid_range', 'server_config', 'server_error'];
+const DB_ERR = ['not_owner', 'invalid_range'];
+const AI_ERR = ['unauthorized', 'bad_request', 'configuration_required', 'not_owner', 'rate_limited', 'ai_unavailable', 'invalid_range', 'server_config', 'server_error'];
 const pct = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 1000) / 10}%` : '–');
 const SRC_COLOR: Record<string, string> = { qr: 'bg-blush', search: 'bg-ink', referral: 'bg-amber-400', direct: 'bg-ink/30' };
 
@@ -27,19 +26,12 @@ export default function OwnerAnalytics() {
   const { id } = useParams();
   const { t, lang } = useI18n();
   const [days, setDays] = useState<(typeof RANGES)[number]>(30);
-  const [ent, setEnt] = useState<Entitlements | null | undefined>(undefined);
   const [data, setData] = useState<AnalyticsData | null>(null);
-  const [locked, setLocked] = useState(false);
   const [error, setError] = useState('');
   const [aiBusy, setAiBusy] = useState(false);
   const [ai, setAi] = useState({ text: '', error: '' });
 
   const range = useCallback(() => { const to = istToday(); return { from: addDays(to, -(days - 1)), to }; }, [days]);
-
-  useEffect(() => {
-    if (!id) return;
-    void supabase.rpc('my_entitlements', { p_business_id: id }).then(({ data: e, error: err }) => setEnt(err ? null : (e as Entitlements)));
-  }, [id]);
 
   useEffect(() => {
     if (!id) return;
@@ -49,10 +41,9 @@ export default function OwnerAnalytics() {
     void supabase.rpc('get_analytics', { p_business_id: id, p_from: from, p_to: to }).then(({ data: d, error: e }) => {
       if (!alive) return;
       if (e) {
-        if (e.message === 'plan_required') { setLocked(true); setData(null); return; }
         console.error(e); setError(t(DB_ERR.includes(e.message) ? `p9.err.${e.message}` : 'err.generic')); return;
       }
-      setLocked(false); setData(d as AnalyticsData);
+      setData(d as AnalyticsData);
     });
     return () => { alive = false; };
   }, [id, range, t]);
@@ -76,23 +67,10 @@ export default function OwnerAnalytics() {
     finally { setAiBusy(false); }
   }
 
-  const planLink = <Link className="btn-primary" to={`/owner/business/${id}/plans`}>{t('p9.seePlans')}</Link>;
-
-  if (locked) {
-    return (
-      <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
-        <Link to="/owner" className="text-sm btn-text">{t('p9.back')}</Link>
-        <h1 className="font-display text-2xl font-semibold">{t('p9.title')}</h1>
-        <Section title={t('p9.lockedTitle')}><p>{t('p9.lockedText')}</p>{planLink}</Section>
-      </section>
-    );
-  }
-
   const tot: Counts | undefined = data?.totals;
   const maxDay = Math.max(1, ...(data?.daily.map((d) => d.profile_view) ?? [1]));
   const srcTotal = Math.max(1, ...(data?.by_source.map((s) => s.profile_view) ?? [1]));
   const empty = !!tot && tot.profile_view + tot.search_impression + tot.booking === 0;
-  const isElite = true;   // subscriptions removed: AI insights are open to every shop owner
 
   return (
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
@@ -139,15 +117,10 @@ export default function OwnerAnalytics() {
           </Section>
 
           <Section title={t('p9.aiTitle')}>
-            {ent === undefined && <div className="h-10 animate-pulse rounded-xl bg-ink/10" />}
-                        {isElite && (
-              <>
-                <p className="text-sm text-ink/70">{t('p9.aiHint')}</p>
-                <button className="btn-primary" disabled={aiBusy} onClick={() => void askAi()}>{aiBusy ? t('p9.aiWorking') : t('p9.aiButton')}</button>
-                <Msg error={ai.error} />
-                {ai.text && <p className="whitespace-pre-wrap rounded-xl bg-cream p-4 text-sm" role="status">{ai.text}</p>}
-              </>
-            )}
+            <p className="text-sm text-ink/70">{t('p9.aiHint')}</p>
+            <button className="btn-primary" disabled={aiBusy} onClick={() => void askAi()}>{aiBusy ? t('p9.aiWorking') : t('p9.aiButton')}</button>
+            <Msg error={ai.error} />
+            {ai.text && <p className="whitespace-pre-wrap rounded-xl bg-cream p-4 text-sm" role="status">{ai.text}</p>}
           </Section>
         </>
       )}

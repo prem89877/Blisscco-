@@ -17,19 +17,19 @@ const PAGE = 20;
 
 interface Row {
   bid: string; key: string; to: string; title: string; business: string | null; catEn: string; catHi: string | null; catMr: string | null;
-  city: string | null; services: number | null; price: number | null; isFrom: boolean; distance: number; open: boolean; cover: string | null; tier: number; verified: boolean;
+  city: string | null; services: number | null; price: number | null; isFrom: boolean; distance: number; open: boolean; cover: string | null; verified: boolean;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromBiz = (r: any): Row => ({
   bid: r.business_id, key: r.business_id, to: `/b/${r.business_id}?src=search`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
   catMr: r.category_name_mr, city: r.city, services: r.service_count, price: r.min_price, isFrom: true, distance: r.distance_m,
-  open: r.is_open_now, cover: r.cover_path, tier: r.tier_rank ?? 0, verified: !!r.is_verified,
+  open: r.is_open_now, cover: r.cover_path, verified: !!r.is_verified,
 });
 const fromSvc = (r: any): Row => ({
   bid: r.business_id, key: r.service_id, to: `/b/${r.business_id}?src=search`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
   catHi: r.category_name_hi, catMr: r.category_name_mr, city: r.city, services: null, price: r.price_inr, isFrom: false,
-  distance: r.distance_m, open: r.is_open_now, cover: r.cover_path, tier: r.tier_rank ?? 0, verified: !!r.is_verified,
+  distance: r.distance_m, open: r.is_open_now, cover: r.cover_path, verified: !!r.is_verified,
 });
 
 export default function Explore() {
