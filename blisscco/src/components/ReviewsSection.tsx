@@ -8,25 +8,25 @@ import { supabase } from '../lib/supabase';
 interface Rating { avg_rating: number; review_count: number }
 interface Row { id: string; reviewer_name: string | null; rating: number; comment: string | null; created_at: string; owner_response: string | null }
 
-export function RatingLine({ businessId }: { businessId: string }) {
+export function RatingLine({ businessId, reloadKey = 0 }: { businessId: string; reloadKey?: number }) {
   const { t } = useI18n();
   const [r, setR] = useState<Rating | null | undefined>(undefined);
   useEffect(() => {
     void supabase.from('public_business_ratings').select('avg_rating,review_count').eq('business_id', businessId).maybeSingle()
       .then(({ data }) => setR((data as Rating | null) ?? null));
-  }, [businessId]);
+  }, [businessId, reloadKey]);
   if (r === undefined) return null;
   return <p className="text-sm text-ink/70">{r ? <><Stars value={r.avg_rating} /> {r.avg_rating} ({r.review_count})</> : t('biz.noReviews')}</p>;
 }
 
-export function ReviewsSection({ businessId }: { businessId: string }) {
+export function ReviewsSection({ businessId, reloadKey = 0 }: { businessId: string; reloadKey?: number }) {
   const { t, lang } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   useEffect(() => {
     void supabase.from('reviews').select('id,reviewer_name,rating,comment,created_at,owner_response')
       .eq('business_id', businessId).eq('status', 'published').order('created_at', { ascending: false }).limit(20)
       .then(({ data }) => setRows((data ?? []) as Row[]));
-  }, [businessId]);
+  }, [businessId, reloadKey]);
   if (rows.length === 0) return null;
   return (
     <Section title={t('rv.title')}>

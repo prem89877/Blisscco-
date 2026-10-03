@@ -18,6 +18,7 @@ begin
   insert into public.services (business_id, service_category, price_inr) values (ba, 'Facial', 500) returning id into sa;
   insert into public.business_hours (business_id, day_of_week, opens_at, closes_at, is_closed)
     select b2, d, '00:00', '23:59', false from unnest(array[ba, bb]) b2, generate_series(0, 6) d;
+  update public.referral_reward_options set is_active = false;   -- test must not depend on reward options already in the database (the reward is picked at random)
   insert into public.referral_reward_options (discount_type, discount_value, max_discount_inr, min_spend_inr, weight) values ('percent', 10, 100, 0, 1);
   update public.referral_config set is_active = true, coupon_valid_days = 30 where id = 1;
 

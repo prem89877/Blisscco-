@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import BookingPanel from '../components/BookingPanel';
+import ReviewForm from '../components/ReviewForm';
 import { RatingLine, ReviewsSection } from '../components/ReviewsSection';
 import Skeleton from '../components/Skeleton';
 import { TierChip, VerifiedTick } from '../components/TierBadge';
+import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
+import { RETURN_KEY } from '../lib/bookingErrors';
 import { sourceFromParam, trackView } from '../lib/analytics';
 import { getStoredRef } from '../lib/referral';
 import { directionsUrl, hhmm, rupees } from '../lib/format';
@@ -18,6 +21,19 @@ interface Pub {
   state: string | null; pincode: string | null; latitude: number; longitude: number; phone: string | null;
 }
 
+function WriteShopReview({ businessId, onDone }: { businessId: string; onDone: () => Promise<void> }) {
+  const { t } = useI18n();
+  const { session } = useAuth();
+  const loc = useLocation();
+  const [open, setOpen] = useState(false);
+  if (!session) {
+    return <Link to="/login" className="btn-secondary w-full" onClick={() => { try { sessionStorage.setItem(RETURN_KEY, loc.pathname); } catch { /* ignore */ } }}>{t('rv.loginToReview')}</Link>;
+  }
+  return open
+    ? <ReviewForm businessId={businessId} onDone={onDone} />
+    : <button className="btn-secondary w-full" onClick={() => setOpen(true)}>{t('rv.write')}</button>;
+}
+
 export default function BusinessProfile() {
   const { id } = useParams();
   const [params] = useSearchParams();
@@ -27,6 +43,7 @@ export default function BusinessProfile() {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [hours, setHours] = useState<Hour[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [rvKey, setRvKey] = useState(0);
   const [flags, setFlags] = useState<{ tier_rank: number; is_verified: boolean } | null>(null);
 
   useEffect(() => {
@@ -71,7 +88,7 @@ export default function BusinessProfile() {
       <header>
         <p className="text-sm text-ink/70">{cat}</p>
         <h1 className="flex flex-wrap items-center gap-2 font-display text-3xl font-semibold">{biz.name}{flags?.is_verified && <VerifiedTick size={26} />}{flags && <TierChip rank={flags.tier_rank} />}</h1>
-        <RatingLine businessId={biz.id} />
+        <RatingLine businessId={biz.id} reloadKey={rvKey} />
       </header>
       {desc && <p>{desc}</p>}
       <p className="text-sm">{[biz.address_line, biz.city, biz.state, biz.pincode].filter(Boolean).join(', ')}</p>
@@ -100,7 +117,8 @@ export default function BusinessProfile() {
           {hours.map((h) => <li key={h.day_of_week} className="flex justify-between py-1"><span>{t(`day.${h.day_of_week}`)}</span><span>{h.is_closed ? t('ed.closed') : `${hhmm(h.opens_at)} – ${hhmm(h.closes_at)}`}</span></li>)}
         </ul>
       </section>
-      <ReviewsSection businessId={biz.id} />
+      <WriteShopReview businessId={biz.id} onDone={async () => { setRvKey((n) => n + 1); }} />
+      <ReviewsSection businessId={biz.id} reloadKey={rvKey} />
     </article>
   );
 }
