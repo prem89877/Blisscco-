@@ -25,7 +25,7 @@ export default function MyBookings() {
   const load = useCallback(async () => {
     if (!uid) return;
     const [b, r] = await Promise.all([
-      supabase.from('bookings').select('*').order('created_at', { ascending: false }).limit(50),
+      supabase.from('bookings').select('*').eq('customer_id', uid).order('created_at', { ascending: false }).limit(50),
       supabase.from('reviews').select('booking_id').eq('customer_id', uid),
     ]);
     if (b.error) { console.error(b.error); setErrKey('err.generic'); return; }
