@@ -71,8 +71,7 @@ begin
   begin perform public.submit_review(b_d2, 5, 'x'); raise exception 'TEST FAIL: reviewed someone else booking';
   exception when others then if sqlerrm like 'TEST FAIL%' then raise; end if; if sqlerrm <> 'not_found' then raise exception 'TEST FAIL: wrong error %', sqlerrm; end if; end;
   j := public.book_walkin(sa); b_d3 := (j ->> 'id')::uuid;      -- booked but NOT completed
-  begin perform public.submit_review(b_d3, 5, 'x'); raise exception 'TEST FAIL: review before completion';
-  exception when others then if sqlerrm like 'TEST FAIL%' then raise; end if; if sqlerrm <> 'not_completed' then raise exception 'TEST FAIL: wrong error %', sqlerrm; end if; end;
+  perform public.submit_review(b_d3, 3, 'not completed yet');   -- reviews are now allowed on any own booking
   reset role; perform set_config('request.jwt.claims', json_build_object('sub', o1, 'role', 'authenticated')::text, true); set local role authenticated;
   begin perform public.submit_review(b_d2, 5, 'x'); raise exception 'TEST FAIL: owner reviewed own business';
   exception when others then if sqlerrm like 'TEST FAIL%' then raise; end if; if sqlerrm <> 'not_found' then raise exception 'TEST FAIL: wrong error %', sqlerrm; end if; end;
@@ -82,7 +81,7 @@ begin
   exception when others then if sqlerrm like 'TEST FAIL%' then raise; end if; if sqlerrm <> 'already_reviewed' then raise exception 'TEST FAIL: wrong error %', sqlerrm; end if; end;
   reset role; set local role anon;
   select review_count into n from public.public_business_ratings where business_id = ba;
-  if n <> 1 then raise exception 'TEST FAIL: expected 1 public review, got %', n; end if;
+  if n <> 2 then raise exception 'TEST FAIL: expected 2 public reviews, got %', n; end if;
 
   -- write protection: no direct inserts/updates for ordinary users
   reset role; perform set_config('request.jwt.claims', json_build_object('sub', r, 'role', 'authenticated')::text, true); set local role authenticated;

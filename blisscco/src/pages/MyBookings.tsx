@@ -57,7 +57,7 @@ export default function MyBookings() {
       {['pending', 'confirmed', 'checked_in'].includes(b.status) && (
         <button className="btn-secondary" disabled={busyId === b.id} onClick={() => void cancel(b.id)}>{t('my.cancel')}</button>
       )}
-      {b.status === 'completed' && (reviewed.has(b.id)
+      {(reviewed.has(b.id)
         ? <p className="text-sm text-green-800">{t('rv.reviewed')}</p>
         : openReview === b.id
           ? <ReviewForm bookingId={b.id} onDone={load} />
