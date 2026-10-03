@@ -18,18 +18,19 @@ const PAGE = 20;
 interface Row {
   bid: string; key: string; to: string; title: string; business: string | null; catEn: string; catHi: string | null; catMr: string | null;
   city: string | null; services: number | null; price: number | null; isFrom: boolean; distance: number; open: boolean; cover: string | null; verified: boolean;
+  exact: boolean;   // false = found through the typo-tolerant match (similar spelling / sound)
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromBiz = (r: any): Row => ({
   bid: r.business_id, key: r.business_id, to: `/b/${r.business_id}?src=search`, title: r.name, business: null, catEn: r.category_name_en, catHi: r.category_name_hi,
   catMr: r.category_name_mr, city: r.city, services: r.service_count, price: r.min_price, isFrom: true, distance: r.distance_m,
-  open: r.is_open_now, cover: r.cover_path, verified: !!r.is_verified,
+  open: r.is_open_now, cover: r.cover_path, verified: !!r.is_verified, exact: true,
 });
 const fromSvc = (r: any): Row => ({
   bid: r.business_id, key: r.service_id, to: `/b/${r.business_id}?src=search`, title: r.service_label, business: r.business_name, catEn: r.category_name_en,
   catHi: r.category_name_hi, catMr: r.category_name_mr, city: r.city, services: null, price: r.price_inr, isFrom: false,
-  distance: r.distance_m, open: r.is_open_now, cover: r.cover_path, verified: !!r.is_verified,
+  distance: r.distance_m, open: r.is_open_now, cover: r.cover_path, verified: !!r.is_verified, exact: r.is_exact !== false,
 });
 
 export default function Explore() {
@@ -135,6 +136,7 @@ export default function Explore() {
             enterKeyHint="search"
             autoComplete="off"
             autoCorrect="off"
+            spellCheck={false}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="search-input [&::-webkit-search-cancel-button]:appearance-none"
@@ -168,6 +170,7 @@ export default function Explore() {
       <Msg error={errKey ? t(errKey) : ''} />
       {loading && rows.length === 0 && [0, 1, 2].map((k) => <div key={k} className="h-72 animate-pulse rounded-3xl bg-ink/10" />)}
       {!loading && !errKey && rows.length === 0 && <p className="py-6 text-center text-ink/70">{t('explore.empty')}</p>}
+      {dq && rows.length > 0 && !rows.some((r) => r.exact) && <p role="status" className="px-2 text-sm text-ink/70">{t('explore.similar', { q: dq })}</p>}
 
       <ul className="grid gap-4 sm:grid-cols-2">
         {rows.map((r) => {

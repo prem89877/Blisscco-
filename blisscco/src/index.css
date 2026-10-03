@@ -17,8 +17,17 @@
   /* Traditional filled pink button (used for "Add a business") */
   .btn-solid { @apply btn bg-blush text-ink shadow-card hover:brightness-95; }
   .btn-secondary { @apply btn border border-ink/20 text-ink hover:bg-ink/5; }
-  .input { @apply min-h-[44px] w-full rounded-xl border border-ink/20 bg-white px-4 py-2.5 text-base text-ink placeholder:text-ink/40 disabled:bg-ink/5; }
-  .card { @apply rounded-2xl bg-white p-5 shadow-card; }
+  /* Every box on the site (text fields, dropdowns, cards, tiles) shares the SEARCH BAR look:
+     white, fully rounded, soft shadow, thin ring, pink ring when focused. */
+  .input { @apply min-h-[48px] w-full rounded-full border-0 bg-white px-5 py-2.5 text-base text-ink shadow-card ring-1 ring-ink/10 transition placeholder:text-ink/40 disabled:bg-ink/5 disabled:shadow-none; }
+  .input:focus, .input:focus-visible { @apply outline-none ring-2 ring-blush ring-offset-0; }
+  textarea.input { @apply rounded-3xl py-3; }
+  select.input { @apply appearance-none pr-10; background-repeat: no-repeat; background-position: right 1rem center; background-size: 16px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232D2A2E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>"); }
+  .input-compact { @apply min-h-[44px] pl-4 pr-9 text-sm; }
+  select.input-compact { background-position: right 0.75rem center; }
+  .card { @apply rounded-3xl bg-white p-5 shadow-card ring-1 ring-ink/10; }
+  .box { @apply rounded-3xl bg-white shadow-card ring-1 ring-ink/10; }
 }
 
 /* Print only the QR poster (owner QR page) */

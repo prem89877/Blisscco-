@@ -158,6 +158,36 @@ const T: Record<string, Tpl> = {
     hi: ['लगभग 2 घंटे में आपकी अपॉइंटमेंट', '{shop} में {service}, {when}।'],
     mr: ['सुमारे 2 तासांत तुमची अपॉइंटमेंट', '{shop} येथे {service}, {when}.'],
   },
+  appointment_remind_20: {
+    en: ['✨ Glow time in 20 minutes!', 'Your {service} at {shop} starts at {time}. Your glow-up is almost here, time to head out! 💖'],
+    hi: ['✨ 20 मिनट में आपका ग्लो टाइम!', '{shop} में {service} {time} पर है। आपका नया लुक बस आने वाला है, अब निकलने का समय है! 💖'],
+    mr: ['✨ 20 मिनिटांत तुमचा ग्लो टाइम!', '{shop} येथे {service} {time} वाजता आहे. तुमचा नवा लूक जवळ आलाय, आता निघण्याची वेळ! 💖'],
+  },
+  appointment_time_set: {
+    en: ['Your time is set! 🎉', '{shop} will see you on {when} for {service}. Open My bookings and tap “Get notified” to get a reminder 20 minutes before.'],
+    hi: ['आपका समय तय हो गया! 🎉', '{shop} ने {service} के लिए {when} का समय दिया है। मेरी बुकिंग खोलें और 20 मिनट पहले रिमाइंडर के लिए “सूचना पाएँ” दबाएँ।'],
+    mr: ['तुमची वेळ ठरली! 🎉', '{shop} ने {service} साठी {when} ची वेळ दिली आहे. माझी बुकिंग उघडा आणि 20 मिनिटे आधी रिमाइंडरसाठी “सूचना मिळवा” दाबा.'],
+  },
+  appointment_time_changed: {
+    en: ['Your time was updated', '{shop} moved your {service} to {when}. Check My bookings.'],
+    hi: ['आपका समय बदला गया', '{shop} ने आपकी {service} का समय {when} कर दिया है। मेरी बुकिंग देखें।'],
+    mr: ['तुमची वेळ बदलली', '{shop} ने तुमची {service} {when} ला हलवली आहे. माझी बुकिंग पहा.'],
+  },
+  booking_new_request: {
+    en: ['New appointment request', '{who} wants {service} on {date}. Send them a time from your queue.'],
+    hi: ['नई अपॉइंटमेंट रिक्वेस्ट', '{who} को {date} को {service} चाहिए। कतार पेज से उन्हें समय भेजें।'],
+    mr: ['नवीन अपॉइंटमेंट विनंती', '{who} यांना {date} रोजी {service} हवे आहे. रांग पेजवरून त्यांना वेळ पाठवा.'],
+  },
+  booking_confirmed_request: {
+    en: ['Request sent ✅', '{shop} will send you a time for {service} on {date}. We will notify you as soon as it is set.'],
+    hi: ['रिक्वेस्ट भेज दी गई ✅', '{shop} {date} को {service} के लिए आपको समय भेजेगा। समय तय होते ही हम आपको बताएँगे।'],
+    mr: ['विनंती पाठवली ✅', '{shop} {date} रोजी {service} साठी तुम्हाला वेळ पाठवेल. वेळ ठरताच आम्ही कळवू.'],
+  },
+  appointment_request_closed: {
+    en: ['Request closed', '{shop} could not fit your {service} request for {date}. You can request another day.'],
+    hi: ['रिक्वेस्ट बंद हुई', '{shop} आपकी {date} की {service} रिक्वेस्ट पूरी नहीं कर सका। आप दूसरा दिन चुन सकते हैं।'],
+    mr: ['विनंती बंद झाली', '{shop} तुमची {date} ची {service} विनंती पूर्ण करू शकले नाही. तुम्ही दुसरा दिवस निवडू शकता.'],
+  },
   coupon_expiring: {
     en: ['Coupon expiring soon', 'Your {disc} coupon expires on {expires}. Use it before then.'],
     hi: ['कूपन जल्द खत्म होगा', 'आपका {disc} का कूपन {expires} को खत्म हो रहा है। उससे पहले इस्तेमाल करें।'],
@@ -187,12 +217,32 @@ const REASON: Record<NotifLang, string> = { en: ' Reason: ', hi: ' कारण:
 const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '');
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : Number(v) || 0);
 
+/** 12-hour clock in India time: 3:30 PM */
+function time12(d: Date): string {
+  const x = new Date(d.getTime() + 5.5 * 3600 * 1000);
+  const h = x.getUTCHours();
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(x.getUTCMinutes()).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+}
+
 function fmtWhen(iso: unknown, lang: NotifLang): string {
   const s = str(iso);
   if (!s) return '';
   const d = new Date(s);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString(LOCALE[lang], { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  return `${d.toLocaleDateString(LOCALE[lang], { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' })}, ${time12(d)}`;
+}
+
+function fmtClock(iso: unknown): string {
+  const s = str(iso);
+  const d = s ? new Date(s) : null;
+  return d && !Number.isNaN(d.getTime()) ? time12(d) : '';
+}
+
+/** 'YYYY-MM-DD' (the day a customer asked for) -> 'Mon, 5 Oct' */
+function fmtDay(ymd: unknown, lang: NotifLang): string {
+  const s = str(ymd);
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(`${s}T00:00:00Z`) : null;
+  return d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString(LOCALE[lang], { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }) : '';
 }
 
 const inr = (paise: unknown, lang: NotifLang) => `₹${(num(paise) / 100).toLocaleString(LOCALE[lang], { maximumFractionDigits: 2 })}`;
@@ -200,8 +250,12 @@ const inr = (paise: unknown, lang: NotifLang) => `₹${(num(paise) / 100).toLoca
 /** Which template a stored notification uses (some types have a variant). */
 export function templateKey(type: string, data: NotifData): string {
   const walkin = str(data.booking_type) === 'walkin';
+  const noTime = str(data.booking_type) === 'appointment' && !str(data.start_at);   // appointment request: the shop has not sent a time yet
   if (type === 'booking_new' && walkin) return 'booking_new_walkin';
   if (type === 'booking_confirmed' && walkin) return 'booking_confirmed_walkin';
+  if (type === 'booking_new' && noTime) return 'booking_new_request';
+  if (type === 'booking_confirmed' && noTime) return 'booking_confirmed_request';
+  if (type === 'appointment_time_set' && data.rescheduled === true) return 'appointment_time_changed';
   if (type === 'appointment_reminder') return str(data.window) === '2h' ? 'appointment_reminder_2h' : 'appointment_reminder_24h';
   if (type === 'subscription_expiring') return str(data.window) === '1d' ? 'subscription_expiring_1d' : 'subscription_expiring_7d';
   if (type === 'payment_refunded' && data.partial === true) return 'payment_refunded_partial';
@@ -220,6 +274,8 @@ export function composeNotification(type: string, data: NotifData, langIn: strin
     service: str(data.service),
     who: str(data.customer_name) || str(data.reviewer_name) || WHO[lang],
     when: fmtWhen(data.start_at, lang),
+    time: fmtClock(data.start_at),
+    date: fmtDay(data.requested_date, lang),
     token: str(data.token),
     stars: str(data.rating),
     plan: str(data.plan_name),

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import TimePicker12 from '../TimePicker12';
 import { Msg, Section } from '../ui';
 import { useI18n } from '../../i18n';
 import { hhmm } from '../../lib/format';
@@ -59,22 +60,23 @@ export default function HoursSection({ data, editable, reload }: { data: Loaded;
 
       <p className="text-sm font-medium">{t('ed.sameTime')}</p>
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm">{t('ed.opens')}
-          <input type="time" className="input w-auto" value={gOpen} disabled={d} onChange={(e) => setGlobal(e.target.value, gClose)} />
-        </label>
-        <label className="flex items-center gap-2 text-sm">{t('ed.closes')}
-          <input type="time" className="input w-auto" value={gClose} disabled={d} onChange={(e) => setGlobal(gOpen, e.target.value)} />
-        </label>
+        <div className="flex flex-wrap items-center gap-2 text-sm"><span>{t('ed.opens')}</span>
+          <TimePicker12 label={t('ed.opens')} value={gOpen} disabled={d} onChange={(v) => setGlobal(v, gClose)} />
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-sm"><span>{t('ed.closes')}</span>
+          <TimePicker12 label={t('ed.closes')} value={gClose} disabled={d} onChange={(v) => setGlobal(gOpen, v)} />
+        </div>
       </div>
 
-      <details className="rounded-xl bg-cream p-3">
+      <details className="box p-3">
         <summary className="cursor-pointer text-sm font-medium">{t('ed.customizeDays')}</summary>
         <div className="mt-3 space-y-2">
           {rows.filter((r) => !r.closed).map((r) => (
             <div key={r.day} className="flex flex-wrap items-center gap-2">
               <span className="w-12 text-sm font-medium">{t(`day.${r.day}`)}</span>
-              <input aria-label={t('ed.opens')} type="time" className="input w-auto" value={r.opens} disabled={d} onChange={(e) => setDay(r.day, { opens: e.target.value })} />
-              <input aria-label={t('ed.closes')} type="time" className="input w-auto" value={r.closes} disabled={d} onChange={(e) => setDay(r.day, { closes: e.target.value })} />
+              <TimePicker12 label={`${t(`day.${r.day}`)} ${t('ed.opens')}`} value={r.opens} disabled={d} onChange={(v) => setDay(r.day, { opens: v })} />
+              <span aria-hidden="true">–</span>
+              <TimePicker12 label={`${t(`day.${r.day}`)} ${t('ed.closes')}`} value={r.closes} disabled={d} onChange={(v) => setDay(r.day, { closes: v })} />
             </div>
           ))}
         </div>

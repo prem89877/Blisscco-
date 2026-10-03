@@ -103,12 +103,14 @@ async function sendPush(item: Item, report: (endpoint: string, outcome: 'ok' | '
   if (!item.subscriptions.length) return { result: 'skipped', error: 'no_subscription' };
   const { title, body } = composeNotification(item.notification.type, item.notification.data, item.language ?? 'en');
   const payload = JSON.stringify({ title, body, url: item.notification.link ?? '/', tag: item.notification.id });
-  const urgency = item.notification.type === 'booking_in_service' || item.notification.type === 'appointment_reminder' ? 'high' : 'normal';
+  const type = item.notification.type;
+  const urgency = type === 'booking_in_service' || type === 'appointment_reminder' || type === 'appointment_remind_20' ? 'high' : 'normal';
+  const ttl = type === 'appointment_remind_20' ? 900 : 86400;      // a 20-minute reminder is useless if it arrives late: drop it after 15 min
 
   let ok = 0; let gone = 0; let retryable = 0; let fatal = 0; const codes: number[] = [];
   for (const s of item.subscriptions) {
     try {
-      await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 86400, urgency, timeout: 8000 });
+      await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: ttl, urgency, timeout: 8000 });
       ok += 1;
       await report(s.endpoint, 'ok');
     } catch (e) {

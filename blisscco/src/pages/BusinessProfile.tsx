@@ -10,7 +10,7 @@ import { useI18n } from '../i18n';
 import { RETURN_KEY } from '../lib/bookingErrors';
 import { sourceFromParam, trackView } from '../lib/analytics';
 import { getStoredRef } from '../lib/referral';
-import { directionsUrl, dowOf, hhmm, istToday, rupees } from '../lib/format';
+import { directionsUrl, dowOf, hhmm, hoursRange, istToday, rupees } from '../lib/format';
 import { signedUrlMap } from '../lib/storage';
 import { supabase } from '../lib/supabase';
 import type { BizImage, Hour, Service } from '../lib/types';
@@ -155,9 +155,9 @@ export default function BusinessProfile() {
         <h2 className="font-display text-xl font-semibold">{t('biz.hours')}</h2>
         <ul className="space-y-0.5 text-sm">
           {hours.map((h) => (
-            <li key={h.day_of_week} className={`flex justify-between rounded-lg px-3 py-2 ${h.day_of_week === today ? 'bg-blush/15 font-semibold' : ''}`}>
+            <li key={h.day_of_week} className={`flex justify-between rounded-full px-4 py-2 ${h.day_of_week === today ? 'bg-blush/15 font-semibold' : ''}`}>
               <span>{t(`day.${h.day_of_week}`)}{h.day_of_week === today ? ` · ${t('biz.today')}` : ''}</span>
-              <span>{h.is_closed ? t('ed.closed') : `${hhmm(h.opens_at)} – ${hhmm(h.closes_at)}`}</span>
+              <span>{h.is_closed ? t('ed.closed') : hoursRange(h.opens_at, h.closes_at)}</span>
             </li>
           ))}
         </ul>

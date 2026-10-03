@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Msg, Section, Select, StatusBadge, TextArea } from '../../components/ui';
 import { useI18n } from '../../i18n';
-import { hhmm, mapsPointUrl, rupees } from '../../lib/format';
+import { hoursRange, mapsPointUrl, rupees } from '../../lib/format';
 import { signedUrlMap } from '../../lib/storage';
 import { supabase } from '../../lib/supabase';
 import type { BizImage, Business, Hour, Service, Status } from '../../lib/types';
@@ -66,7 +66,7 @@ function Detail({ b, onDone }: { b: Business; onDone: () => Promise<void> }) {
           ? <img key={im.id} src={urls[im.storage_path]} alt="" loading="lazy" className="aspect-square w-full rounded-lg object-cover" />
           : <div key={im.id} className="aspect-square animate-pulse rounded-lg bg-ink/10" />)}
       </div>
-      <ul>{hours.map((h) => <li key={h.day_of_week}>{t(`day.${h.day_of_week}`)}: {h.is_closed ? t('ed.closed') : `${hhmm(h.opens_at)} – ${hhmm(h.closes_at)}`}</li>)}</ul>
+      <ul>{hours.map((h) => <li key={h.day_of_week}>{t(`day.${h.day_of_week}`)}: {h.is_closed ? t('ed.closed') : hoursRange(h.opens_at, h.closes_at)}</li>)}</ul>
       <ul>{services.map((s) => <li key={s.id}>{s.name || s.service_category} — {rupees(s.price_inr)}</li>)}</ul>
 
       {(b.status === 'pending_review' || b.status === 'approved') && (

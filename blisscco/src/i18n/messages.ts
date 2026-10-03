@@ -827,9 +827,66 @@ const mr13: M = {
 };
 const p13 = { en: en13, hi: hi13, mr: mr13 };
 
+// ---- Appointment request flow (date only; the shop sends the time), 12-hour clock, similar-match notice ----
+const en14: M = {
+  'time.hour': 'Hour', 'time.minute': 'Minute',
+  'bk.doneReqTitle': 'Request sent!', 'bk.timeLater': 'Just pick a day. The shop will send you the exact time.', 'bk.requestAppt': 'Request appointment',
+  'bk.doneAppt': 'Your appointment request is sent. The shop will send you the exact time, and we will notify you as soon as it is set.',
+  'bk.err.slot_passed': 'That day or time has already passed. Pick another.', 'bk.err.duplicate': 'You already requested this service for this day.',
+  'bk.err.time_not_set': 'Send the time to the customer first.', 'bk.err.reminder_not_allowed': 'A reminder cannot be set for this booking.',
+  'bs.awaiting_time': 'Waiting for time',
+  'my.timePending': 'Time not set yet', 'my.timePendingHelp': 'The shop will send you the exact time. You will get a notification, then tap “Get notified” here.',
+  'my.getNotified': 'Get notified', 'my.notifyIsOn': 'You will be notified 20 minutes before', 'my.notifyOff': 'Turn off',
+  'my.notifyOn': 'Done! We will send you a push notification and an email 20 minutes before your visit.',
+  'my.notifyPushDenied': 'Reminder is on and you will get an email. Notifications are blocked in this browser; allow them in settings to get push too.',
+  'my.notifyPushError': 'Reminder is on and you will get an email, but push could not be turned on for this device.',
+  'my.notifyInstall': 'Reminder is on and you will get an email. For push on iPhone, add Blisscco to your Home Screen first.',
+  'oq.requests': 'Appointment requests', 'oq.requestsHelp': 'Customers chose a day only. Pick a time and tap “Send time”.',
+  'oq.noTimeYet': 'time not set', 'oq.pickTime': 'Appointment time', 'oq.sendTime': 'Send time', 'oq.updateTime': 'Update time',
+  'oq.timeSent': 'Time sent to the customer.',
+  'explore.similar': 'No exact match. Showing the closest results for “{q}”.',
+};
+const hi14: M = {
+  'time.hour': 'घंटा', 'time.minute': 'मिनट',
+  'bk.doneReqTitle': 'रिक्वेस्ट भेज दी गई!', 'bk.timeLater': 'बस दिन चुनें। दुकान आपको सही समय भेजेगी।', 'bk.requestAppt': 'अपॉइंटमेंट माँगें',
+  'bk.doneAppt': 'आपकी अपॉइंटमेंट रिक्वेस्ट भेज दी गई है। दुकान आपको सही समय भेजेगी और समय तय होते ही हम आपको बताएँगे।',
+  'bk.err.slot_passed': 'वह दिन या समय निकल चुका है। दूसरा चुनें।', 'bk.err.duplicate': 'आपने इस दिन के लिए यह सेवा पहले ही माँगी है।',
+  'bk.err.time_not_set': 'पहले ग्राहक को समय भेजें।', 'bk.err.reminder_not_allowed': 'इस बुकिंग के लिए रिमाइंडर नहीं लग सकता।',
+  'bs.awaiting_time': 'समय का इंतज़ार',
+  'my.timePending': 'समय अभी तय नहीं', 'my.timePendingHelp': 'दुकान आपको सही समय भेजेगी। नोटिफ़िकेशन मिलने पर यहाँ “सूचना पाएँ” दबाएँ।',
+  'my.getNotified': 'सूचना पाएँ', 'my.notifyIsOn': '20 मिनट पहले आपको सूचना मिलेगी', 'my.notifyOff': 'बंद करें',
+  'my.notifyOn': 'हो गया! विज़िट से 20 मिनट पहले हम आपको पुश नोटिफ़िकेशन और ईमेल भेजेंगे।',
+  'my.notifyPushDenied': 'रिमाइंडर चालू है और आपको ईमेल मिलेगा। इस ब्राउज़र में नोटिफ़िकेशन बंद हैं; पुश के लिए सेटिंग में अनुमति दें।',
+  'my.notifyPushError': 'रिमाइंडर चालू है और आपको ईमेल मिलेगा, पर इस डिवाइस पर पुश चालू नहीं हो सका।',
+  'my.notifyInstall': 'रिमाइंडर चालू है और आपको ईमेल मिलेगा। iPhone पर पुश के लिए पहले Blisscco को होम स्क्रीन में जोड़ें।',
+  'oq.requests': 'अपॉइंटमेंट रिक्वेस्ट', 'oq.requestsHelp': 'ग्राहकों ने सिर्फ़ दिन चुना है। समय चुनें और “समय भेजें” दबाएँ।',
+  'oq.noTimeYet': 'समय तय नहीं', 'oq.pickTime': 'अपॉइंटमेंट का समय', 'oq.sendTime': 'समय भेजें', 'oq.updateTime': 'समय बदलें',
+  'oq.timeSent': 'ग्राहक को समय भेज दिया गया।',
+  'explore.similar': 'सटीक नतीजा नहीं मिला। “{q}” से मिलते-जुलते नतीजे दिखा रहे हैं।',
+};
+const mr14: M = {
+  'time.hour': 'तास', 'time.minute': 'मिनिट',
+  'bk.doneReqTitle': 'विनंती पाठवली!', 'bk.timeLater': 'फक्त दिवस निवडा. दुकान तुम्हाला नेमकी वेळ पाठवेल.', 'bk.requestAppt': 'अपॉइंटमेंट मागा',
+  'bk.doneAppt': 'तुमची अपॉइंटमेंट विनंती पाठवली आहे. दुकान तुम्हाला नेमकी वेळ पाठवेल आणि वेळ ठरताच आम्ही कळवू.',
+  'bk.err.slot_passed': 'तो दिवस किंवा वेळ निघून गेली आहे. दुसरी निवडा.', 'bk.err.duplicate': 'तुम्ही या दिवसासाठी ही सेवा आधीच मागितली आहे.',
+  'bk.err.time_not_set': 'आधी ग्राहकाला वेळ पाठवा.', 'bk.err.reminder_not_allowed': 'या बुकिंगसाठी रिमाइंडर लावता येत नाही.',
+  'bs.awaiting_time': 'वेळेची प्रतीक्षा',
+  'my.timePending': 'वेळ अजून ठरलेली नाही', 'my.timePendingHelp': 'दुकान तुम्हाला नेमकी वेळ पाठवेल. सूचना मिळाल्यावर इथे “सूचना मिळवा” दाबा.',
+  'my.getNotified': 'सूचना मिळवा', 'my.notifyIsOn': '20 मिनिटे आधी तुम्हाला सूचना मिळेल', 'my.notifyOff': 'बंद करा',
+  'my.notifyOn': 'झाले! भेटीच्या 20 मिनिटे आधी आम्ही तुम्हाला पुश सूचना आणि ईमेल पाठवू.',
+  'my.notifyPushDenied': 'रिमाइंडर चालू आहे आणि तुम्हाला ईमेल मिळेल. या ब्राउझरमध्ये सूचना बंद आहेत; पुशसाठी सेटिंगमध्ये परवानगी द्या.',
+  'my.notifyPushError': 'रिमाइंडर चालू आहे आणि तुम्हाला ईमेल मिळेल, पण या डिव्हाइसवर पुश सुरू होऊ शकले नाही.',
+  'my.notifyInstall': 'रिमाइंडर चालू आहे आणि तुम्हाला ईमेल मिळेल. iPhone वर पुशसाठी आधी Blisscco होम स्क्रीनवर जोडा.',
+  'oq.requests': 'अपॉइंटमेंट विनंत्या', 'oq.requestsHelp': 'ग्राहकांनी फक्त दिवस निवडला आहे. वेळ निवडा आणि “वेळ पाठवा” दाबा.',
+  'oq.noTimeYet': 'वेळ ठरलेली नाही', 'oq.pickTime': 'अपॉइंटमेंटची वेळ', 'oq.sendTime': 'वेळ पाठवा', 'oq.updateTime': 'वेळ बदला',
+  'oq.timeSent': 'ग्राहकाला वेळ पाठवली.',
+  'explore.similar': 'अचूक निकाल नाही. “{q}” शी जुळणारे निकाल दाखवत आहोत.',
+};
+const p14 = { en: en14, hi: hi14, mr: mr14 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr },
 };

@@ -2,16 +2,19 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Field from '../../components/Field';
 import Skeleton from '../../components/Skeleton';
+import TimePicker12 from '../../components/TimePicker12';
 import { Check, Msg, Section, Select } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { bookingErrKey } from '../../lib/bookingErrors';
-import { fmtDateTime, fmtTime, istDayStartIso, istToday, rupees } from '../../lib/format';
+import { dowOf, fmtDate, fmtDateTime, fmtTime, hhmm, istDayStartIso, istToday, rupees } from '../../lib/format';
 import { supabase } from '../../lib/supabase';
-import type { Booking, BookingSettings, BookingStatus, Service } from '../../lib/types';
+import type { Booking, BookingSettings, BookingStatus, Hour, Service } from '../../lib/types';
 
 type Action = { label: string; to: BookingStatus };
 
 function actionsFor(b: Booking): Action[] {
+  const cancelOnly: Action = { label: 'act.cancel', to: 'cancelled' };
+  if (b.type === 'appointment' && b.start_at === null) return b.status === 'pending' ? [cancelOnly] : [];   // send the time first
   const apptStarted = b.type === 'walkin' || (b.start_at !== null && new Date(b.start_at) <= new Date());
   const noShow: Action[] = apptStarted ? [{ label: 'act.noShow', to: 'no_show' }] : [];
   const cancel: Action = { label: 'act.cancel', to: 'cancelled' };
@@ -38,16 +41,19 @@ export default function OwnerQueue() {
   const [ctl, setCtl] = useState({ queue_status: 'open', est: '', unavailable: false });
   const [cfg, setCfg] = useState({ slot: '30', capacity: '1', days: '14', appt: true, walkin: true, coupons: true });
   const [issue, setIssue] = useState({ service: '', guest: '' });
+  const [hours, setHours] = useState<Hour[]>([]);
+  const [times, setTimes] = useState<Record<string, string>>({});   // booking id -> 'HH:MM' chosen in the picker
 
   const load = useCallback(async (initial = false) => {
     if (!id) return;
     const today = istToday();
-    const [b, s, sv, bk] = await Promise.all([
+    const [b, s, sv, bk, hr] = await Promise.all([
       supabase.from('businesses').select('name').eq('id', id).maybeSingle(),
       supabase.from('business_booking_settings').select('*').eq('business_id', id).maybeSingle(),
       supabase.from('services').select('*').eq('business_id', id).eq('is_active', true).order('created_at'),
       supabase.from('bookings').select('*').eq('business_id', id)
-        .or(`queue_date.eq.${today},start_at.gte.${istDayStartIso(today)}`).order('created_at').limit(300),
+        .or(`queue_date.eq.${today},start_at.gte.${istDayStartIso(today)},requested_date.gte.${today}`).order('created_at').limit(300),
+      supabase.from('business_hours').select('*').eq('business_id', id),
     ]);
     if (!b.data || !s.data) { setMissing(true); return; }
     const settings = s.data as BookingSettings;
@@ -55,6 +61,7 @@ export default function OwnerQueue() {
     setSt(settings);
     setServices((sv.data ?? []) as Service[]);
     setBookings((bk.data ?? []) as Booking[]);
+    setHours((hr.data ?? []) as Hour[]);
     if (initial) {
       setCtl({ queue_status: settings.queue_status, est: settings.est_wait_minutes === null ? '' : String(settings.est_wait_minutes), unavailable: settings.temporarily_unavailable });
       setCfg({ slot: String(settings.slot_minutes), capacity: String(settings.capacity), days: String(settings.max_days_ahead), appt: settings.appointments_enabled, walkin: settings.walkin_enabled, coupons: settings.accept_coupons });
@@ -97,6 +104,23 @@ export default function OwnerQueue() {
     await load();
   }
 
+  async function sendTime(b: Booking) {
+    if (busy) return;
+    const val = times[b.id] ?? defaultTime(b);
+    setBusy(true); setErrKey(''); setOk('');
+    const { error } = await supabase.rpc('owner_set_appointment_time', { p_booking_id: b.id, p_time: val });
+    setBusy(false);
+    if (error) setErrKey(bookingErrKey(error.message)); else setOk(t('oq.timeSent'));
+    await load();
+  }
+
+  /** Picker starts at the booking's current time, else at the shop's opening time on the requested day. */
+  function defaultTime(b: Booking): string {
+    if (b.start_at) { const d = new Date(new Date(b.start_at).getTime() + 5.5 * 3600 * 1000); return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`; }
+    const h = b.requested_date ? hours.find((x) => x.day_of_week === dowOf(b.requested_date as string)) : undefined;
+    return (h && !h.is_closed && hhmm(h.opens_at)) || '10:00';
+  }
+
   async function issueToken() {
     if (busy || !issue.service) return;
     setBusy(true); setErrKey('');
@@ -111,7 +135,11 @@ export default function OwnerQueue() {
 
   const today = istToday();
   const tokens = bookings.filter((b) => b.type === 'walkin' && b.queue_date === today).sort((a, b) => (a.token_number ?? 0) - (b.token_number ?? 0));
-  const appts = bookings.filter((b) => b.type === 'appointment').sort((a, b) => (a.start_at ?? '').localeCompare(b.start_at ?? ''));
+  const apptKey = (b: Booking) => b.start_at ?? `${b.requested_date ?? ''}T00`;
+  const live = ['pending', 'confirmed', 'checked_in', 'in_service'];
+  const requests = bookings.filter((b) => b.type === 'appointment' && b.start_at === null && live.includes(b.status))
+    .sort((a, b) => apptKey(a).localeCompare(apptKey(b)));
+  const appts = bookings.filter((b) => b.type === 'appointment' && b.start_at !== null).sort((a, b) => apptKey(a).localeCompare(apptKey(b)));
   const waiting = tokens.filter((b) => b.status === 'confirmed' || b.status === 'checked_in');
   const serving = tokens.filter((b) => b.status === 'in_service');
 
@@ -119,11 +147,18 @@ export default function OwnerQueue() {
     <li key={b.id} className="space-y-2 py-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-medium">{b.type === 'walkin' ? `#${b.token_number}` : fmtDateTime(b.start_at ?? b.created_at, lang)} · {b.customer_name || b.guest_name || '—'}</p>
+          <p className="font-medium">{b.type === 'walkin' ? `#${b.token_number}` : b.start_at ? fmtDateTime(b.start_at, lang) : `${b.requested_date ? fmtDate(b.requested_date, lang) : ''} · ${t('oq.noTimeYet')}`} · {b.customer_name || b.guest_name || '—'}</p>
           <p className="text-sm text-ink/70">{b.service_label} · {rupees(b.price_inr)}</p>
         </div>
         <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(`bs.${b.status}`)}</span>
       </div>
+      {b.type === 'appointment' && ['pending', 'confirmed'].includes(b.status) && (
+        <div className="flex flex-wrap items-center gap-2">
+          <TimePicker12 label={t('oq.pickTime')} value={times[b.id] ?? defaultTime(b)} disabled={busy}
+            onChange={(v) => setTimes((p) => ({ ...p, [b.id]: v }))} />
+          <button className="btn-confirm !w-auto px-5" disabled={busy} onClick={() => void sendTime(b)}>{b.start_at ? t('oq.updateTime') : t('oq.sendTime')}</button>
+        </div>
+      )}
       <div className="flex flex-wrap gap-2">
         {actionsFor(b).map((a) => <button key={a.to} className="btn-secondary" disabled={busy} onClick={() => void setStatus(b.id, a.to)}>{t(a.label)}</button>)}
       </div>
@@ -131,7 +166,7 @@ export default function OwnerQueue() {
   );
 
   const stat = (label: string, v: string | number) => (
-    <div className="rounded-xl bg-cream p-3 text-center"><p className="text-xs text-ink/70">{label}</p><p className="text-lg font-semibold">{v}</p></div>
+    <div className="box p-3 text-center"><p className="text-xs text-ink/70">{label}</p><p className="text-lg font-semibold">{v}</p></div>
   );
 
   return (
@@ -170,6 +205,11 @@ export default function OwnerQueue() {
 
       <Section title={t('oq.today')}>
         {tokens.length === 0 ? <p className="text-sm text-ink/70">{t('oq.empty')}</p> : <ul className="divide-y divide-ink/10">{tokens.map(row)}</ul>}
+      </Section>
+
+      <Section title={t('oq.requests')}>
+        <p className="text-sm text-ink/70">{t('oq.requestsHelp')}</p>
+        {requests.length === 0 ? <p className="text-sm text-ink/70">{t('oq.empty')}</p> : <ul className="divide-y divide-ink/10">{requests.map(row)}</ul>}
       </Section>
 
       <Section title={t('oq.appointments')}>

@@ -21,6 +21,8 @@ export interface Booking {
   guest_name: string | null;source: 'customer' | 'owner';service_id: string;service_label: string;price_inr: number;
   type: 'appointment' | 'walkin';status: BookingStatus;start_at: string | null;end_at: string | null;
   queue_date: string | null;token_number: number | null;created_at: string;
+  /** appointment: the day the customer asked for (start_at stays null until the shop sends a time) */
+  requested_date: string | null;remind_me: boolean;time_set_at: string | null;
 }
 export interface QueueInfo {
   queue_status: 'open' | 'paused' | 'closed';temporarily_unavailable: boolean;est_wait_minutes: number | null;
