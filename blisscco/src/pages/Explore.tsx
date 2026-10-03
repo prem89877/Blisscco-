@@ -4,7 +4,7 @@ import ReferralBanner from '../components/ReferralBanner';
 import BannerStrip from '../components/BannerStrip';
 import { Stars } from '../components/Stars';
 import { VerifiedTick } from '../components/TierBadge';
-import { Check, Msg } from '../components/ui';
+import { Msg } from '../components/ui';
 import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
 import { trackImpressions } from '../lib/analytics';
@@ -117,36 +117,53 @@ export default function Explore() {
 
   return (
     <section className="mx-auto max-w-3xl space-y-4 px-4 py-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold">{t('explore.title')}</h1>
-        <p className="text-sm text-ink/70">{t('explore.within')}</p>
+      <div className="explore-hero">
+        <h1 className="font-display text-2xl font-semibold sm:text-3xl">{t('explore.title')}</h1>
+        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-ink/70">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-blush">
+            <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" />
+          </svg>
+          {t('explore.within')}
+        </p>
+
+        <form role="search" onSubmit={onSearch} className="search-bar mt-4">
+          <label htmlFor="q" className="sr-only">{t('home.search')}</label>
+          <input
+            ref={inputRef}
+            id="q"
+            type="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="search-input [&::-webkit-search-cancel-button]:appearance-none"
+          />
+          {!q && (
+            <span key={hint} aria-hidden="true" className="hint-fade pointer-events-none absolute left-5 right-16 top-1/2 -translate-y-1/2 truncate text-base text-ink/40">
+              {t('explore.eg')} {SEARCH_HINTS[hint]}
+            </span>
+          )}
+          <button type="submit" aria-label={t('home.search')} className="search-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+            </svg>
+          </button>
+        </form>
+
+        <div className="chip-row mt-3">
+          <button type="button" aria-pressed={openNow} onClick={() => setOpenNow((v) => !v)} className={`chip ${openNow ? 'chip-on' : ''}`}>
+            <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-white' : 'bg-green-500'}`} aria-hidden="true" />
+            {t('explore.openNow')}
+          </button>
+          {SEARCH_HINTS.slice(0, 8).map((h) => (
+            <button key={h} type="button" onClick={() => { setQ(h); setDq(h); inputRef.current?.blur(); }} className="chip capitalize">{h}</button>
+          ))}
+        </div>
       </div>
 
       <ReferralBanner />
       <BannerStrip lat={coords.lat} lng={coords.lng} />
-      <form role="search" onSubmit={onSearch} className="relative">
-        <label htmlFor="q" className="sr-only">{t('home.search')}</label>
-        <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/50" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
-        </svg>
-        <input
-          ref={inputRef}
-          id="q"
-          type="search"
-          enterKeyHint="search"
-          autoComplete="off"
-          autoCorrect="off"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="input pl-11 [&::-webkit-search-cancel-button]:appearance-none"
-        />
-        {!q && (
-          <span key={hint} aria-hidden="true" className="hint-fade pointer-events-none absolute left-11 top-1/2 -translate-y-1/2 truncate pr-4 text-base text-ink/40">
-            {t('explore.eg')} {SEARCH_HINTS[hint]}
-          </span>
-        )}
-      </form>
-      <Check id="on" label={t('explore.openNow')} checked={openNow} onChange={setOpenNow} />
 
       <Msg error={errKey ? t(errKey) : ''} />
       {loading && rows.length === 0 && [0, 1, 2].map((k) => <div key={k} className="h-28 animate-pulse rounded-2xl bg-ink/10" />)}
@@ -155,7 +172,7 @@ export default function Explore() {
       <ul className="space-y-3">
         {rows.map((r) => (
           <li key={r.key}>
-            <Link to={r.to} className="card flex gap-3 p-3">
+            <Link to={r.to} className="card result-card flex gap-3 p-3">
               {r.cover && urls[r.cover]
                 ? <img src={urls[r.cover]} alt="" loading="lazy" className="h-24 w-24 flex-none rounded-xl object-cover" />
                 : <div className="h-24 w-24 flex-none rounded-xl bg-ink/10" />}

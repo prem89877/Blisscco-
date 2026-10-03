@@ -32,3 +32,15 @@
 @keyframes hint-in { from { opacity: 0; transform: translateY(-40%); } to { opacity: 1; transform: translateY(-50%); } }
 .hint-fade { animation: hint-in 0.35s ease-out; }
 @media (prefers-reduced-motion: reduce) { .hint-fade { animation: none; } }
+
+/* Explore page: search bar, chips, cards */
+.explore-hero { @apply rounded-3xl bg-gradient-to-br from-blush/25 via-white to-cream p-5 shadow-card; }
+.search-bar { @apply relative flex items-center rounded-full bg-white shadow-card ring-1 ring-ink/10 transition focus-within:ring-2 focus-within:ring-blush; }
+.search-input { @apply min-h-[56px] w-full rounded-full bg-transparent py-3 pl-5 pr-16 text-base text-ink outline-none; }
+.search-input:focus-visible { box-shadow: none; }
+.search-btn { @apply absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-white shadow-md transition hover:brightness-95 active:scale-95; background-color: #ff91a4; }
+.chip-row { @apply -mx-1 flex gap-2 overflow-x-auto px-1 pb-1; scrollbar-width: none; }
+.chip-row::-webkit-scrollbar { display: none; }
+.chip { @apply inline-flex min-h-[36px] flex-none items-center gap-1.5 rounded-full border border-ink/10 bg-white px-3.5 text-sm font-medium text-ink/80 transition hover:border-blush active:scale-95; }
+.chip-on { @apply border-blush text-white; background-color: #ff91a4; }
+.result-card { @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-lg; }
