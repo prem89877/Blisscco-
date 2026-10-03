@@ -124,7 +124,7 @@ export default function BookingPanel({ businessId, services, hours }: { business
 
       <Msg error={errKey ? t(errKey) : ''} />
       {session ? (
-        <button className="btn-primary w-full" disabled={busy || !canConfirm || (tab === 'appointment' ? !apptOk : !walkinOk)} onClick={() => void book()}>
+        <button className="btn-confirm" disabled={busy || !canConfirm || (tab === 'appointment' ? !apptOk : !walkinOk)} onClick={() => void book()}>
           {busy ? t('common.loading') : tab === 'appointment' ? t('bk.confirm') : t('bk.getToken')}
         </button>
       ) : (

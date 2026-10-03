@@ -166,35 +166,62 @@ export default function Explore() {
       <BannerStrip lat={coords.lat} lng={coords.lng} />
 
       <Msg error={errKey ? t(errKey) : ''} />
-      {loading && rows.length === 0 && [0, 1, 2].map((k) => <div key={k} className="h-28 animate-pulse rounded-2xl bg-ink/10" />)}
+      {loading && rows.length === 0 && [0, 1, 2].map((k) => <div key={k} className="h-72 animate-pulse rounded-3xl bg-ink/10" />)}
       {!loading && !errKey && rows.length === 0 && <p className="py-6 text-center text-ink/70">{t('explore.empty')}</p>}
 
-      <ul className="space-y-3">
-        {rows.map((r) => (
-          <li key={r.key}>
-            <Link to={r.to} className="card result-card flex gap-3 p-3">
-              {r.cover && urls[r.cover]
-                ? <img src={urls[r.cover]} alt="" loading="lazy" className="h-24 w-24 flex-none rounded-xl object-cover" />
-                : <div className="h-24 w-24 flex-none rounded-xl bg-ink/10" />}
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1.5 font-semibold"><span className="truncate">{r.title}</span>{!r.business && r.verified && <VerifiedTick size={16} />}</p>
-                {r.business && <p className="flex items-center gap-1.5 text-sm"><span className="truncate">{r.business}</span>{r.verified && <VerifiedTick size={14} />}</p>}
-                <p className="truncate text-xs text-ink/70">{[localName(r.catEn, r.catHi, r.catMr, lang), r.city].filter(Boolean).join(' · ')}</p>
-                <p className="text-xs text-ink/60">{ratings[r.bid] ? <><Stars value={ratings[r.bid].avg_rating} /> {ratings[r.bid].avg_rating} ({ratings[r.bid].review_count})</> : t('biz.noReviews')}{r.services !== null ? ` · ${t('explore.services', { n: r.services })}` : ''}</p>
-                <p className="mt-1 flex items-center gap-2 text-xs">
-                  <span className={`rounded-full px-2 py-0.5 font-medium ${r.open ? 'bg-green-100 text-green-900' : 'bg-ink/10 text-ink/70'}`}>{r.open ? t('explore.openNow') : t('explore.closedNow')}</span>
-                  <span>{distanceLabel(r.distance)}</span>
-                </p>
-              </div>
-              {r.price !== null && (
-                <div className="flex-none text-right">
-                  {r.isFrom && <p className="text-xs text-ink/60">{t('explore.from')}</p>}
-                  <p className="font-semibold">{rupees(r.price)}</p>
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {rows.map((r) => {
+          const rt = ratings[r.bid];
+          const name = r.business ?? r.title;
+          return (
+            <li key={r.key}>
+              <Link to={r.to} className="shop-card">
+                <div className="shop-cover">
+                  {r.cover && urls[r.cover]
+                    ? <img src={urls[r.cover]} alt="" loading="lazy" />
+                    : <div className="flex h-full w-full items-center justify-center font-display text-6xl font-semibold text-ink/30" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</div>}
+                  <div className="absolute left-3 top-3 z-10 flex gap-1.5">
+                    <span className="shop-pill">
+                      <span className={`h-2 w-2 rounded-full ${r.open ? 'bg-green-500' : 'bg-ink/40'}`} aria-hidden="true" />
+                      {r.open ? t('explore.openNow') : t('explore.closedNow')}
+                    </span>
+                  </div>
+                  <span className="shop-pill absolute bottom-3 right-3 z-10">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-blush"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                    {distanceLabel(r.distance)}
+                  </span>
                 </div>
-              )}
-            </Link>
-          </li>
-        ))}
+
+                <div className="space-y-2 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1.5 font-display text-lg font-semibold leading-tight">
+                        <span className="truncate">{r.title}</span>{!r.business && r.verified && <VerifiedTick size={18} />}
+                      </p>
+                      {r.business && <p className="flex items-center gap-1.5 text-sm text-ink/80"><span className="truncate">{r.business}</span>{r.verified && <VerifiedTick size={14} />}</p>}
+                    </div>
+                    {r.price !== null && (
+                      <div className="flex-none text-right">
+                        {r.isFrom && <p className="text-[11px] leading-none text-ink/60">{t('explore.from')}</p>}
+                        <p className="text-lg font-semibold leading-tight">{rupees(r.price)}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                    <span className="rounded-full bg-blush/25 px-2.5 py-1 font-semibold">{localName(r.catEn, r.catHi, r.catMr, lang)}</span>
+                    {r.city && <span className="truncate text-ink/70">{r.city}</span>}
+                  </p>
+
+                  <p className="flex items-center gap-1.5 text-xs text-ink/70">
+                    {rt ? <><Stars value={rt.avg_rating} /> <span className="font-semibold text-ink">{rt.avg_rating}</span> ({rt.review_count})</> : t('biz.noReviews')}
+                    {r.services !== null ? <span>· {t('explore.services', { n: r.services })}</span> : null}
+                  </p>
+                </div>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
 
       {hasMore && (

@@ -44,3 +44,24 @@
 .chip { @apply inline-flex min-h-[36px] flex-none items-center gap-1.5 rounded-full border border-ink/10 bg-white px-3.5 text-sm font-medium text-ink/80 transition hover:border-blush active:scale-95; }
 .chip-on { @apply border-blush text-white; background-color: #ff91a4; }
 .result-card { @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-lg; }
+
+/* Confirm booking: solid #ff91a4 background */
+.btn-confirm { @apply btn w-full font-semibold text-ink shadow-card transition hover:brightness-95 active:scale-[0.98]; background-color: #ff91a4; }
+.btn-confirm:disabled { @apply shadow-none; }
+
+/* AI price suggestion (service form) */
+.btn-ai { @apply inline-flex min-h-[40px] items-center gap-1.5 rounded-full border bg-transparent px-4 text-sm font-medium text-ink transition hover:bg-blush/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60; border-color: #ff91a4; }
+.ai-tip { @apply rounded-xl bg-white p-3 ring-1 ring-blush/50; }
+
+/* Shop profile: services in a horizontal scroll row. Each pill looks like a transparent button with a #ff91a4 border, but is NOT clickable. */
+.svc-row { @apply -mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.svc-row::-webkit-scrollbar { display: none; }
+.svc-pill { @apply flex-none cursor-default select-none snap-start rounded-2xl border bg-transparent px-4 py-2.5 text-left; border-color: #ff91a4; pointer-events: none; min-width: 120px; max-width: 220px; }
+
+/* Browse shops: shop cards */
+.shop-card { @apply block overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-ink/5 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]; }
+.shop-cover { @apply relative h-44 w-full overflow-hidden bg-gradient-to-br from-blush/40 via-blush/20 to-cream; }
+.shop-cover img { @apply h-full w-full object-cover transition duration-300; }
+.shop-card:hover .shop-cover img { @apply scale-105; }
+.shop-cover::after { content: ''; position: absolute; inset: auto 0 0 0; height: 45%; background: linear-gradient(to top, rgba(45,42,46,0.45), transparent); pointer-events: none; }
+.shop-pill { @apply inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur; }

@@ -136,17 +136,17 @@ export default function BusinessProfile() {
           {minPrice !== null && <p className="text-xs text-ink/60">{t('biz.from')} {rupees(minPrice)}</p>}
         </div>
         {services.length === 0 && <p className="text-sm text-ink/60">{t('biz.noServices')}</p>}
-        <ul className="space-y-2">
-          {services.map((s) => (
-            <li key={s.id} className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3">
-              <div className="min-w-0">
-                <p className="truncate font-medium">{s.name || s.service_category}</p>
+        {services.length > 0 && (
+          <ul className="svc-row" aria-label={t('biz.services')}>
+            {services.map((s) => (
+              <li key={s.id} className="svc-pill">
+                <p className="truncate text-sm font-medium">{s.name || s.service_category}</p>
+                <p className="text-base font-semibold" style={{ color: '#2D2A2E' }}>{rupees(s.price_inr)}</p>
                 {s.duration_minutes ? <p className="text-xs text-ink/60">{s.duration_minutes} min</p> : null}
-              </div>
-              <p className="flex-none rounded-full bg-white px-3 py-1 text-sm font-semibold shadow-sm">{rupees(s.price_inr)}</p>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <BookingPanel businessId={biz.id} services={services} hours={hours} />

@@ -805,9 +805,31 @@ const mr12: M = {
 
 const p12 = { en: en12, hi: hi12, mr: mr12 };
 
+
+// ---- p13: AI price suggestion ----
+const en13: M = {
+  'ps.btn': 'Suggest price with AI', 'ps.thinking': 'Thinking…', 'ps.title': 'AI price suggestion', 'ps.needName': 'Type the service name first.',
+  'ps.err.unauthorized': 'Please log in again.', 'ps.err.bad_request': 'Type a valid service name and try again.', 'ps.err.not_owner': 'This shop is not yours.',
+  'ps.err.rate_limited': 'Too many suggestions. Try again in a while.', 'ps.err.configuration_required': 'AI is not set up yet.',
+  'ps.err.ai_unavailable': 'AI did not answer. Please try again.', 'ps.err.server_config': 'Server is not configured yet.', 'ps.err.server_error': 'Something went wrong. Please try again.',
+};
+const hi13: M = {
+  'ps.btn': 'AI से कीमत सुझाएँ', 'ps.thinking': 'सोच रहा है…', 'ps.title': 'AI कीमत सुझाव', 'ps.needName': 'पहले सेवा का नाम लिखें।',
+  'ps.err.unauthorized': 'कृपया दोबारा लॉग इन करें।', 'ps.err.bad_request': 'सही सेवा नाम लिखकर फिर कोशिश करें।', 'ps.err.not_owner': 'यह दुकान आपकी नहीं है।',
+  'ps.err.rate_limited': 'बहुत सारे सुझाव हो गए। थोड़ी देर बाद फिर कोशिश करें।', 'ps.err.configuration_required': 'AI अभी सेट नहीं है।',
+  'ps.err.ai_unavailable': 'AI ने जवाब नहीं दिया। फिर कोशिश करें।', 'ps.err.server_config': 'सर्वर अभी सेट नहीं है।', 'ps.err.server_error': 'कुछ गड़बड़ हो गई। फिर कोशिश करें।',
+};
+const mr13: M = {
+  'ps.btn': 'AI ने किंमत सुचवा', 'ps.thinking': 'विचार करत आहे…', 'ps.title': 'AI किंमत सूचना', 'ps.needName': 'आधी सेवेचे नाव लिहा.',
+  'ps.err.unauthorized': 'कृपया पुन्हा लॉग इन करा.', 'ps.err.bad_request': 'योग्य सेवेचे नाव लिहून पुन्हा प्रयत्न करा.', 'ps.err.not_owner': 'हे दुकान तुमचे नाही.',
+  'ps.err.rate_limited': 'खूप सूचना झाल्या. थोड्या वेळाने पुन्हा प्रयत्न करा.', 'ps.err.configuration_required': 'AI अजून सेट केलेले नाही.',
+  'ps.err.ai_unavailable': 'AI ने उत्तर दिले नाही. पुन्हा प्रयत्न करा.', 'ps.err.server_config': 'सर्व्हर अजून सेट केलेला नाही.', 'ps.err.server_error': 'काहीतरी चुकले. पुन्हा प्रयत्न करा.',
+};
+const p13 = { en: en13, hi: hi13, mr: mr13 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr },
 };

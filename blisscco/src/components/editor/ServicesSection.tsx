@@ -9,12 +9,38 @@ import type { Loaded } from '../../lib/types';
 const empty = { service: '', price: '' };
 
 export default function ServicesSection({ data, reload }: { data: Loaded; reload: () => Promise<void> }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [f, setF] = useState(empty);
   const [editId, setEditId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const blocked = data.business.status === 'suspended';
+  const [tip, setTip] = useState('');
+  const [tipBusy, setTipBusy] = useState(false);
+  const [tipErr, setTipErr] = useState('');
+
+  const TIP_ERR = ['unauthorized', 'bad_request', 'not_owner', 'rate_limited', 'configuration_required', 'ai_unavailable', 'server_config', 'server_error'];
+
+  async function suggestPrice() {
+    if (tipBusy) return;
+    setTip(''); setTipErr('');
+    const service = f.service.trim();
+    if (service.length < 2) { setTipErr(t('ps.needName')); return; }
+    setTipBusy(true);
+    try {
+      const { data: s } = await supabase.auth.getSession();
+      const token = s.session?.access_token;
+      if (!token) { setTipErr(t('ps.err.unauthorized')); return; }
+      const r = await fetch('/api/ai-price-suggest', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ business_id: data.business.id, service, lang }),
+      });
+      const j = (await r.json().catch(() => ({}))) as { suggestion?: string; error?: string };
+      if (r.ok && j.suggestion) setTip(j.suggestion);
+      else setTipErr(t(j.error && TIP_ERR.includes(j.error) ? `ps.err.${j.error}` : 'err.generic'));
+    } catch { setTipErr(t('err.generic')); }
+    finally { setTipBusy(false); }
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -65,6 +91,16 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
         <form onSubmit={onSubmit} className="space-y-3 rounded-xl bg-cream p-3" noValidate>
           <Field id="sc" label={t('ed.svcCategory')} value={f.service} onChange={(v) => setF({ ...f, service: v })} disabled={busy} />
           <Field id="sp2" label={t('ed.svcPrice')} value={f.price} onChange={(v) => setF({ ...f, price: v })} disabled={busy} />
+          <button type="button" className="btn-ai" disabled={busy || tipBusy} onClick={() => void suggestPrice()}>
+            <span aria-hidden="true">✨</span> {tipBusy ? t('ps.thinking') : t('ps.btn')}
+          </button>
+          {tip && (
+            <div role="status" className="ai-tip">
+              <p className="text-xs font-semibold text-ink/60">{t('ps.title')}</p>
+              <p className="mt-0.5 whitespace-normal break-words text-sm leading-snug">{tip}</p>
+            </div>
+          )}
+          <Msg error={tipErr} />
           <Msg error={error} />
           <div className="flex gap-2">
             <button type="submit" className="btn-primary flex-1" disabled={busy}>{editId ? t('common.save') : t('common.add')}</button>

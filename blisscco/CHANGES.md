@@ -1,25 +1,19 @@
-# Blisscco update: subscriptions removed + nicer shop profile
+# Blisscco update: AI price suggestion + nicer Browse cards + scrollable services + pink Confirm button
 
-## Run this in Supabase (SQL Editor), once
-`supabase/migrations/0017_remove_subscriptions.sql`
+## Supabase me kuch run nahi karna (koi SQL change nahi)
+
+## Vercel
+Naya API file `api/ai-price-suggest.ts` apne aap deploy hoga. Wahi env vars chalenge jo AI insights ke liye hain (AI_API_KEY, AI_PROVIDER, AI_MODEL, AI_BASE_URL). Naye env var ki zaroorat nahi.
 
 ## New files
-- supabase/migrations/0017_remove_subscriptions.sql
-- src/i18n/messages12.ts
-- CHANGES.md
+- api/ai-price-suggest.ts
 
 ## Changed files
-- src/pages/BusinessProfile.tsx  (new look)
-- src/pages/owner/OwnerPlans.tsx  (PRO/ELITE cards removed; only Blue badge + Banner)
-- src/pages/owner/OwnerBanners.tsx  (no plan needed, only banner credits)
-- src/pages/owner/OwnerAnalytics.tsx  (open for everyone, AI insights too)
-- src/pages/Explore.tsx  (PRO/ELITE chip removed)
-- src/components/TierBadge.tsx  (TierChip removed, blue tick stays)
-- src/pages/admin/AdminHome.tsx  (Subscriptions link removed)
-- src/pages/admin/AdminReports.tsx  (text only)
-- src/pages/Privacy.tsx  (text only)
-- src/App.tsx  (admin subscriptions route removed)
-- src/i18n/messages.ts  (messages12 added)
-
-## Deleted files
-- src/pages/admin/AdminSubscriptions.tsx
+- src/components/editor/ServicesSection.tsx  (AI price suggestion button + 1-2 line result)
+- src/pages/Explore.tsx  (Browse shops: naye shop cards)
+- src/pages/BusinessProfile.tsx  (services horizontal scroll, pink border pills)
+- src/components/BookingPanel.tsx  (Confirm booking button -> #ff91a4)
+- src/index.css  (naye styles: btn-confirm, btn-ai, ai-tip, svc-row, svc-pill, shop-card)
+- src/i18n/messages.ts  (naye texts: EN / HI / MR)
+- vercel.json  (ai-price-suggest function timeout)
+- CHANGES.md
