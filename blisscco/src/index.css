@@ -52,6 +52,7 @@
 /* AI price suggestion (service form) */
 .btn-ai { @apply inline-flex min-h-[40px] items-center gap-1.5 rounded-full border bg-transparent px-4 text-sm font-medium text-ink transition hover:bg-blush/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60; border-color: #ff91a4; }
 .ai-tip { @apply rounded-xl bg-white p-3 ring-1 ring-blush/50; }
+.ai-price { @apply min-h-[56px] rounded-xl border bg-transparent px-2 py-2 transition hover:bg-blush/10 active:scale-95; border-color: #ff91a4; }
 
 /* Shop profile: services in a horizontal scroll row. Each pill looks like a transparent button with a #ff91a4 border, but is NOT clickable. */
 .svc-row { @apply -mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2; scrollbar-width: none; -webkit-overflow-scrolling: touch; }

@@ -15,7 +15,7 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const blocked = data.business.status === 'suspended';
-  const [tip, setTip] = useState('');
+  const [tip, setTip] = useState<{ basic: number; standard: number; premium: number } | null>(null);
   const [tipBusy, setTipBusy] = useState(false);
   const [tipErr, setTipErr] = useState('');
 
@@ -23,7 +23,7 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
 
   async function suggestPrice() {
     if (tipBusy) return;
-    setTip(''); setTipErr('');
+    setTip(null); setTipErr('');
     const service = f.service.trim();
     if (service.length < 2) { setTipErr(t('ps.needName')); return; }
     setTipBusy(true);
@@ -35,8 +35,8 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ business_id: data.business.id, service, lang }),
       });
-      const j = (await r.json().catch(() => ({}))) as { suggestion?: string; error?: string };
-      if (r.ok && j.suggestion) setTip(j.suggestion);
+      const j = (await r.json().catch(() => ({}))) as { basic?: number; standard?: number; premium?: number; error?: string };
+      if (r.ok && j.basic && j.standard && j.premium) setTip({ basic: j.basic, standard: j.standard, premium: j.premium });
       else setTipErr(t(j.error && TIP_ERR.includes(j.error) ? `ps.err.${j.error}` : 'err.generic'));
     } catch { setTipErr(t('err.generic')); }
     finally { setTipBusy(false); }
@@ -97,7 +97,14 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
           {tip && (
             <div role="status" className="ai-tip">
               <p className="text-xs font-semibold text-ink/60">{t('ps.title')}</p>
-              <p className="mt-0.5 whitespace-normal break-words text-sm leading-snug">{tip}</p>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                {([['basic', tip.basic], ['standard', tip.standard], ['premium', tip.premium]] as const).map(([k, v]) => (
+                  <button key={k} type="button" className="ai-price" onClick={() => setF({ ...f, price: String(v) })}>
+                    <span className="block text-[11px] font-medium text-ink/60">{t(`ps.${k}`)}</span>
+                    <span className="block text-base font-semibold">{rupees(v)}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           <Msg error={tipErr} />
