@@ -34,6 +34,14 @@ function WriteShopReview({ businessId, onDone }: { businessId: string; onDone: (
     : <button className="btn-secondary w-full" onClick={() => setOpen(true)}>{t('rv.write')}</button>;
 }
 
+function NameLoader({ name, className = '' }: { name: string; className?: string }) {
+  return (
+    <div className={`name-loader ${className}`} role="status" aria-label={name}>
+      <span className="name-loader-text font-display text-3xl font-semibold">{name}</span>
+    </div>
+  );
+}
+
 export default function BusinessProfile() {
   const { id } = useParams();
   const [params] = useSearchParams();
@@ -44,11 +52,15 @@ export default function BusinessProfile() {
   const [hours, setHours] = useState<Hour[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [rvKey, setRvKey] = useState(0);
+  const [imgsReady, setImgsReady] = useState(false);
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({});
+  const [hoursOpen, setHoursOpen] = useState(false);
   const [flags, setFlags] = useState<{ is_verified: boolean } | null>(null);
 
   useEffect(() => {
     if (!id) { setBiz(null); return; }
     let alive = true;
+    setImgsReady(false); setLoaded({}); setHoursOpen(false);
     void (async () => {
       const b = await supabase.from('public_businesses').select('*').eq('id', id).maybeSingle();
       if (!alive) return;
@@ -65,8 +77,9 @@ export default function BusinessProfile() {
       if (!alive) return;
       const imgs = (i.data ?? []) as BizImage[];
       setImages(imgs); setHours((h.data ?? []) as Hour[]); setServices((s.data ?? []) as Service[]);
+      if (imgs.length === 0) { setImgsReady(true); return; }
       const m = await signedUrlMap(imgs.map((x) => x.storage_path));
-      if (alive) setUrls(m);
+      if (alive) { setUrls(m); setImgsReady(true); }
     })();
     return () => { alive = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- count the visit once per shop, not when other query params change
@@ -88,11 +101,25 @@ export default function BusinessProfile() {
   return (
     <article className="mx-auto max-w-2xl space-y-5 px-4 pb-10 pt-4">
       <div className="relative">
-        {images.length > 0 ? (
+        {!imgsReady ? (
+          <NameLoader name={biz.name} className="h-64 w-full rounded-3xl" />
+        ) : images.length > 0 ? (
           <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto rounded-3xl pb-1 [scrollbar-width:none]">
-            {images.map((im) => urls[im.storage_path]
-              ? <img key={im.id} src={urls[im.storage_path]} alt={biz.name} loading="lazy" className={`h-64 flex-none snap-center rounded-3xl object-cover ${images.length > 1 ? 'w-[85%]' : 'w-full'}`} />
-              : <div key={im.id} className={`h-64 flex-none animate-pulse rounded-3xl bg-ink/10 ${images.length > 1 ? 'w-[85%]' : 'w-full'}`} />)}
+            {images.map((im) => {
+              const w = images.length > 1 ? 'w-[85%]' : 'w-full';
+              const src = urls[im.storage_path];
+              return (
+                <div key={im.id} className={`relative h-64 flex-none snap-center overflow-hidden rounded-3xl ${w}`}>
+                  {!loaded[im.id] && <NameLoader name={biz.name} className="absolute inset-0" />}
+                  {src && (
+                    <img src={src} alt={biz.name} loading="lazy"
+                      onLoad={() => setLoaded((p) => ({ ...p, [im.id]: true }))}
+                      onError={() => setLoaded((p) => ({ ...p, [im.id]: true }))}
+                      className={`h-full w-full object-cover transition-opacity duration-500 ${loaded[im.id] ? 'opacity-100' : 'opacity-0'}`} />
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="flex h-48 items-center justify-center rounded-3xl bg-gradient-to-br from-blush/40 via-blush/20 to-cream font-display text-6xl font-semibold text-ink/40" aria-hidden="true">{biz.name.slice(0, 1).toUpperCase()}</div>
@@ -153,14 +180,34 @@ export default function BusinessProfile() {
 
       <section className="card space-y-2">
         <h2 className="font-display text-xl font-semibold">{t('biz.hours')}</h2>
-        <ul className="space-y-0.5 text-sm">
-          {hours.map((h) => (
-            <li key={h.day_of_week} className={`flex justify-between rounded-full px-4 py-2 ${h.day_of_week === today ? 'bg-blush/15 font-semibold' : ''}`}>
-              <span>{t(`day.${h.day_of_week}`)}{h.day_of_week === today ? ` · ${t('biz.today')}` : ''}</span>
-              <span>{h.is_closed ? t('ed.closed') : hoursRange(h.opens_at, h.closes_at)}</span>
-            </li>
-          ))}
-        </ul>
+        {hours.length === 0 ? <p className="text-sm text-ink/60">—</p> : (
+          <>
+            <button type="button" onClick={() => setHoursOpen((o) => !o)} aria-expanded={hoursOpen} aria-controls="hours-list"
+              className="flex w-full items-center justify-between gap-3 rounded-2xl bg-blush/10 px-4 py-3 text-left">
+              <span className="min-w-0">
+                <span className={`flex items-center gap-1.5 text-sm font-semibold ${openNow ? 'text-emerald-700' : 'text-ink/70'}`}>
+                  <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-emerald-500' : 'bg-red-400'}`} />
+                  {openNow ? t('biz.openNow') : t('biz.closedNow')}
+                </span>
+                <span className="mt-0.5 block text-xs text-ink/70">
+                  {t('biz.today')}: {!th || th.is_closed ? t('ed.closed') : hoursRange(th.opens_at, th.closes_at)}
+                </span>
+              </span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                className={`flex-none transition-transform duration-200 ${hoursOpen ? 'rotate-180' : ''}`} aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </button>
+            {hoursOpen && (
+              <ul id="hours-list" className="space-y-0.5 text-sm">
+                {hours.map((h) => (
+                  <li key={h.day_of_week} className={`flex justify-between rounded-full px-4 py-2 ${h.day_of_week === today ? 'bg-blush/15 font-semibold' : ''}`}>
+                    <span>{t(`day.${h.day_of_week}`)}{h.day_of_week === today ? ` · ${t('biz.today')}` : ''}</span>
+                    <span>{h.is_closed ? t('ed.closed') : hoursRange(h.opens_at, h.closes_at)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
       </section>
 
       <WriteShopReview businessId={biz.id} onDone={async () => { setRvKey((n) => n + 1); }} />

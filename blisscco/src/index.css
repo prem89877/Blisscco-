@@ -75,3 +75,13 @@
 .shop-card:hover .shop-cover img { @apply scale-105; }
 .shop-cover::after { content: ''; position: absolute; inset: auto 0 0 0; height: 45%; background: linear-gradient(to top, rgba(45,42,46,0.45), transparent); pointer-events: none; }
 .shop-pill { @apply inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur; }
+
+/* Shop-name loader (profile photos) */
+.name-loader { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 1.5rem; padding: 0 1rem; text-align: center;
+  background: linear-gradient(110deg, rgba(255,145,164,.22) 20%, rgba(253,248,245,.9) 40%, rgba(255,145,164,.22) 60%); background-size: 200% 100%; animation: nl-bg 1.6s linear infinite; }
+.name-loader-text { background: linear-gradient(110deg, rgba(45,42,46,.35) 30%, #2D2A2E 50%, rgba(45,42,46,.35) 70%); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: nl-text 1.6s linear infinite, nl-pulse 1.6s ease-in-out infinite; }
+@keyframes nl-bg { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes nl-text { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes nl-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .name-loader, .name-loader-text { animation: none; } .name-loader-text { color: rgba(45,42,46,.6); } }
