@@ -4,7 +4,7 @@ import { VerifiedTick } from '../../components/TierBadge';
 import { Msg, Section } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { rupees } from '../../lib/format';
-import { loadRazorpay, PLAN_ERRORS, type OrderResponse } from '../../lib/razorpay';
+import { CHECKOUT_LOGO, loadRazorpay, PLAN_ERRORS, type OrderResponse } from '../../lib/razorpay';
 import { supabase } from '../../lib/supabase';
 import type { Entitlements, PaymentTxn, Plan } from '../../lib/types';
 
@@ -71,7 +71,7 @@ export default function OwnerPlans() {
       if (!(await loadRazorpay()) || !window.Razorpay) { setMsg({ error: t('p8.err.gateway_error'), ok: '' }); return; }
       const rz = new window.Razorpay({
         key: order.key_id, amount: order.amount, currency: order.currency, name: 'Blisscco', description: order.description,
-        order_id: order.order_id, theme: { color: '#FF91A4' },
+        order_id: order.order_id, image: CHECKOUT_LOGO, theme: { color: '#FF91A4' },
         handler: () => { void waitForActivation(order.txn_id); },
         modal: { ondismiss: () => { if (alive.current) setBusy(null); } },
       });

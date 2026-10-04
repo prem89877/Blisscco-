@@ -2,7 +2,7 @@ import QRCode from 'qrcode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n';
 import { rupees } from '../lib/format';
-import { loadRazorpay, PLAN_ERRORS, UPI_ONLY, type OrderResponse } from '../lib/razorpay';
+import { CHECKOUT_LOGO, loadRazorpay, PLAN_ERRORS, UPI_ONLY, type OrderResponse } from '../lib/razorpay';
 import { supabase } from '../lib/supabase';
 import { Msg } from './ui';
 
@@ -115,7 +115,7 @@ export default function PhysicalQrOrder({ businessId, businessName, link, approv
       if (!(await loadRazorpay()) || !window.Razorpay) { setMsg({ error: t('p8.err.gateway_error'), ok: '' }); return; }
       const rz = new window.Razorpay({
         key: order.key_id, amount: order.amount, currency: order.currency, name: 'Blisscco', description: order.description,
-        order_id: order.order_id, theme: { color: '#FF91A4' }, config: UPI_ONLY,
+        order_id: order.order_id, image: CHECKOUT_LOGO, theme: { color: '#FF91A4' }, config: UPI_ONLY,
         handler: () => { void waitForPaid(order.txn_id); },
         modal: { ondismiss: () => { if (alive.current) setBusy(false); } },
       });

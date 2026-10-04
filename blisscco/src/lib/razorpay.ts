@@ -1,10 +1,14 @@
 export interface RzpOptions {
   key: string; amount: number; currency: string; name: string; description: string; order_id: string;
   handler: () => void; modal?: { ondismiss?: () => void }; theme?: { color: string };
+  image?: string;     // logo shown in checkout (overrides the dashboard brand logo)
   config?: unknown;   // optional checkout config, e.g. UPI-only (see UPI_ONLY below)
 }
 interface RzpInstance { open: () => void; on: (ev: string, cb: () => void) => void }
 declare global { interface Window { Razorpay?: new (o: RzpOptions) => RzpInstance } }
+
+/** Blisscco logo for checkout. Must be a public https PNG/JPG (the account is shared with another site, so we set it per payment). */
+export const CHECKOUT_LOGO = `${window.location.origin}/icons/icon-192.png`;
 
 /** Checkout shows only the UPI block (Google Pay, PhonePe, Paytm, BHIM, any UPI app / UPI ID). */
 export const UPI_ONLY = {
