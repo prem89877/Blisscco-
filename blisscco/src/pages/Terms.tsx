@@ -48,16 +48,16 @@ export default function Terms() {
 
       <H>Paid services for business owners</H>
       <UL>
-        <li>Blisscco currently offers three optional paid services: the blue badge, extra banners, and a personalised physical QR poster. Prices are shown before you pay and may change for future purchases. You pay Blisscco through Razorpay by UPI. [ACTION REQUIRED: state whether prices include GST and how invoices will be given.]</li>
+        <li>Blisscco currently offers three optional paid services: the blue badge, extra banners, and a personalised physical QR poster. Prices are shown before you pay and may change for future purchases. You pay Blisscco through Razorpay by UPI. All prices are inclusive of applicable GST. A GST-compliant invoice/receipt will be provided electronically after payment.</li>
         <li>A service starts only after Razorpay confirms the payment to us, which can take a short while. If a payment fails, the payment provider handles any return of money.</li>
-        <li>Refunds and cancellations: [ACTION REQUIRED: write your refund and cancellation policy for each paid service.] If a payment is refunded in full, the blue badge or banner credit it gave is removed.</li>
+        <li>Refunds and cancellations: Payments are non-refundable and cannot be cancelled after successful payment. Physical QR poster orders cannot be cancelled once processing has started. If a payment is refunded in full, the blue badge or banner credit it gave is removed.</li>
       </UL>
 
       <H>Blue badge</H>
       <UL>
         <li>To get the badge, you upload a business document (GST, shop licence, Udyam or another document). A Blisscco admin looks at it. If it is approved, you may buy the badge, and the blue tick shows next to your shop name for one year while it is active.</li>
         <li>The badge only means that a Blisscco admin reviewed a business document submitted by the shop. It does not mean Blisscco guarantees or endorses the shop, its service quality, prices, safety or licences, and we cannot promise that a document is genuine or still valid.</li>
-        <li>The badge does not change where a shop appears in search results. We may remove a badge if we find the document was false or the shop breaks these terms. [ACTION REQUIRED: say whether a fee is refunded in that case.]</li>
+        <li>The badge does not change where a shop appears in search results. We may remove a badge if we find the document was false or the shop breaks these terms. No refund will be provided if a badge is removed due to false documents or violation of these Terms.</li>
       </UL>
 
       <H>Sponsored banners</H>
@@ -84,13 +84,13 @@ export default function Terms() {
       <p>We may reject or remove content or listings, cancel bookings, withdraw rewards, or suspend or close an account if you break these terms, if we suspect fraud or illegal activity, if a business is reported or found to be unsafe or false, or if the law or an authority requires it. Where we reasonably can, we will tell you why and you can write to us to ask for a review. You can stop using Blisscco at any time. Business owners can set a listing to inactive. To close an account, email us.</p>
 
       <H>Our responsibility</H>
-      <p>Blisscco is provided on an "as is" and "as available" basis and may sometimes be unavailable or change. We work to keep information accurate but we do not guarantee it. To the extent the law allows, Blisscco is not responsible for the quality, safety or legality of services offered by businesses, for what businesses or other users say or do, or for disputes between customers and businesses, or for indirect or consequential losses. Nothing in these terms removes any right you have under Indian law, including consumer law, or limits liability that cannot be limited by law. [Needs lawyer confirmation: whether to add a financial limit on Blisscco's liability, and how much.]</p>
+      <p>Blisscco is provided on an “as is” and “as available” basis. We do not guarantee uninterrupted service or complete accuracy. To the extent permitted by law, Blisscco is not responsible for businesses, users, their services or disputes between them, or indirect or consequential losses. Nothing in these Terms limits rights or liability that cannot be limited under Indian law.</p>
 
       <H>Changes to these terms</H>
       <p>We may update these terms. The new version will be posted here with a new date. If you keep using Blisscco after the change, you accept it, unless the law needs your fresh consent. Business owners may be asked to accept updated listing terms.</p>
 
       <H>Governing law</H>
-      <p>These terms are governed by the laws of India. Courts in {COURTS_CITY} have jurisdiction, without taking away any right you have under consumer law to approach another forum.</p>
+      <p>These Terms are governed by the laws of India. Courts in {COURTS_CITY} shall have jurisdiction, subject to applicable consumer laws.</p>
 
       <H>Contact and complaints</H>
       <p>{mail}</p>

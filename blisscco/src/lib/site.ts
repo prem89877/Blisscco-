@@ -9,4 +9,4 @@ export const OPERATOR_NAME = 'Prem Talekar';
 export const OPERATOR_ADDRESS = 'Juna Satara, Bhusawal, Maharashtra';
 export const GRIEVANCE_OFFICER = 'Prem Talekar, Owner, Blisscco';
 export const GRIEVANCE_RESPONSE_TIME = 'complaints are acknowledged within 3 working days and resolved within 30 days';
-export const COURTS_CITY = '[ACTION REQUIRED: city whose courts will hear disputes]';
+export const COURTS_CITY = 'Bhusawal, Maharashtra';

@@ -6,7 +6,6 @@ export default function LegalPage({ title, children }: { title: string; children
     <article className="mx-auto max-w-2xl space-y-4 px-4 py-8 text-sm leading-relaxed">
       <h1 className="font-display text-3xl font-semibold">{title}</h1>
       <p className="text-ink/60">Last updated: {LEGAL_LAST_UPDATED}</p>
-      <p className="rounded-xl bg-amber-50 p-3 text-amber-900">Draft for launch. Have a lawyer review this before going live.</p>
       {children}
     </article>
   );
