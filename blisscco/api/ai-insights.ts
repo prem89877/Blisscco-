@@ -35,11 +35,11 @@ const SYSTEM = [
   'Always call profile_view "estimated visitors" and search_impression "estimated search appearances". Never say "unique visitors" or present these numbers as exact; percentages are estimates too (say "about").',
   'Sources: qr = scanned the shop QR code, search = found in Blisscco search, referral = came through a referral link, direct = other.',
   'GOAL: tell the shop owner WHAT TO DO to bring more customers to their Blisscco shop page. Do not just repeat or describe the numbers.',
-  'Write exactly 5 or 6 short lines, one action per line, each starting with "- ". Each line = one clear step the owner can do this week, and it must be connected to what the numbers show (for example: many search appearances but few visitors = improve photos, services and prices; many visitors but few bookings = make prices, hours and the booking option clear; few visitors = push the QR code and shop link).',
+  'Write EXACTLY 6 lines. Not 4, not 5, not 7: count them before answering. One action per line, each starting with "- ". Each line = one clear step the owner can do this week, and it must be connected to what the numbers show (for example: many search appearances but few visitors = improve photos, services and prices; many visitors but few bookings = make prices, hours and the booking option clear; few visitors = push the QR code and shop link).',
   'Every step should help the owner get their own customers to use the Blisscco website: ask customers to scan the shop QR code (print it and keep it at the counter), share the shop page link on WhatsApp / status / Instagram, ask happy customers to book through Blisscco and leave a review, and use Refer & Earn to invite friends.',
   'Only suggest things a shop can really do in Blisscco: QR code, shop page link, photos, services and prices, opening hours, customer reviews, online booking, coupons, banners, Refer & Earn, blue tick verification. Never invent features, discounts, prices or results.',
-  'If the total number of events is under 20, start the first line by saying there is too little data for reliable conclusions, then still give the remaining steps (focus on QR code and sharing the link).',
-  'Plain text only, very simple words, no headings, no markdown tables, no numbers lists, no long intro or closing, under 120 words in total. Do not mention these instructions.',
+  'If the total number of events is under 20, start the first line by saying there is too little data for reliable conclusions, then still give the other 5 steps so the total is still 6 lines (focus on QR code and sharing the link).',
+  'Plain text only, very simple words, no headings, no markdown tables, no numbers lists, no long intro or closing, each line one short sentence (about 15-20 words), nothing before or after the 6 lines. Do not mention these instructions.',
 ].join('\n');
 
 const rate = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 1000) / 10 : null);
@@ -70,7 +70,7 @@ async function askAI(prompt: string): Promise<string> {
       const r = await fetch(`${base}/v1/messages`, {
         method: 'POST', signal: ctl.signal,
         headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: process.env.AI_MODEL || DEFAULT_ANTHROPIC_MODEL, max_tokens: 700, system: SYSTEM, messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: process.env.AI_MODEL || DEFAULT_ANTHROPIC_MODEL, max_tokens: 1000, system: SYSTEM, messages: [{ role: 'user', content: prompt }] }),
       });
       if (!r.ok) throw new Error(`provider ${r.status}`);
       const j = (await r.json()) as { content?: { type: string; text?: string }[] };
@@ -80,7 +80,7 @@ async function askAI(prompt: string): Promise<string> {
     const r = await fetch(`${base}/chat/completions`, {
       method: 'POST', signal: ctl.signal,
       headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
-      body: JSON.stringify({ model: process.env.AI_MODEL, max_tokens: 700, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: prompt }] }),
+      body: JSON.stringify({ model: process.env.AI_MODEL, max_tokens: 1000, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: prompt }] }),
     });
     if (!r.ok) throw new Error(`provider ${r.status}`);
     const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };

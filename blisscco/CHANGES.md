@@ -9,7 +9,7 @@ Optional: measure with `supabase/manual/benchmark_search.sql` before and after (
 - supabase/RUN_LOG.md, README.md, CHANGES.md
 - src/i18n/messages.ts   (p9.* texts EN / HI / MR: "Estimated visitors"; new ps.disclaimer EN / HI / MR)
 - src/components/editor/ServicesSection.tsx   (AI price suggestion disclaimer shown under the 3 prices)
-- api/ai-insights.ts   (AI says "estimated visitors", never "unique visitors"; answer is now 5-6 action lines telling the owner how to bring customers to Blisscco)
+- api/ai-insights.ts   (AI says "estimated visitors", never "unique visitors"; answer is now EXACTLY 6 action lines telling the owner how to bring customers to Blisscco)
 
 ## New files
 - supabase/manual/benchmark_search.sql
