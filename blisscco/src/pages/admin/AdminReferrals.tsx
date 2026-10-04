@@ -7,7 +7,7 @@ import { fmtDateTime } from '../../lib/format';
 import { supabase } from '../../lib/supabase';
 
 interface Opt { id: string; discount_type: 'percent' | 'flat'; discount_value: number; max_discount_inr: number | null; min_spend_inr: number; weight: number; is_active: boolean }
-interface Ref { id: string; status: string; code: string; created_at: string; phone_verified: boolean; reject_reason: string | null }
+interface Ref { id: string; status: string; code: string; created_at: string; email_verified: boolean; reject_reason: string | null }
 
 export default function AdminReferrals() {
   const { t, lang } = useI18n();
@@ -24,7 +24,7 @@ export default function AdminReferrals() {
     const [c, o, r] = await Promise.all([
       supabase.from('referral_config').select('*').eq('id', 1).maybeSingle(),
       supabase.from('referral_reward_options').select('*').order('created_at'),
-      supabase.from('referrals').select('id,status,code,created_at,phone_verified,reject_reason').order('created_at', { ascending: false }).limit(50),
+      supabase.from('referrals').select('id,status,code,created_at,email_verified,reject_reason').order('created_at', { ascending: false }).limit(50),
     ]);
     const cfg = c.data as { is_active: boolean; coupon_valid_days: number } | null;
     if (cfg) { setActive(cfg.is_active); setDays(String(cfg.coupon_valid_days)); }

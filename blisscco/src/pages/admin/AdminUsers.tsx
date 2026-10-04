@@ -5,7 +5,7 @@ import { fmtDateTime } from '../../lib/format';
 import { useI18n } from '../../i18n';
 import { supabase } from '../../lib/supabase';
 
-interface U { id: string; email: string; full_name: string | null; phone: string | null; role: string; is_suspended: boolean; created_at: string }
+interface U { id: string; email: string; full_name: string | null; role: string; is_suspended: boolean; created_at: string }
 
 export default function AdminUsers() {
   const { lang } = useI18n();
@@ -43,7 +43,7 @@ export default function AdminUsers() {
       <Link to="/admin" className="text-sm btn-text">← Admin</Link>
       <h1 className="font-display text-2xl font-semibold">Users</h1>
       <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); void load(q); }}>
-        <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search email, name or phone" aria-label="Search users" />
+        <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search email or name" aria-label="Search users" />
         <button className="btn-secondary" type="submit">Search</button>
       </form>
       <Msg error={err} ok={ok} />

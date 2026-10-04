@@ -22,6 +22,7 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0014 | migrations/0014_admin_tools.sql | Phase 11 Part 1: booking disputes + audited correction, user suspend, free/cancel subscriptions, coupon revoke, earnings report | NOT YET - run this | Run after 0013; safe to re-run |
 | 0019 | migrations/0019_appointment_request_flow.sql | Appointment REQUEST flow: customer picks date only, owner sends the time, "Get notified" 20-minute push + e-mail reminder (pg_cron every minute) | NOT YET - run this | Run after 0018; needs pg_cron + pg_net (already used by 0013); safe to re-run. Switches OFF the old automatic 24 h / 2 h appointment reminders |
 | 0020 | migrations/0020_fuzzy_search.sql | Typo-tolerant search (similar spelling / sound / missing space) in search_services | NOT YET - run this | Run after 0018; enables fuzzystrmatch extension; drops and recreates search_services (1 new column is_exact); safe to re-run |
+| 0021 | migrations/0021_referral_email_verification.sql | Refer & Earn: e-mail verification instead of phone OTP; removes profiles.phone / phone_verified, referrals phone columns, phone trigger; admin_list_users without phone | NOT YET - run this | Run after 0020; safe to re-run. Run it BEFORE deploying the new frontend |
 | - | tests/phase11a_admin_tests.sql | Phase 11 Part 1 admin tests (test project only) | Run after 0014 | Rolls back |
 | - | manual/set_notification_config.sql | Stores dispatcher URL + shared secret (notification_config) | Run once by hand, after 0013 | Contains a secret: edit before running, never commit the edited copy |
 | - | tests/phase10_notifications_tests.sql | Notification triggers / prefs / reminders / retry tests (test project only) | Run after 0013 | Rolls back |
@@ -39,4 +40,5 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 ## Next migrations (planned)
 - (Phase 10 done: 0013)
 - (Phase 11 Part 1 done: 0014)
+- (0021 done: referral e-mail verification)
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)

@@ -9,7 +9,7 @@ declare
 begin
   insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data) values
     (o1, 'o1@t7.dev', now(), '{"signup_role":"owner"}'), (o2, 'o2@t7.dev', now(), '{"signup_role":"owner"}'),
-    (r, 'r@t7.dev', now(), '{}'), (d1, 'd1@t7.dev', now(), '{}'), (d2, 'd2@t7.dev', now(), '{}'),
+    (r, 'r@t7.dev', now(), '{}'), (d1, 'bro.ther@gmail.com', null, '{}'), (d2, 'brother+two@gmail.com', null, '{}'),
     (d3, 'd3@t7.dev', now(), '{}'), (adm, 'adm@t7.dev', now(), '{}');
   update public.profiles set role = 'admin' where id = adm;
   select id into cat from public.business_categories limit 1;
@@ -34,36 +34,35 @@ begin
   if public.claim_referral(rcode) then raise exception 'TEST FAIL: referral attribution changed/duplicated'; end if;
   j := public.book_walkin(sa); b_d1 := (j ->> 'id')::uuid;
 
-  -- shop completes the service; d1 phone NOT verified yet -> no reward (TEST 4)
+  -- shop completes the service; d1 e-mail NOT verified yet -> no reward (TEST 4)
   reset role; perform set_config('request.jwt.claims', json_build_object('sub', o1, 'role', 'authenticated')::text, true); set local role authenticated;
   perform public.set_booking_status(b_d1, 'in_service'); perform public.set_booking_status(b_d1, 'completed');
   reset role;
   select status into s from public.referrals where referred_id = d1;
-  if s <> 'pending' then raise exception 'TEST FAIL: reward given without verified phone (status %)', s; end if;
+  if s <> 'pending' then raise exception 'TEST FAIL: reward given without verified email (status %)', s; end if;
   select count(*) into n from public.coupons where holder_id = r;
-  if n <> 0 then raise exception 'TEST FAIL: coupon created without verified phone'; end if;
+  if n <> 0 then raise exception 'TEST FAIL: coupon created without verified email'; end if;
 
-  -- phone gets verified by Auth -> reward is issued now (TEST 4, positive case)
-  update auth.users set phone = '+919000000001', phone_confirmed_at = now() where id = d1;
+  -- e-mail gets confirmed by Auth -> reward is issued now (TEST 4, positive case)
+  update auth.users set email_confirmed_at = now() where id = d1;
   select status, id into s, ref1 from public.referrals where referred_id = d1;
   if s <> 'rewarded' then raise exception 'TEST FAIL: expected rewarded, got %', s; end if;
   select count(*) into n from public.coupons where holder_id = r and status = 'active';
   if n <> 1 then raise exception 'TEST FAIL: expected 1 active coupon, got %', n; end if;
   select c.code into coup from public.coupons c where c.holder_id = r;
 
-  -- TEST 5: the same phone number cannot earn a second reward (d1 moves to another number, d2 reuses the old one)
-  update auth.users set phone = '+919000000009', phone_confirmed_at = now() where id = d1;
+  -- TEST 5: the same e-mail identity cannot earn a second reward (d2 = same Gmail with dots / +tag)
   perform set_config('request.jwt.claims', json_build_object('sub', d2, 'role', 'authenticated')::text, true); set local role authenticated;
   if not public.claim_referral(rcode) then raise exception 'TEST FAIL: d2 referral not accepted'; end if;
   j := public.book_walkin(sa); b_d2 := (j ->> 'id')::uuid;
   reset role; perform set_config('request.jwt.claims', json_build_object('sub', o1, 'role', 'authenticated')::text, true); set local role authenticated;
   perform public.set_booking_status(b_d2, 'in_service'); perform public.set_booking_status(b_d2, 'completed');
   reset role;
-  update auth.users set phone = '+919000000001', phone_confirmed_at = now() where id = d2;
+  update auth.users set email_confirmed_at = now() where id = d2;
   select status into s from public.referrals where referred_id = d2;
-  if s <> 'rejected' then raise exception 'TEST FAIL: duplicate phone was rewarded (status %)', s; end if;
+  if s <> 'rejected' then raise exception 'TEST FAIL: duplicate email was rewarded (status %)', s; end if;
   select count(*) into n from public.coupons where holder_id = r;
-  if n <> 1 then raise exception 'TEST FAIL: second coupon created for same phone, total %', n; end if;
+  if n <> 1 then raise exception 'TEST FAIL: second coupon created for same email, total %', n; end if;
 
   -- TEST 9: reviews only for the customer's own completed booking, once
   perform set_config('request.jwt.claims', json_build_object('sub', d3, 'role', 'authenticated')::text, true); set local role authenticated;

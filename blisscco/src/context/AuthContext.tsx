@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import type { Lang } from '../i18n';
 
 export type Role = 'customer' | 'owner' | 'admin';
-export interface Profile { id: string; role: Role; full_name: string | null; language: Lang; is_suspended: boolean; phone_verified: boolean }
+export interface Profile { id: string; role: Role; full_name: string | null; language: Lang; is_suspended: boolean; email_verified: boolean }
 
 interface SignUpArgs { email: string; password: string; fullName: string; role: 'customer' | 'owner'; language: Lang }
 interface AuthCtx {
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!uid) return;
     let alive = true;
-    supabase.from('profiles').select('id, role, full_name, language, is_suspended, phone_verified').eq('id', uid).maybeSingle()
+    supabase.from('profiles').select('id, role, full_name, language, is_suspended, email_verified').eq('id', uid).maybeSingle()
       .then(({ data }) => { if (alive) { setProfile((data as Profile | null) ?? null); setProfileUid(uid); } })
       .then(undefined, () => { if (alive) setProfileUid(uid); });
     return () => { alive = false; };
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = useCallback(async () => {
     if (!uid) return;
-    const { data } = await supabase.from('profiles').select('id, role, full_name, language, is_suspended, phone_verified').eq('id', uid).maybeSingle();
+    const { data } = await supabase.from('profiles').select('id, role, full_name, language, is_suspended, email_verified').eq('id', uid).maybeSingle();
     setProfile((data as Profile | null) ?? null);
   }, [uid]);
 

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Msg, Section } from '../components/ui';
-import Field from '../components/Field';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { fmtDate, rupees } from '../lib/format';
@@ -8,44 +7,36 @@ import { couponState, couponText } from '../lib/referral';
 import { supabase } from '../lib/supabase';
 import type { Coupon } from '../lib/types';
 
-function PhoneVerify() {
+function EmailVerify() {
   const { t } = useI18n();
-  const { refreshProfile } = useAuth();
-  const [phone, setPhone] = useState('+91');
-  const [token, setToken] = useState('');
-  const [sent, setSent] = useState(false);
+  const { session, refreshProfile } = useAuth();
   const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
   const [errKey, setErrKey] = useState('');
-  const clean = phone.replace(/[\s-]/g, '');
-  const valid = /^\+[0-9]{10,15}$/.test(clean);
+  const email = session?.user.email ?? '';
 
-  async function send() {
-    if (busy || !valid) return;
+  async function resend() {
+    if (busy || !email) return;
     setBusy(true); setErrKey('');
-    const { error } = await supabase.auth.updateUser({ phone: clean });
+    const { error } = await supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: `${window.location.origin}/login` } });
     setBusy(false);
-    if (error) { console.error(error); setErrKey('ref.smsError'); return; }
+    if (error) { console.error(error); setErrKey('ref.emailError'); return; }
     setSent(true);
   }
-  async function verify() {
-    if (busy || !token.trim()) return;
+  async function recheck() {
+    if (busy) return;
     setBusy(true); setErrKey('');
-    const { error } = await supabase.auth.verifyOtp({ phone: clean, token: token.trim(), type: 'phone_change' });
-    setBusy(false);
-    if (error) { console.error(error); setErrKey('ref.smsError'); return; }
     await refreshProfile();
+    setBusy(false);
   }
 
   return (
-    <Section title={t('ref.verifyPhone')}>
-      <p className="text-sm text-ink/70">{t('ref.phoneWhy')}</p>
-      <Field id="ph" label={t('ref.phone')} value={phone} onChange={setPhone} disabled={busy || sent} />
-      {!sent
-        ? <button className="btn-primary w-full" disabled={busy || !valid} onClick={() => void send()}>{busy ? t('common.loading') : t('ref.sendCode')}</button>
-        : <>
-            <Field id="otp" label={t('ref.otp')} value={token} onChange={setToken} disabled={busy} />
-            <button className="btn-primary w-full" disabled={busy} onClick={() => void verify()}>{busy ? t('common.loading') : t('ref.verify')}</button>
-          </>}
+    <Section title={t('ref.verifyEmail')}>
+      <p className="text-sm text-ink/70">{t('ref.emailWhy')}</p>
+      {email && <p className="break-all text-sm font-medium">{email}</p>}
+      <button className="btn-primary w-full" disabled={busy || !email} onClick={() => void resend()}>{busy ? t('common.loading') : t('ref.resendEmail')}</button>
+      {sent && <p role="status" className="text-sm text-ink/80">{t('ref.emailSent')}</p>}
+      <button className="btn-secondary w-full" disabled={busy} onClick={() => void recheck()}>{t('ref.emailDone')}</button>
       <Msg error={errKey ? t(errKey) : ''} />
     </Section>
   );
@@ -103,7 +94,7 @@ export default function Refer() {
         </Section>
       )}
 
-      {active && profile && !profile.phone_verified && <PhoneVerify />}
+      {active && profile && !profile.email_verified && <EmailVerify />}
 
       <Section title={t('ref.coupons')}>
         {coupons.length === 0 && <p className="text-sm text-ink/70">{t('ref.noCoupons')}</p>}
