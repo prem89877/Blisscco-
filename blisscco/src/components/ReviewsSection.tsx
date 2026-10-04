@@ -30,14 +30,32 @@ export function ReviewsSection({ businessId, reloadKey = 0 }: { businessId: stri
   if (rows.length === 0) return null;
   return (
     <Section title={t('rv.title')}>
-      <ul className="divide-y divide-ink/10">
-        {rows.map((r) => (
-          <li key={r.id} className="space-y-1 py-3 text-sm">
-            <p><Stars value={r.rating} /> <span className="font-medium">{r.reviewer_name ?? '—'}</span> <span className="text-ink/60">· {fmtDate(r.created_at.slice(0, 10), lang)}</span></p>
-            {r.comment && <p>{r.comment}</p>}
-            {r.owner_response && <p className="rounded-lg bg-cream p-2"><strong>{t('rv.ownerReply')}:</strong> {r.owner_response}</p>}
-          </li>
-        ))}
+      <ul className="space-y-3">
+        {rows.map((r) => {
+          const name = r.reviewer_name?.trim() || '—';
+          return (
+            <li key={r.id} className="rounded-2xl bg-cream/70 p-4 ring-1 ring-ink/5">
+              <div className="flex items-start gap-3">
+                <span aria-hidden="true" className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-blush text-lg font-semibold uppercase text-ink">
+                  {name.charAt(0)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold leading-tight">{name}</p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2">
+                    <Stars value={r.rating} size="lg" />
+                    <span className="text-xs text-ink/60">{fmtDate(r.created_at.slice(0, 10), lang)}</span>
+                  </div>
+                </div>
+              </div>
+              {r.comment && <p className="mt-3 break-words text-base leading-relaxed">{r.comment}</p>}
+              {r.owner_response && (
+                <p className="mt-3 rounded-xl bg-white p-3 text-sm ring-1 ring-blush/40">
+                  <strong>{t('rv.ownerReply')}:</strong> {r.owner_response}
+                </p>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </Section>
   );

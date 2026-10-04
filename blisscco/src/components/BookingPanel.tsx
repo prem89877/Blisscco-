@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Msg, Section, Select } from './ui';
 import QueueCard from './QueueCard';
+import DatePicker from './DatePicker';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { bookingErrKey, RETURN_KEY } from '../lib/bookingErrors';
-import { addDays, dowOf, fmtDate, istToday, rupees } from '../lib/format';
+import { addDays, dowOf, istToday, rupees } from '../lib/format';
 import { trackBooking } from '../lib/analytics';
 import { supabase } from '../lib/supabase';
 import type { Hour, QueueInfo, Service } from '../lib/types';
@@ -17,7 +18,7 @@ type Done = { kind: 'token'; n: number } | { kind: 'appt' } | null;
  * (shown in "My bookings", with a "Get notified" button). Walk-in tokens work as before.
  */
 export default function BookingPanel({ businessId, services, hours }: { businessId: string; services: Service[]; hours: Hour[] }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const { session } = useAuth();
   const loc = useLocation();
   const [info, setInfo] = useState<QueueInfo | null | undefined>(undefined);
@@ -96,7 +97,7 @@ export default function BookingPanel({ businessId, services, hours }: { business
 
       {tab === 'appointment' && (apptOk ? (
         <>
-          <Select id="date" label={t('bk.chooseDate')} value={date} onChange={setDate} options={dates.map((d) => ({ value: d, label: fmtDate(d, lang) }))} />
+          <DatePicker id="date" label={t('bk.chooseDate')} value={date} onChange={setDate} allowed={dates} />
           <p className="text-sm text-ink/70">{t('bk.timeLater')}</p>
         </>
       ) : <Msg error={t('bk.err.not_available')} />)}

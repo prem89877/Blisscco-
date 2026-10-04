@@ -1,9 +1,11 @@
 import { useI18n } from '../i18n';
 
-export function Stars({ value }: { value: number }) {
+const SIZES = { sm: '', md: 'text-lg', lg: 'text-2xl' } as const;
+
+export function Stars({ value, size = 'sm' }: { value: number; size?: keyof typeof SIZES }) {
   const full = Math.round(value);
   return (
-    <span aria-label={`${value} / 5`} className="whitespace-nowrap text-amber-500">
+    <span aria-label={`${value} / 5`} className={`whitespace-nowrap tracking-wide text-amber-500 ${SIZES[size]}`}>
       {'★'.repeat(full)}<span className="text-ink/20">{'★'.repeat(5 - full)}</span>
     </span>
   );
