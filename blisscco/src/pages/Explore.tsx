@@ -109,8 +109,9 @@ export default function Explore() {
         <p className="text-ink/80">{t('explore.why')}</p>
         {status === 'denied' && <Msg error={t('explore.denied')} />}
         {status === 'error' && <Msg error={t('explore.unavailable')} />}
+        {status === 'outside' && <Msg error={t('geo.outsideIndiaUser')} />}
         <button className="btn-primary w-full" disabled={status === 'asking'} onClick={request}>
-          {status === 'asking' ? t('explore.locating') : status === 'denied' || status === 'error' ? t('explore.retry') : t('explore.allow')}
+          {status === 'asking' ? t('explore.locating') : status === 'denied' || status === 'error' || status === 'outside' ? t('explore.retry') : t('explore.allow')}
         </button>
       </section>
     );

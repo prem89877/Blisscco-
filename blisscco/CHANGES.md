@@ -1,28 +1,32 @@
-# Blisscco update: automatic walk-in queue
+# Blisscco update: India-only location + address / PIN code validation
 
 ## Supabase (SQL Editor)
-Run `supabase/migrations/0022_auto_queue.sql` BEFORE deploying the new frontend. Safe to re-run. No table, column or RLS change.
+Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new frontend. Safe to re-run. No new column, no RLS change on existing tables (one new locked table `india_boundary` that only the database functions read). Old shops are not touched until their location / PIN / status is edited again.
 
 ## What changed
-- Queue positions are computed automatically from the waiting tokens (nothing is set by hand). Skip / cancel / complete -> everyone behind moves up.
-- Owner (Queue page): "Run the queue" card with **Start Next**, **Complete**, **Skip**. Each waiting row also shows "No. n in queue" and has Skip / Cancel; the person being served has Complete.
-- Customer (My bookings): live card "You are #2 in queue", "Now serving: #5", "You're next!", "It's your turn". Refreshes every 5 s and instantly through realtime when the shop acts on the customer's own token.
-- Safe transitions: all queue changes lock the business row first, then re-check the booking row. Double-click or two devices cannot serve the same token twice or serve more people at once than `capacity` (default 1). Errors: `already_serving`, `queue_empty`, `invalid_transition`.
-- **Offline (customer):** if the phone is offline the app still opens and shows the last data that loaded (My bookings + queue position) with an "offline / saved data" notice. Cancel, Get notified, review and dispute are disabled offline. Live position and fresh data need internet; it refreshes by itself when the phone comes back online.
-- The saved copy is kept per user on the device and is deleted on log out. The service worker caches only the app shell (no user data); version bumped to v3.
-- Appointments, booking, payments, RLS, notifications: unchanged.
+- **India polygon check.** A point is accepted only if: (1) latitude is a real latitude, (2) longitude is a real longitude, (3) the point is inside the India polygon (mainland + Andaman & Nicobar + Lakshadweep). Swapped lat/lng, 0,0, Nepal, Pakistan, Bangladesh, Sri Lanka etc. are refused.
+- **Owner GPS button (Business editor > Details):** a location outside India is not saved; the owner sees a clear message. Saving the form checks again.
+- **Customer Explore:** if the phone's location is outside India, nearby search is not run and a message is shown (retry button stays).
+- **Address + PIN code:** street address (at least 5 characters, must contain letters), city (letters only), state (must be a real Indian state / UT; short forms like MH, UP, TN are fixed to the full name on save) and a 6-digit PIN code (cannot start with 0, first two digits must be a PIN series India Post uses). The PIN must belong to the state typed (for example 411001 with Karnataka is refused). When the owner types a PIN that has only one possible state, an empty State box is filled automatically.
+- **Submit for review:** checklist now has a separate "Valid PIN code" line (PIN is now compulsory), and the location line only turns green when the point is inside India. Wrong values are explained in red under the list.
+- **Server side (0023):** the same India polygon and PIN rules run in the database (`is_in_india`, `is_valid_in_pincode`, trigger `businesses_before_write`), so they cannot be skipped from the browser. Errors: `location_outside_india`, `invalid_pincode`, `application incomplete: valid PIN code`, `application incomplete: location inside India`.
+- Texts added in English, Hindi and Marathi.
+
+## Good to know
+- The polygon is a simplified outline (about 10-20 km accuracy, coast padded offshore). Points right on the border can go either way; it is a sanity check, not a survey map. It covers India-administered territory.
+- State vs PIN check is client side only (the database checks the PIN format and series, not the state).
+- The nearby-search SQL functions were not changed.
 
 ## Changed files
-- src/pages/owner/OwnerQueue.tsx   (Run the queue card, walk-in row actions, synchronous double-click lock)
-- src/pages/MyBookings.tsx   (live queue position card, 5 s refresh + realtime)
-- src/lib/types.ts   (QueuePosition)
-- src/lib/bookingErrors.ts   (already_serving, queue_empty)
-- src/i18n/messages.ts   (new p15 block, EN / HI / MR; includes offline texts)
-- public/sw.js   (app shell served offline, v3)
-- src/context/AuthContext.tsx   (profile saved for offline, caches cleared on log out)
-- src/components/Layout.tsx   (offline bar)
+- src/components/editor/DetailsSection.tsx   (GPS + save validation, PIN digits only, state fix / prefill, database error messages)
+- src/components/editor/SubmitSection.tsx   (address, PIN and India location checks in the checklist)
+- src/context/LocationContext.tsx   (new status `outside` for customers outside India)
+- src/pages/Explore.tsx   (message + retry when outside India)
+- src/i18n/messages.ts   (new p16 block, EN / HI / MR)
 - supabase/RUN_LOG.md, CHANGES.md
 
 ## New files
-- supabase/migrations/0022_auto_queue.sql
-- src/lib/offlineCache.ts   (per-user saved copy + useOnline)
+- src/lib/indiaGeo.ts   (India GeoJSON polygon)
+- src/lib/india.ts   (coordinate check, state list, PIN rules, address validation)
+- supabase/migrations/0023_india_validation.sql
+- supabase/tests/phase11c_india_tests.sql   (test project only; rolls back; not run by the assistant)

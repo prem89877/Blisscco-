@@ -6,6 +6,7 @@ import { catName } from '../../lib/format';
 import { supabase } from '../../lib/supabase';
 import type { Loaded } from '../../lib/types';
 import { isEmail } from '../../lib/validation';
+import { addressErrorKey, checkIndiaCoords, coordErrorKey, stateFromPincode, validateAddress } from '../../lib/india';
 
 const r6 = (n: number) => Math.round(n * 1e6) / 1e6;
 
@@ -29,7 +30,13 @@ export default function DetailsSection({ data, editable, reload }: { data: Loade
     setGpsMsg('');
     if (!navigator.geolocation) { setGpsMsg(t('err.generic')); return; }
     navigator.geolocation.getCurrentPosition(
-      (pos) => { setLat(r6(pos.coords.latitude)); setLng(r6(pos.coords.longitude)); },
+      (pos) => {
+        const la = r6(pos.coords.latitude);
+        const lo = r6(pos.coords.longitude);
+        const c = checkIndiaCoords(la, lo);
+        if (!c.ok) { setGpsMsg(t(coordErrorKey(c.reason))); return; }   // not saved: outside India / invalid
+        setLat(la); setLng(lo);
+      },
       (err) => setGpsMsg(err.code === err.PERMISSION_DENIED ? t('ed.gpsDenied') : t('err.generic')),
       { enableHighAccuracy: true, timeout: 20000 },
     );
@@ -43,17 +50,30 @@ export default function DetailsSection({ data, editable, reload }: { data: Loade
     if (f.name.trim().length < 2) return setError(t('err.nameRequired'));
     if (phone && !/^\+?[0-9]{10,13}$/.test(phone)) return setError(t('ed.invalidPhone'));
     if (f.email.trim() && !isEmail(f.email)) return setError(t('err.invalidEmail'));
-    if (f.pincode.trim() && !/^[0-9]{6}$/.test(f.pincode.trim())) return setError(t('ed.invalidPin'));
+    const addr = validateAddress(f, false);   // checks only what was typed; state must match the PIN code
+    if (addr.errors.length) return setError(t(addressErrorKey(addr.errors[0])));
+    if (lat !== null || lng !== null) {
+      const c = checkIndiaCoords(lat, lng);
+      if (!c.ok) return setError(t(coordErrorKey(c.reason)));
+    }
+    const stateName = addr.state ?? f.state.trim();
     setBusy(true);
     const { error: err } = await supabase.from('businesses').update({
       category_id: f.category_id || null, name: f.name.trim(), description: f.description.trim() || null,
       phone: phone || null, email: f.email.trim() || null,
       show_phone_publicly: f.show_phone_publicly, show_email_publicly: f.show_email_publicly,
-      address_line: f.address_line.trim() || null, city: f.city.trim() || null, state: f.state.trim() || null,
+      address_line: f.address_line.trim() || null, city: f.city.trim() || null, state: stateName || null,
       pincode: f.pincode.trim() || null, latitude: lat, longitude: lng,
     }).eq('id', b.id);
     setBusy(false);
-    if (err) { console.error(err); setError(t('err.generic')); return; }
+    if (err) {
+      console.error(err);
+      // the database repeats the India checks, so show a clear message if it refuses
+      const m = err.message ?? '';
+      setError(m.includes('location_outside_india') ? t('geo.outsideIndia') : m.includes('invalid_pincode') ? t('addr.err.pin_unknown') : t('err.generic'));
+      return;
+    }
+    set('state', stateName);
     setOk(t('common.saved'));
     await reload();
   }
@@ -75,7 +95,12 @@ export default function DetailsSection({ data, editable, reload }: { data: Loade
           <Field id="city" label={t('ed.city')} value={f.city} onChange={(v) => set('city', v)} disabled={d} />
           <Field id="state" label={t('ed.state')} value={f.state} onChange={(v) => set('state', v)} disabled={d} />
         </div>
-        <Field id="pin" label={t('ed.pincode')} value={f.pincode} onChange={(v) => set('pincode', v)} disabled={d} />
+        <Field id="pin" label={t('ed.pincode')} value={f.pincode} disabled={d}
+          onChange={(v) => {
+            const pin = v.replace(/\D/g, '').slice(0, 6);
+            set('pincode', pin);
+            if (!f.state.trim()) { const s = stateFromPincode(pin); if (s) set('state', s); }   // fill state when the PIN has only one possible state
+          }} />
 
         <div className="space-y-2 rounded-xl bg-cream p-3">
           <p className="text-sm font-medium">{t('ed.location')}</p>

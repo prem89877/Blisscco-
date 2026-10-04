@@ -922,9 +922,51 @@ const mr15: M = {
 };
 const p15 = { en: en15, hi: hi15, mr: mr15 };
 
+// ---- India-only location + address / PIN code checks ----
+const en16: M = {
+  'geo.outsideIndia': 'This location is outside India. Please stand at your shop in India and try again.',
+  'geo.invalidCoords': 'This location is not valid. Please try again.',
+  'geo.outsideIndiaUser': 'Blisscco works only inside India right now. Your location looks to be outside India.',
+  'addr.err.addr_short': 'Enter the full street address (at least 5 characters).',
+  'addr.err.addr_chars': 'The address must contain letters, not only numbers or symbols.',
+  'addr.err.city_invalid': 'Enter a valid city name.',
+  'addr.err.state_unknown': 'Enter a valid Indian state or union territory.',
+  'addr.err.pin_format': 'Enter a valid 6-digit Indian PIN code (it cannot start with 0).',
+  'addr.err.pin_unknown': 'This does not look like a valid Indian PIN code. Please check it.',
+  'addr.err.pin_state_mismatch': 'This PIN code does not belong to the chosen state. Check the PIN code and the state.',
+  'ck.pincode': 'Valid PIN code (matches the state)', 'ck.location': 'GPS location set (inside India)',
+};
+const hi16: M = {
+  'geo.outsideIndia': 'यह लोकेशन भारत के बाहर है। कृपया भारत में अपनी दुकान पर खड़े होकर फिर कोशिश करें।',
+  'geo.invalidCoords': 'यह लोकेशन मान्य नहीं है। कृपया फिर कोशिश करें।',
+  'geo.outsideIndiaUser': 'Blisscco अभी सिर्फ़ भारत में चलता है। आपकी लोकेशन भारत के बाहर लग रही है।',
+  'addr.err.addr_short': 'पूरा पता लिखें (कम से कम 5 अक्षर)।',
+  'addr.err.addr_chars': 'पते में अक्षर होने चाहिए, सिर्फ़ अंक या चिह्न नहीं।',
+  'addr.err.city_invalid': 'मान्य शहर का नाम लिखें।',
+  'addr.err.state_unknown': 'भारत का मान्य राज्य या केंद्रशासित प्रदेश लिखें।',
+  'addr.err.pin_format': '6 अंकों का मान्य भारतीय पिन कोड दर्ज करें (0 से शुरू नहीं हो सकता)।',
+  'addr.err.pin_unknown': 'यह मान्य भारतीय पिन कोड नहीं लग रहा। कृपया जाँचें।',
+  'addr.err.pin_state_mismatch': 'यह पिन कोड चुने गए राज्य का नहीं है। पिन कोड और राज्य जाँचें।',
+  'ck.pincode': 'मान्य पिन कोड (राज्य से मेल खाता)', 'ck.location': 'GPS लोकेशन सेट (भारत के अंदर)',
+};
+const mr16: M = {
+  'geo.outsideIndia': 'हे लोकेशन भारताबाहेर आहे. कृपया भारतात तुमच्या दुकानाच्या जागी उभे राहून पुन्हा प्रयत्न करा.',
+  'geo.invalidCoords': 'हे लोकेशन वैध नाही. कृपया पुन्हा प्रयत्न करा.',
+  'geo.outsideIndiaUser': 'Blisscco सध्या फक्त भारतात चालते. तुमचे लोकेशन भारताबाहेर दिसत आहे.',
+  'addr.err.addr_short': 'पूर्ण पत्ता लिहा (किमान 5 अक्षरे).',
+  'addr.err.addr_chars': 'पत्त्यात अक्षरे असावीत, फक्त अंक किंवा चिन्हे नकोत.',
+  'addr.err.city_invalid': 'वैध शहराचे नाव टाका.',
+  'addr.err.state_unknown': 'भारतातील वैध राज्य किंवा केंद्रशासित प्रदेश टाका.',
+  'addr.err.pin_format': '6 अंकी वैध भारतीय पिन कोड टाका (0 ने सुरू होऊ शकत नाही).',
+  'addr.err.pin_unknown': 'हा वैध भारतीय पिन कोड वाटत नाही. कृपया तपासा.',
+  'addr.err.pin_state_mismatch': 'हा पिन कोड निवडलेल्या राज्याचा नाही. पिन कोड आणि राज्य तपासा.',
+  'ck.pincode': 'वैध पिन कोड (राज्याशी जुळणारा)', 'ck.location': 'GPS लोकेशन सेट (भारताच्या आत)',
+};
+const p16 = { en: en16, hi: hi16, mr: mr16 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr },
 };
