@@ -188,6 +188,11 @@ const T: Record<string, Tpl> = {
     hi: ['रिक्वेस्ट बंद हुई', '{shop} आपकी {date} की {service} रिक्वेस्ट पूरी नहीं कर सका। आप दूसरा दिन चुन सकते हैं।'],
     mr: ['विनंती बंद झाली', '{shop} तुमची {date} ची {service} विनंती पूर्ण करू शकले नाही. तुम्ही दुसरा दिवस निवडू शकता.'],
   },
+  appointment_request_expired: {
+    en: ['Request expired', '{shop} did not reply to your {service} request for {date} within 1 hour. Please visit other shops near you or request another day.'],
+    hi: ['रिक्वेस्ट की समय सीमा खत्म', '{shop} ने 1 घंटे में आपकी {date} की {service} रिक्वेस्ट का जवाब नहीं दिया। कृपया आसपास की दूसरी दुकानें देखें या दूसरा दिन चुनें।'],
+    mr: ['विनंतीची मुदत संपली', '{shop} ने 1 तासात तुमच्या {date} च्या {service} विनंतीला उत्तर दिले नाही. कृपया जवळची इतर दुकाने पहा किंवा दुसरा दिवस निवडा.'],
+  },
   coupon_expiring: {
     en: ['Coupon expiring soon', 'Your {disc} coupon expires on {expires}. Use it before then.'],
     hi: ['कूपन जल्द खत्म होगा', 'आपका {disc} का कूपन {expires} को खत्म हो रहा है। उससे पहले इस्तेमाल करें।'],

@@ -150,7 +150,7 @@ export default function OwnerQueue() {
           <p className="font-medium">{b.type === 'walkin' ? `#${b.token_number}` : b.start_at ? fmtDateTime(b.start_at, lang) : `${b.requested_date ? fmtDate(b.requested_date, lang) : ''} · ${t('oq.noTimeYet')}`} · {b.customer_name || b.guest_name || '—'}</p>
           <p className="text-sm text-ink/70">{b.service_label} · {rupees(b.price_inr)}</p>
         </div>
-        <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(`bs.${b.status}`)}</span>
+        <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(b.status === 'cancelled' && b.cancelled_by === 'system' ? 'bs.expired' : `bs.${b.status}`)}</span>
       </div>
       {b.type === 'appointment' && ['pending', 'confirmed'].includes(b.status) && (
         <div className="flex flex-wrap items-center gap-2">

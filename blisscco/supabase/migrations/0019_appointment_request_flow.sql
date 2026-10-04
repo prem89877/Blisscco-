@@ -7,11 +7,13 @@
 --   * bookings: new columns requested_date, time_set_at, remind_me, remind_set_at. An appointment may now exist WITHOUT a
 --     time (start_at / end_at null) until the owner sets it.
 --   * new functions: book_appointment_request, owner_set_appointment_time, set_booking_reminder,
---                    send_appointment_remind_20 (cron, every minute), expire_unscheduled_requests (cron, daily)
+--                    send_appointment_remind_20 (cron, every minute), expire_unscheduled_requests (cron, every minute)
 --   * set_booking_status: an appointment whose time is not set yet cannot be checked-in / started / completed / no-show
 --   * notification triggers: carry requested_date; a request closed without a time gets its own message
 --   * old automatic 24 h / 2 h appointment reminders are switched OFF (reminders are now opt-in via "Get notified")
 --   * the old timed functions (book_appointment, get_available_slots) are left in place so an old cached app keeps working.
+--   * AUTO-EXPIRY: an appointment request the shop has not answered (no time sent) within 1 hour is closed by the system
+--     (status 'cancelled', cancelled_by 'system' = shown as "Expired"). Checked every minute by pg_cron.
 
 -- ============ 1) COLUMNS ============
 alter table public.bookings add column if not exists requested_date date;
@@ -24,6 +26,10 @@ update public.bookings
  where type = 'appointment' and requested_date is null and start_at is not null;
 update public.bookings set time_set_at = coalesce(time_set_at, created_at)
  where type = 'appointment' and start_at is not null and time_set_at is null;
+
+-- cancelled_by may also be 'system' (request expired because the shop did not answer in time)
+alter table public.bookings drop constraint if exists bookings_cancelled_by_check;
+alter table public.bookings add constraint bookings_cancelled_by_check check (cancelled_by in ('customer', 'owner', 'system'));
 
 -- Appointment = date always known; time either fully set (start+end) or not set at all.
 alter table public.bookings drop constraint if exists bookings_shape;
@@ -176,15 +182,24 @@ begin
   return jsonb_build_object('appointment_remind_20', n);
 end $$;
 
--- Requests whose day has passed without the owner sending a time are closed (customer is told).
+-- A request is closed when the shop has not sent a time within 1 HOUR of the request (or its day has already passed).
+-- Runs every minute. Only 'pending' requests without a time are touched; a request that already got a time is never expired.
+-- The row is locked first (skip locked), so it cannot clash with the owner sending the time at the same moment.
 create or replace function public.expire_unscheduled_requests() returns jsonb
 language plpgsql security definer set search_path = '' as $$
-declare n int;
+declare n int := 0; r record;
 begin
-  update public.bookings set status = 'cancelled', cancelled_at = now(), cancelled_by = 'owner'
-   where type = 'appointment' and start_at is null and status = 'pending'
-     and requested_date < (now() at time zone 'Asia/Kolkata')::date;
-  get diagnostics n = row_count;
+  for r in
+    select id from public.bookings
+     where type = 'appointment' and start_at is null and status = 'pending'
+       and (created_at < now() - interval '1 hour' or requested_date < (now() at time zone 'Asia/Kolkata')::date)
+     order by created_at limit 500
+     for update skip locked
+  loop
+    update public.bookings set status = 'cancelled', cancelled_at = now(), cancelled_by = 'system' where id = r.id;
+    insert into public.booking_status_history (booking_id, from_status, to_status, actor_id) values (r.id, 'pending', 'cancelled', null);
+    n := n + 1;
+  end loop;
   return jsonb_build_object('expired_requests', n);
 end $$;
 
@@ -260,6 +275,8 @@ begin
         perform public._notify(new.customer_id,
           case when new.type = 'appointment' and new.start_at is null then 'appointment_request_closed' else 'booking_cancelled_by_shop' end,
           'booking', v_data, '/my-bookings', null, true);
+      elsif new.cancelled_by = 'system' then
+        perform public._notify(new.customer_id, 'appointment_request_expired', 'booking', v_data, '/my-bookings', null, true);
       elsif new.cancelled_by = 'customer' then
         select owner_id into v_owner from public.businesses where id = new.business_id;
         perform public._notify(v_owner, 'booking_cancelled_by_customer', 'booking', v_data, '/owner/business/' || new.business_id::text || '/queue', null, true);
@@ -291,8 +308,8 @@ do $$ begin
   create extension if not exists pg_cron;
   begin perform cron.unschedule('blisscco-appt-reminders'); exception when others then null; end;   -- old automatic 24 h / 2 h reminders: off
   perform cron.schedule('blisscco-appt-remind-20', '* * * * *', 'select public.send_appointment_remind_20()');
-  -- 18:35 UTC = 00:05 India time
-  perform cron.schedule('blisscco-expire-requests', '35 18 * * *', 'select public.expire_unscheduled_requests()');
+  -- every minute: requests unanswered for 1 hour are expired (same job name = updated, not duplicated)
+  perform cron.schedule('blisscco-expire-requests', '* * * * *', 'select public.expire_unscheduled_requests()');
 exception when others then
   raise notice 'pg_cron schedule skipped (%): enable pg_cron in Dashboard > Database > Extensions, then re-run this file.', sqlerrm;
 end $$;

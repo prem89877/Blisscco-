@@ -67,6 +67,7 @@ export default function MyBookings() {
   const card = (b: Booking) => {
     const isAppt = b.type === 'appointment';
     const waitingForTime = isAppt && b.start_at === null && ACTIVE.includes(b.status);
+    const expired = isAppt && b.status === 'cancelled' && b.cancelled_by === 'system';   // shop did not answer within 1 hour
     const canNotify = isAppt && b.start_at !== null && ['pending', 'confirmed'].includes(b.status) && new Date(b.start_at) > new Date();
     return (
       <li key={b.id} className="card space-y-2">
@@ -75,7 +76,7 @@ export default function MyBookings() {
             <Link to={`/b/${b.business_id}`} className="font-semibold btn-text">{b.business_name}</Link>
             <p className="text-sm">{b.service_label} · {rupees(b.price_inr)}</p>
           </div>
-          <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(waitingForTime ? 'bs.awaiting_time' : `bs.${b.status}`)}</span>
+          <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(expired ? 'bs.expired' : waitingForTime ? 'bs.awaiting_time' : `bs.${b.status}`)}</span>
         </div>
         <p className="text-sm">
           {!isAppt
@@ -85,6 +86,15 @@ export default function MyBookings() {
               : `${b.requested_date ? fmtDate(b.requested_date, lang) : ''}${waitingForTime ? ` · ${t('my.timePending')}` : ''}`}
         </p>
         {waitingForTime && <p className="text-xs text-ink/70">{t('my.timePendingHelp')}</p>}
+        {expired && (
+          <>
+            <p className="text-sm text-ink/80">{t('my.expiredHelp')}</p>
+            <div className="flex flex-wrap gap-2">
+              <Link to="/explore" className="btn-primary !w-auto px-5">{t('my.visitOtherShops')}</Link>
+              <Link to={`/b/${b.business_id}`} className="btn-secondary !w-auto px-5">{t('my.viewShop')}</Link>
+            </div>
+          </>
+        )}
         {ACTIVE.includes(b.status) && <p className="text-xs text-ink/70">{t('my.payAtShop')}</p>}
 
         {canNotify && (b.remind_me

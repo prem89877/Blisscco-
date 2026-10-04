@@ -23,6 +23,8 @@ export interface Booking {
   queue_date: string | null;token_number: number | null;created_at: string;
   /** appointment: the day the customer asked for (start_at stays null until the shop sends a time) */
   requested_date: string | null;remind_me: boolean;time_set_at: string | null;
+  /** 'system' = a request the shop did not answer within 1 hour (shown as Expired) */
+  cancelled_by?: 'customer' | 'owner' | 'system' | null;
 }
 export interface QueueInfo {
   queue_status: 'open' | 'paused' | 'closed';temporarily_unavailable: boolean;est_wait_minutes: number | null;
