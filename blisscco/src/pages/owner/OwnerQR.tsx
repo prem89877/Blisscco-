@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import PhysicalQrOrder from '../../components/PhysicalQrOrder';
 import { Msg, Section } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { supabase } from '../../lib/supabase';
@@ -54,7 +55,7 @@ export default function OwnerQR() {
       <Msg error={error} />
       {biz.status !== 'approved' && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm">{t('p9.qrNotLive')}</p>}
       <Section title={biz.name}>
-        <div className="print-area space-y-3 text-center">
+        <div className="space-y-3 text-center">
           <p className="font-display text-xl font-semibold">{biz.name}</p>
           {svg
             ? <div role="img" aria-label={t('p9.qrAlt', { name: biz.name })} className="mx-auto w-64 max-w-full [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
@@ -64,7 +65,7 @@ export default function OwnerQR() {
         <p className="break-all rounded-xl bg-ink/5 p-3 text-xs">{link}</p>
         <div className="flex flex-wrap gap-2">
           <button className="btn-primary" disabled={!svg} onClick={() => void downloadPng()}>{t('p9.qrDownload')}</button>
-          <button className="btn-secondary" disabled={!svg} onClick={() => window.print()}>{t('p9.qrPrint')}</button>
+          <PhysicalQrOrder businessId={id!} businessName={biz.name} link={link} approved={biz.status === 'approved'} />
           <button className="btn-secondary" onClick={() => void copyLink()}>{t('p9.qrCopy')}</button>
         </div>
         <p className="text-sm text-ink/70">{t('p9.qrHint')}</p>

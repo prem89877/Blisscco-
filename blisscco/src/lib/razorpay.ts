@@ -1,9 +1,19 @@
 export interface RzpOptions {
   key: string; amount: number; currency: string; name: string; description: string; order_id: string;
   handler: () => void; modal?: { ondismiss?: () => void }; theme?: { color: string };
+  config?: unknown;   // optional checkout config, e.g. UPI-only (see UPI_ONLY below)
 }
 interface RzpInstance { open: () => void; on: (ev: string, cb: () => void) => void }
 declare global { interface Window { Razorpay?: new (o: RzpOptions) => RzpInstance } }
+
+/** Checkout shows only the UPI block (Google Pay, PhonePe, Paytm, BHIM, any UPI app / UPI ID). */
+export const UPI_ONLY = {
+  display: {
+    blocks: { upi: { name: 'Pay via UPI', instruments: [{ method: 'upi' }] } },
+    sequence: ['block.upi'],
+    preferences: { show_default_blocks: false },
+  },
+};
 
 let loading: Promise<boolean> | null = null;
 export function loadRazorpay(): Promise<boolean> {

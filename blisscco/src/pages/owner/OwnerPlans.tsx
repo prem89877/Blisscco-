@@ -85,7 +85,7 @@ export default function OwnerPlans() {
     }
   }
 
-  const addOns = plans;   // only the blue badge and extra banner packs are sold
+  const addOns = plans.filter((p) => p.kind !== 'physical_qr');   // blue badge + extra banners here; the physical QR is bought on the QR page
   const price = (p: Plan) => rupees(p.amount_paise / 100);
   const planName = (code: string) => plans.find((p) => p.code === code)?.name ?? code;
 

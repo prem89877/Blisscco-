@@ -53,7 +53,7 @@ export interface Review {
 
 // ---- Phase 8 ----
 export interface Plan {
-  code: string;kind: 'plan' | 'badge' | 'banner_pack';name: string;amount_paise: number;duration_days: number;
+  code: string;kind: 'plan' | 'badge' | 'banner_pack' | 'physical_qr';name: string;amount_paise: number;duration_days: number;
   banner_credits: number;sort_order: number;
 }
 export interface Entitlements {

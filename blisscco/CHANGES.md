@@ -1,3 +1,31 @@
+# Blisscco update: Physical QR poster (Rs 50, UPI)
+
+## Supabase (SQL Editor)
+Run `supabase/migrations/0024_physical_qr.sql` BEFORE deploying the new frontend. Safe to re-run. It only adds the plan kind `physical_qr` and one plan row (Rs 50 = 5000 paise). To change the price later: `update public.plans set amount_paise = 7500 where code = 'physical_qr';`
+
+## What changed
+- Owner **Shop QR code** page: the **Print** button is replaced by **"Get your personalized physical QR"** (Download PNG and Copy link stay).
+- Tapping it opens a preview with the Blisscco poster: the shop name is printed under "blisscco" and the shop's own QR code sits in the white box.
+- **Pay Rs 50 via UPI** opens Razorpay checkout showing only UPI (Google Pay, PhonePe, Paytm, BHIM, UPI ID). The price comes from the database; the browser never sends an amount. Booking is confirmed only after the Razorpay webhook marks the payment paid (same safe flow as the blue badge / banners).
+- After booking, the page shows "Booked n time(s) already". Admin sees the payment in Admin > Payments as `physical_qr`; deliver to the shop address.
+- Texts added in English, Hindi and Marathi. Only approved shops can book.
+- The Plans page does not list the physical QR (it is sold only on the QR page).
+
+## Changed files
+- src/pages/owner/OwnerQR.tsx
+- src/pages/owner/OwnerPlans.tsx
+- src/lib/razorpay.ts
+- src/lib/types.ts
+- src/i18n/messages.ts
+- supabase/RUN_LOG.md, CHANGES.md
+
+## New files
+- src/components/PhysicalQrOrder.tsx
+- public/qr-poster-template.jpg
+- supabase/migrations/0024_physical_qr.sql
+
+---
+
 # Blisscco update: India-only location + address / PIN code validation
 
 ## Supabase (SQL Editor)

@@ -24,6 +24,7 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0020 | migrations/0020_fuzzy_search.sql | Typo-tolerant search (similar spelling / sound / missing space) in search_services + 2 speed indexes (services_search_cover_idx, business_images_cover_lookup_idx) | NOT YET - run this | Run after 0018; enables fuzzystrmatch extension; drops and recreates search_services (1 new column is_exact); safe to re-run |
 | 0021 | migrations/0021_referral_email_verification.sql | Refer & Earn: e-mail verification instead of phone OTP; removes profiles.phone / phone_verified, referrals phone columns, phone trigger; admin_list_users without phone | NOT YET - run this | Run after 0020; safe to re-run. Run it BEFORE deploying the new frontend |
 | 0023 | migrations/0023_india_validation.sql | India-only locations: simplified India polygon (india_boundary), is_in_india(), is_valid_in_pincode(), businesses_before_write now refuses non-India location / bad PIN / review without PIN | NOT YET - run this | Run after 0022; needs PostGIS (already enabled); safe to re-run. Run it BEFORE deploying the new frontend |
+| 0024 | migrations/0024_physical_qr.sql | Physical QR poster product: new plan kind `physical_qr`, plan row `physical_qr` = Rs 50 (5000 paise), plan_duration check updated | NOT YET - run this | Run after 0023, BEFORE deploying the new frontend; safe to re-run. Re-uses Razorpay create-order + webhook (no API change) |
 | 0022 | migrations/0022_auto_queue.sql | Automatic walk-in queue: owner_queue_start_next / owner_queue_complete / owner_queue_skip, get_my_queue_positions (live position), set_booking_status re-defined with a serving guard, realtime on bookings | NOT YET - run this | Run after 0021; safe to re-run; no table/column/RLS change. Run it BEFORE deploying the new frontend |
 | - | tests/phase11c_india_tests.sql | India polygon / PIN code / businesses trigger tests (test project only) | Run after 0023 | Rolls back |
 | - | manual/benchmark_search.sql | Search benchmark (time + EXPLAIN) to run before and after the 0020 indexes | Run by hand on a test project | Read-only, changes nothing |
@@ -47,4 +48,5 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 - (0021 done: referral e-mail verification)
 - (0022 done: automatic walk-in queue)
 - (0023 done: India-only location + PIN validation)
+- (0024 done: physical QR poster, Rs 50 via UPI)
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)

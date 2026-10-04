@@ -964,9 +964,50 @@ const mr16: M = {
 };
 const p16 = { en: en16, hi: hi16, mr: mr16 };
 
+const en17: M = {
+  'pq.btn': 'Get your personalized physical QR', 'pq.title': 'Your personalized physical QR',
+  'pq.sub': 'A ready-to-stick Blisscco poster with your shop name and your shop QR code. Preview below.',
+  'pq.alt': 'Preview of the Blisscco QR poster for {name}', 'pq.price': 'Price: {p} (one time)',
+  'pq.pay': 'Pay {p} via UPI', 'pq.close': 'Close', 'pq.upiOnly': 'Pay with any UPI app: Google Pay, PhonePe, Paytm, BHIM or your UPI ID.',
+  'pq.deliver': 'After payment we will print it and send it to your shop address.',
+  'pq.waiting': 'Payment received. Confirming with the payment gateway… do not close this page.',
+  'pq.done': 'Booked! Your physical QR poster is confirmed. We will send it to your shop address.',
+  'pq.pending': 'Payment received. Confirmation can take a minute. Open this page again shortly. If it still does not show as booked, contact support.',
+  'pq.failed': 'Payment failed. You were not charged, or your bank will refund the amount.',
+  'pq.booked': 'Booked {n} time(s) already', 'pq.unavailable': 'Physical QR booking is not available right now. Please try later.',
+  'pq.notLive': 'You can book the physical QR once your shop is approved.',
+};
+const hi17: M = {
+  'pq.btn': 'अपना पर्सनलाइज़्ड फिज़िकल QR पाएं', 'pq.title': 'आपका पर्सनलाइज़्ड फिज़िकल QR',
+  'pq.sub': 'चिपकाने के लिए तैयार Blisscco पोस्टर, जिस पर आपकी दुकान का नाम और दुकान का QR कोड है। नीचे प्रीव्यू देखें।',
+  'pq.alt': '{name} के Blisscco QR पोस्टर का प्रीव्यू', 'pq.price': 'कीमत: {p} (एक बार)',
+  'pq.pay': 'UPI से {p} चुकाएं', 'pq.close': 'बंद करें', 'pq.upiOnly': 'किसी भी UPI ऐप से चुकाएं: Google Pay, PhonePe, Paytm, BHIM या अपनी UPI ID।',
+  'pq.deliver': 'भुगतान के बाद हम इसे प्रिंट करके आपकी दुकान के पते पर भेजेंगे।',
+  'pq.waiting': 'भुगतान मिल गया। पेमेंट गेटवे से पुष्टि हो रही है… यह पेज बंद न करें।',
+  'pq.done': 'बुक हो गया! आपका फिज़िकल QR पोस्टर पक्का है। हम इसे आपकी दुकान के पते पर भेजेंगे।',
+  'pq.pending': 'भुगतान मिल गया। पुष्टि में एक मिनट लग सकता है। थोड़ी देर बाद यह पेज फिर खोलें। फिर भी बुक न दिखे तो सपोर्ट से संपर्क करें।',
+  'pq.failed': 'भुगतान नहीं हुआ। आपसे पैसे नहीं कटे, या बैंक रकम वापस कर देगा।',
+  'pq.booked': 'पहले से {n} बार बुक किया है', 'pq.unavailable': 'फिज़िकल QR बुकिंग अभी उपलब्ध नहीं है। कृपया बाद में कोशिश करें।',
+  'pq.notLive': 'दुकान मंज़ूर होने के बाद आप फिज़िकल QR बुक कर सकते हैं।',
+};
+const mr17: M = {
+  'pq.btn': 'तुमचा पर्सनलाइझ्ड फिजिकल QR मिळवा', 'pq.title': 'तुमचा पर्सनलाइझ्ड फिजिकल QR',
+  'pq.sub': 'लावण्यासाठी तयार Blisscco पोस्टर, ज्यावर तुमच्या दुकानाचे नाव आणि दुकानाचा QR कोड आहे. खाली प्रीव्ह्यू पहा.',
+  'pq.alt': '{name} च्या Blisscco QR पोस्टरचा प्रीव्ह्यू', 'pq.price': 'किंमत: {p} (एकदाच)',
+  'pq.pay': 'UPI ने {p} भरा', 'pq.close': 'बंद करा', 'pq.upiOnly': 'कोणत्याही UPI अ‍ॅपने भरा: Google Pay, PhonePe, Paytm, BHIM किंवा तुमचा UPI ID.',
+  'pq.deliver': 'पेमेंटनंतर आम्ही ते प्रिंट करून तुमच्या दुकानाच्या पत्त्यावर पाठवू.',
+  'pq.waiting': 'पेमेंट मिळाले. पेमेंट गेटवेकडून खात्री होत आहे… हे पेज बंद करू नका.',
+  'pq.done': 'बुक झाले! तुमचे फिजिकल QR पोस्टर निश्चित झाले. आम्ही ते तुमच्या दुकानाच्या पत्त्यावर पाठवू.',
+  'pq.pending': 'पेमेंट मिळाले. खात्रीला एक मिनिट लागू शकतो. थोड्या वेळाने हे पेज पुन्हा उघडा. तरीही बुक दिसत नसेल तर सपोर्टशी संपर्क करा.',
+  'pq.failed': 'पेमेंट झाले नाही. तुमचे पैसे कापले गेले नाहीत, किंवा बँक रक्कम परत करेल.',
+  'pq.booked': 'आधीच {n} वेळा बुक केले आहे', 'pq.unavailable': 'फिजिकल QR बुकिंग सध्या उपलब्ध नाही. कृपया नंतर प्रयत्न करा.',
+  'pq.notLive': 'दुकान मंजूर झाल्यावर तुम्ही फिजिकल QR बुक करू शकता.',
+};
+const p17 = { en: en17, hi: hi17, mr: mr17 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr },
 };
