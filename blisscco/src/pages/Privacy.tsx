@@ -76,19 +76,19 @@ export default function Privacy() {
         <li>Razorpay: payments from business owners. Razorpay's checkout script is loaded when an owner pays.</li>
         <li>Resend: sends our notification emails, so it receives your email address and the email's text.</li>
         <li>Browser push services (such as those run by Google, Apple or Mozilla): carry push notifications to your device.</li>
-        <li>An AI provider, used only by business owners for the optional "AI insights" and "AI price suggestion" tools. We send only summary visit numbers, a service name, the shop's city and state, and the shop's other service prices. No customer data is sent. [ACTION REQUIRED: name the AI provider you configured.]</li>
-        <li>Our sign-in emails (email verification and password reset) are sent by our sign-in service. [ACTION REQUIRED: confirm which email service sends them.]</li>
+        <li>An AI provider, used only by business owners for the optional "AI insights" and "AI price suggestion" tools. We send only summary visit numbers, a service name, the shop's city and state, and the shop's other service prices. No customer data is sent. The AI provider we use is Google Gemini (Google AI Studio).</li>
+        <li>Our sign-in emails (email verification and password reset) are sent through Resend.</li>
       </UL>
       <p>We do not sell your personal data. We share it with these companies only so Blisscco can work, with shops as described above, and with authorities when the law requires.</p>
 
       <H>Where data is processed</H>
-      <p>Some of the companies above may store or process data outside India. [ACTION REQUIRED: confirm the region of your Supabase project and Vercel functions.]</p>
+      <p>Our Supabase project and our Vercel functions run in India (Mumbai). Some of the other companies above (for example Google, Razorpay, Resend and browser push services) may store or process data outside India.</p>
 
       <H>How long we keep data</H>
       <UL>
-        <li>Account, bookings, reviews and referral records: kept while your account exists, and afterwards as needed for disputes, fraud prevention and legal reasons. [ACTION REQUIRED: decide and state a maximum period.]</li>
-        <li>Payment records and Razorpay notifications: kept for accounting and legal reasons. [ACTION REQUIRED: state period.]</li>
-        <li>Blue badge documents: kept while needed to show how a badge decision was made. [ACTION REQUIRED: state period.]</li>
+        <li>Account, bookings, reviews and referral records: kept while your account exists, and afterwards as needed for disputes, fraud prevention and legal reasons, for a maximum of 7 years after your account is deleted.</li>
+        <li>Payment records and Razorpay notifications: kept for accounting and legal reasons for 7 years after the transaction.</li>
+        <li>Blue badge documents: kept while needed to show how a badge decision was made, and for 2 years after the badge expires or is revoked.</li>
         <li>In-app notifications and their delivery records: 90 days.</li>
         <li>Visit statistics rows: 400 days (about 13 months).</li>
         <li>AI insight usage log (a count used for daily limits): 30 days.</li>
