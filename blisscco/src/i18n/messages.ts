@@ -1005,9 +1005,29 @@ const mr17: M = {
 };
 const p17 = { en: en17, hi: hi17, mr: mr17 };
 
+// ---- p18: legal notice at sign-up + two wording fixes found in the legal audit ----
+// 'landing.sub' no longer says "trusted" (Blisscco cannot vouch for every shop).
+// 'p8.verified' (blue tick tooltip) now says what the tick really means: a business document was checked.
+const en18: M = {
+  'legal.agreePre': 'By continuing you agree to our', 'legal.and': 'and', 'legal.agreePost': '.',
+  'landing.sub': 'Find salons, spas, tattoo studios and more. No account needed to look around.',
+  'p8.verified': 'Documents verified',
+};
+const hi18: M = {
+  'legal.agreePre': 'जारी रखकर आप हमारी', 'legal.and': 'और', 'legal.agreePost': ' से सहमत होते हैं।',
+  'landing.sub': 'सैलून, स्पा, टैटू स्टूडियो और बहुत कुछ खोजें। देखने के लिए अकाउंट की ज़रूरत नहीं।',
+  'p8.verified': 'दस्तावेज़ सत्यापित',
+};
+const mr18: M = {
+  'legal.agreePre': 'पुढे जाऊन तुम्ही आमच्या', 'legal.and': 'आणि', 'legal.agreePost': ' यांना सहमती देता.',
+  'landing.sub': 'सलून, स्पा, टॅटू स्टुडिओ आणि बरेच काही शोधा. पाहण्यासाठी अकाउंट लागत नाही.',
+  'p8.verified': 'कागदपत्रे पडताळलेली',
+};
+const p18 = { en: en18, hi: hi18, mr: mr18 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr },
 };

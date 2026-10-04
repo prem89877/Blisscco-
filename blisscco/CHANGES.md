@@ -1,3 +1,35 @@
+# Blisscco update: Legal-readiness audit (Terms, Privacy Policy, sign-up notice)
+
+Full audit with every finding, risky-wording table and the pre-launch checklist: `LEGAL_AUDIT_REPORT.md`.
+
+## Supabase (SQL Editor)
+Run `supabase/migrations/0025_business_listing_terms_v2.sql` BEFORE onboarding shops. Safe to re-run. It only changes DATA: the business listing terms that owners accept were still the text "PLACEHOLDER - replace with reviewed Terms..."; v2 now holds real text and becomes the current version. No table, column or policy change.
+
+## What changed
+- **Privacy Policy** rewritten to match what the code really does (data collected, location, analytics, payments, notifications, third parties, retention, deletion, children, grievance contact). Removed or corrected claims that the code could not support (see audit report, section 6).
+- **Terms of Service** rewritten: platform role, bookings and queue, reviews (they are NOT limited to completed services in the code), listings, paid services (blue badge, banners, physical QR), coupons and referrals, QR, suspension, liability. Removed the claim "Reviews must reflect a real, completed service".
+- **Sign-up / login screens** now show "By continuing you agree to our Terms and Privacy Policy" (Google sign-in can create an account too). The listing-terms box now links to Terms and Privacy.
+- **Wording fixes in the app:** home page text no longer says "trusted salons"; the blue tick tooltip says "Documents verified" (was "Verified business"). To undo either, delete the key from the `p18` block in `src/i18n/messages.ts`.
+- Operator name, address, grievance officer, response time and court city are NOT in the project. They are placeholders marked `[ACTION REQUIRED ...]` in `src/lib/site.ts` and must be filled before launch.
+
+## Changed files
+- src/pages/Privacy.tsx, src/pages/Terms.tsx, src/pages/LegalPage.tsx
+- src/lib/site.ts
+- src/pages/Register.tsx, src/pages/Login.tsx
+- src/components/editor/SubmitSection.tsx
+- src/i18n/messages.ts   (new p18 block: EN / HI / MR)
+- supabase/RUN_LOG.md, CHANGES.md
+
+## New files
+- src/components/LegalConsent.tsx
+- supabase/migrations/0025_business_listing_terms_v2.sql
+- LEGAL_AUDIT_REPORT.md
+
+## Not tested
+No `npm install` / build was possible here (no network). Files were only syntax-checked. Run `npm run build` once.
+
+---
+
 # Blisscco update: Physical QR poster (Rs 50, UPI)
 
 ## Supabase (SQL Editor)

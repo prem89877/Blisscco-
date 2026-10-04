@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Check, Msg, Section } from '../ui';
 import { useI18n } from '../../i18n';
 import { supabase } from '../../lib/supabase';
@@ -62,6 +63,10 @@ export default function SubmitSection({ data, reload }: { data: Loaded; reload: 
       {hints.map((h) => <p key={h} role="alert" className="text-sm text-red-700">{h}</p>)}
       <h3 className="text-sm font-medium">{t('ed.terms')}</h3>
       <div className="max-h-40 overflow-y-auto rounded-xl bg-cream p-3 text-sm whitespace-pre-wrap">{terms}</div>
+      <p className="text-xs text-ink/60">
+        <Link to="/terms" target="_blank" className="link-text">{t('footer.terms')}</Link>{' · '}
+        <Link to="/privacy" target="_blank" className="link-text">{t('footer.privacy')}</Link>
+      </p>
       <Check id="terms" label={t('ed.acceptTerms')} checked={accepted} onChange={setAccepted} disabled={busy} />
       <Msg error={error} ok={ok} />
       <button className="btn-primary w-full" disabled={!ready || busy} onClick={() => void submit()}>{busy ? t('common.loading') : t('ed.submit')}</button>

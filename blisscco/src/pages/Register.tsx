@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthCard from '../components/AuthCard';
 import Field from '../components/Field';
 import GoogleButton from '../components/GoogleButton';
+import LegalConsent from '../components/LegalConsent';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { authErrorKey, isEmail, isStrongEnough } from '../lib/validation';
@@ -50,6 +51,7 @@ export default function Register({ role }: { role: 'customer' | 'owner' }) {
 
   return (
     <AuthCard title={t(`auth.registerTitle.${role}`)}>
+      <LegalConsent />
       <GoogleButton intent={role} />
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field id="name" label={t('auth.fullName')} autoComplete="name" value={fullName} onChange={setFullName} disabled={busy} />
