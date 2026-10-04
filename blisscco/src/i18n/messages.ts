@@ -890,9 +890,35 @@ const mr14: M = {
 };
 const p14 = { en: en14, hi: hi14, mr: mr14 };
 
+const en15: M = {
+  'bk.err.already_serving': 'Someone is already being served. Complete them first.', 'bk.err.queue_empty': 'Nobody is waiting in the queue.',
+  'oq.run': 'Run the queue', 'oq.startNext': 'Start Next', 'oq.skip': 'Skip',
+  'oq.nowServing': 'Now serving: #{n}', 'oq.nobodyServing': 'Nobody is being served right now.',
+  'oq.position': 'No. {n} in queue', 'oq.runHelp': 'Start Next calls the first waiting token. Skip marks the first waiting customer as not arrived. Positions update by themselves.',
+  'q.youAre': 'You are #{n} in queue', 'q.upNext': "You're next! Please be ready.", 'q.yourTurn': "It's your turn. You are being served now.",
+  'q.nowServing': 'Now serving: #{n}', 'q.noOneServing': 'Nobody is being served yet.', 'q.live': 'Live. Updates automatically.',
+};
+const hi15: M = {
+  'bk.err.already_serving': 'कोई पहले से सेवा में है। पहले उसे पूरा करें।', 'bk.err.queue_empty': 'कतार में कोई इंतज़ार नहीं कर रहा।',
+  'oq.run': 'कतार चलाएँ', 'oq.startNext': 'अगला शुरू करें', 'oq.skip': 'छोड़ें',
+  'oq.nowServing': 'अभी सेवा में: #{n}', 'oq.nobodyServing': 'अभी किसी की सेवा नहीं चल रही।',
+  'oq.position': 'कतार में नंबर {n}', 'oq.runHelp': 'अगला शुरू करें पहले प्रतीक्षारत टोकन को बुलाता है। छोड़ें पहले प्रतीक्षारत ग्राहक को "नहीं आए" मार्क करता है। नंबर अपने आप अपडेट होते हैं।',
+  'q.youAre': 'आप कतार में #{n} पर हैं', 'q.upNext': 'आप अगले हैं! कृपया तैयार रहें।', 'q.yourTurn': 'आपकी बारी है। अभी आपकी सेवा चल रही है।',
+  'q.nowServing': 'अभी सेवा में: #{n}', 'q.noOneServing': 'अभी किसी की सेवा शुरू नहीं हुई।', 'q.live': 'लाइव। अपने आप अपडेट होता है।',
+};
+const mr15: M = {
+  'bk.err.already_serving': 'कोणीतरी आधीच सेवेत आहे. आधी त्यांना पूर्ण करा.', 'bk.err.queue_empty': 'रांगेत कोणी वाट पाहत नाही.',
+  'oq.run': 'रांग चालवा', 'oq.startNext': 'पुढचा सुरू करा', 'oq.skip': 'वगळा',
+  'oq.nowServing': 'आता सेवेत: #{n}', 'oq.nobodyServing': 'सध्या कोणाची सेवा सुरू नाही.',
+  'oq.position': 'रांगेत क्रमांक {n}', 'oq.runHelp': 'पुढचा सुरू करा पहिल्या प्रतीक्षेतील टोकनला बोलावतो. वगळा पहिल्या प्रतीक्षेतील ग्राहकाला "आले नाहीत" म्हणून नोंदवतो. क्रमांक आपोआप अपडेट होतात.',
+  'q.youAre': 'तुम्ही रांगेत #{n} वर आहात', 'q.upNext': 'तुम्ही पुढे आहात! कृपया तयार रहा.', 'q.yourTurn': 'तुमची पाळी आहे. आता तुमची सेवा सुरू आहे.',
+  'q.nowServing': 'आता सेवेत: #{n}', 'q.noOneServing': 'अजून कोणाची सेवा सुरू नाही.', 'q.live': 'थेट. आपोआप अपडेट होते.',
+};
+const p15 = { en: en15, hi: hi15, mr: mr15 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr },
 };

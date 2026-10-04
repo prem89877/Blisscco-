@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Field from '../../components/Field';
 import Skeleton from '../../components/Skeleton';
@@ -43,6 +43,7 @@ export default function OwnerQueue() {
   const [issue, setIssue] = useState({ service: '', guest: '' });
   const [hours, setHours] = useState<Hour[]>([]);
   const [times, setTimes] = useState<Record<string, string>>({});   // booking id -> 'HH:MM' chosen in the picker
+  const lockRef = useRef(false);   // synchronous guard: a double-click can never send two requests
 
   const load = useCallback(async (initial = false) => {
     if (!id) return;
@@ -95,14 +96,25 @@ export default function OwnerQueue() {
     void saveSettings({ slot_minutes: slot, capacity: cap, max_days_ahead: days, appointments_enabled: cfg.appt, walkin_enabled: cfg.walkin, accept_coupons: cfg.coupons });
   }
 
-  async function setStatus(bid: string, to: BookingStatus) {
-    if (busy) return;
-    setBusy(true); setErrKey('');
-    const { error } = await supabase.rpc('set_booking_status', { p_booking_id: bid, p_new: to });
-    setBusy(false);
-    if (error) setErrKey(bookingErrKey(error.message));
+  /** One queue action at a time. The database also re-checks everything under a lock, so two devices are safe too. */
+  async function queueAction(fn: () => PromiseLike<{ error: { message: string } | null }>) {
+    if (lockRef.current) return;
+    lockRef.current = true;
+    setBusy(true); setErrKey(''); setOk('');
+    try {
+      const { error } = await fn();
+      if (error) setErrKey(bookingErrKey(error.message));
+    } finally {
+      lockRef.current = false;
+      setBusy(false);
+    }
     await load();
   }
+
+  const setStatus = (bid: string, to: BookingStatus) => queueAction(() => supabase.rpc('set_booking_status', { p_booking_id: bid, p_new: to }));
+  const startNext = () => (id ? queueAction(() => supabase.rpc('owner_queue_start_next', { p_business_id: id })) : undefined);
+  const completeBooking = (bid: string) => queueAction(() => supabase.rpc('owner_queue_complete', { p_booking_id: bid }));
+  const skipBooking = (bid: string) => queueAction(() => supabase.rpc('owner_queue_skip', { p_booking_id: bid }));
 
   async function sendTime(b: Booking) {
     if (busy) return;
@@ -142,12 +154,27 @@ export default function OwnerQueue() {
   const appts = bookings.filter((b) => b.type === 'appointment' && b.start_at !== null).sort((a, b) => apptKey(a).localeCompare(apptKey(b)));
   const waiting = tokens.filter((b) => b.status === 'confirmed' || b.status === 'checked_in');
   const serving = tokens.filter((b) => b.status === 'in_service');
+  const positionOf = new Map(waiting.map((b, i) => [b.id, i + 1]));   // automatic: 1 = next in line
+  const canStartNext = waiting.length > 0 && serving.length < Math.max(st.capacity, 1);
+
+  const walkinActions = (b: Booking) => {
+    if (b.status === 'in_service') return <button className="btn-confirm !w-auto px-5" disabled={busy} onClick={() => void completeBooking(b.id)}>{t('act.complete')}</button>;
+    if (b.status === 'confirmed' || b.status === 'checked_in') {
+      return (
+        <>
+          <button className="btn-secondary" disabled={busy} onClick={() => void skipBooking(b.id)}>{t('oq.skip')}</button>
+          <button className="btn-secondary" disabled={busy} onClick={() => void setStatus(b.id, 'cancelled')}>{t('act.cancel')}</button>
+        </>
+      );
+    }
+    return null;
+  };
 
   const row = (b: Booking) => (
     <li key={b.id} className="space-y-2 py-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-medium">{b.type === 'walkin' ? `#${b.token_number}` : b.start_at ? fmtDateTime(b.start_at, lang) : `${b.requested_date ? fmtDate(b.requested_date, lang) : ''} · ${t('oq.noTimeYet')}`} · {b.customer_name || b.guest_name || '—'}</p>
+          <p className="font-medium">{b.type === 'walkin' ? `#${b.token_number}${positionOf.has(b.id) ? ` · ${t('oq.position', { n: positionOf.get(b.id) ?? 0 })}` : ''}` : b.start_at ? fmtDateTime(b.start_at, lang) : `${b.requested_date ? fmtDate(b.requested_date, lang) : ''} · ${t('oq.noTimeYet')}`} · {b.customer_name || b.guest_name || '—'}</p>
           <p className="text-sm text-ink/70">{b.service_label} · {rupees(b.price_inr)}</p>
         </div>
         <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{t(b.status === 'cancelled' && b.cancelled_by === 'system' ? 'bs.expired' : `bs.${b.status}`)}</span>
@@ -160,7 +187,7 @@ export default function OwnerQueue() {
         </div>
       )}
       <div className="flex flex-wrap gap-2">
-        {actionsFor(b).map((a) => <button key={a.to} className="btn-secondary" disabled={busy} onClick={() => void setStatus(b.id, a.to)}>{t(a.label)}</button>)}
+        {b.type === 'walkin' ? walkinActions(b) : actionsFor(b).map((a) => <button key={a.to} className="btn-secondary" disabled={busy} onClick={() => void setStatus(b.id, a.to)}>{t(a.label)}</button>)}
       </div>
     </li>
   );
@@ -194,6 +221,16 @@ export default function OwnerQueue() {
           <Check id="un" label={t('oq.unavailable')} checked={ctl.unavailable} onChange={(v) => setCtl({ ...ctl, unavailable: v })} disabled={busy} />
           <button type="submit" className="btn-primary w-full" disabled={busy}>{t('common.save')}</button>
         </form>
+      </Section>
+
+      <Section title={t('oq.run')}>
+        <p role="status" className="font-medium">{serving[0] ? t('oq.nowServing', { n: serving[0].token_number ?? 0 }) : t('oq.nobodyServing')}</p>
+        <div className="grid grid-cols-3 gap-2">
+          <button className="btn-confirm" disabled={busy || !canStartNext} onClick={() => void startNext()}>{t('oq.startNext')}</button>
+          <button className="btn-secondary" disabled={busy || serving.length === 0} onClick={() => serving[0] && void completeBooking(serving[0].id)}>{t('act.complete')}</button>
+          <button className="btn-secondary" disabled={busy || waiting.length === 0} onClick={() => waiting[0] && void skipBooking(waiting[0].id)}>{t('oq.skip')}</button>
+        </div>
+        <p className="text-xs text-ink/70">{t('oq.runHelp')}</p>
       </Section>
 
       <Section title={t('oq.issue')}>

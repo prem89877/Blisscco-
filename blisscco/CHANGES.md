@@ -1,20 +1,22 @@
-# Blisscco update: search speed indexes + "estimated" analytics
+# Blisscco update: automatic walk-in queue
 
 ## Supabase (SQL Editor)
-Re-run `supabase/migrations/0019_appointment_request_flow.sql` (changed: 1-hour auto-expiry) AND `0020_fuzzy_search.sql` (2 indexes). Both safe to re-run. No new migration file. pg_cron must be enabled.
-Optional: measure with `supabase/manual/benchmark_search.sql` before and after (test project).
+Run `supabase/migrations/0022_auto_queue.sql` BEFORE deploying the new frontend. Safe to re-run. No table, column or RLS change.
+
+## What changed
+- Queue positions are computed automatically from the waiting tokens (nothing is set by hand). Skip / cancel / complete -> everyone behind moves up.
+- Owner (Queue page): "Run the queue" card with **Start Next**, **Complete**, **Skip**. Each waiting row also shows "No. n in queue" and has Skip / Cancel; the person being served has Complete.
+- Customer (My bookings): live card "You are #2 in queue", "Now serving: #5", "You're next!", "It's your turn". Refreshes every 5 s and instantly through realtime when the shop acts on the customer's own token.
+- Safe transitions: all queue changes lock the business row first, then re-check the booking row. Double-click or two devices cannot serve the same token twice or serve more people at once than `capacity` (default 1). Errors: `already_serving`, `queue_empty`, `invalid_transition`.
+- Appointments, booking, payments, RLS, notifications: unchanged.
 
 ## Changed files
-- supabase/migrations/0019_appointment_request_flow.sql   (cancelled_by 'system', expire_unscheduled_requests after 1 hour, cron every minute, notify trigger)
-- api/_lib/notificationText.ts   (new text appointment_request_expired EN / HI / MR)
-- src/pages/MyBookings.tsx   (Expired badge + Visit other shops / View shop profile buttons)
-- src/pages/owner/OwnerQueue.tsx   (Expired label)
-- src/lib/types.ts   (cancelled_by)
-- supabase/migrations/0020_fuzzy_search.sql   (2 `create index if not exists`, function untouched)
-- supabase/RUN_LOG.md, README.md, CHANGES.md
-- src/i18n/messages.ts   (p9.* texts EN / HI / MR: "Estimated visitors"; new ps.disclaimer EN / HI / MR)
-- src/components/editor/ServicesSection.tsx   (AI price suggestion disclaimer shown under the 3 prices)
-- api/ai-insights.ts   (AI says "estimated visitors", never "unique visitors"; answer is now EXACTLY 6 action lines telling the owner how to bring customers to Blisscco)
+- src/pages/owner/OwnerQueue.tsx   (Run the queue card, walk-in row actions, synchronous double-click lock)
+- src/pages/MyBookings.tsx   (live queue position card, 5 s refresh + realtime)
+- src/lib/types.ts   (QueuePosition)
+- src/lib/bookingErrors.ts   (already_serving, queue_empty)
+- src/i18n/messages.ts   (new p15 block, EN / HI / MR)
+- supabase/RUN_LOG.md, CHANGES.md
 
 ## New files
-- supabase/manual/benchmark_search.sql
+- supabase/migrations/0022_auto_queue.sql

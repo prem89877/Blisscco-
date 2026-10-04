@@ -9,7 +9,7 @@ import { bookingErrKey } from '../lib/bookingErrors';
 import { fmtDate, fmtDateTime, rupees } from '../lib/format';
 import { enablePush, pushSupport } from '../lib/push';
 import { supabase } from '../lib/supabase';
-import type { Booking } from '../lib/types';
+import type { Booking, QueuePosition } from '../lib/types';
 
 const ACTIVE = ['pending', 'confirmed', 'checked_in', 'in_service'];
 
@@ -22,6 +22,7 @@ export default function MyBookings() {
   const [errKey, setErrKey] = useState('');
   const [note, setNote] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [positions, setPositions] = useState<Record<string, QueuePosition>>({});   // walk-in booking id -> live position
   const uid = session?.user.id;
 
   const load = useCallback(async () => {
@@ -35,6 +36,29 @@ export default function MyBookings() {
     setReviewed(new Set(((r.data ?? []) as { booking_id: string }[]).map((x) => x.booking_id)));
   }, [uid]);
   useEffect(() => { void load(); const iv = setInterval(() => void load(), 30000); return () => clearInterval(iv); }, [load]);
+
+  // Live queue position: computed by the database from the tokens ahead of mine (nothing is set by hand).
+  const hasLiveWalkin = rows?.some((b) => b.type === 'walkin' && ACTIVE.includes(b.status)) ?? false;
+  const loadPositions = useCallback(async () => {
+    if (!uid) return;
+    const { data, error } = await supabase.rpc('get_my_queue_positions');
+    if (error) { console.error(error); return; }
+    setPositions(Object.fromEntries(((data ?? []) as QueuePosition[]).map((p) => [p.id, p])));
+  }, [uid]);
+  useEffect(() => {
+    if (!hasLiveWalkin) { setPositions({}); return; }
+    void loadPositions();
+    const iv = setInterval(() => { if (document.visibilityState === 'visible') void loadPositions(); }, 5000);
+    return () => clearInterval(iv);
+  }, [hasLiveWalkin, loadPositions]);
+  // Instant update when the shop starts / skips / completes MY token (realtime; the 5 s refresh above covers the rest).
+  useEffect(() => {
+    if (!uid) return;
+    const ch = supabase.channel(`my-bookings-${uid}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings', filter: `customer_id=eq.${uid}` }, () => { void load(); void loadPositions(); })
+      .subscribe();
+    return () => { void supabase.removeChannel(ch); };
+  }, [uid, load, loadPositions]);
 
   async function cancel(id: string) {
     if (busyId) return;
@@ -68,6 +92,7 @@ export default function MyBookings() {
     const isAppt = b.type === 'appointment';
     const waitingForTime = isAppt && b.start_at === null && ACTIVE.includes(b.status);
     const expired = isAppt && b.status === 'cancelled' && b.cancelled_by === 'system';   // shop did not answer within 1 hour
+    const pos = !isAppt && ACTIVE.includes(b.status) ? positions[b.id] : undefined;
     const canNotify = isAppt && b.start_at !== null && ['pending', 'confirmed'].includes(b.status) && new Date(b.start_at) > new Date();
     return (
       <li key={b.id} className="card space-y-2">
@@ -85,6 +110,16 @@ export default function MyBookings() {
               ? fmtDateTime(b.start_at, lang)
               : `${b.requested_date ? fmtDate(b.requested_date, lang) : ''}${waitingForTime ? ` · ${t('my.timePending')}` : ''}`}
         </p>
+        {pos && (
+          <div role="status" aria-live="polite" className="rounded-xl bg-cream p-3">
+            <p className="text-lg font-semibold">
+              {pos.status === 'in_service' ? t('q.yourTurn') : t('q.youAre', { n: pos.position ?? 1 })}
+            </p>
+            {pos.status !== 'in_service' && pos.position === 1 && <p className="text-sm font-medium text-green-800">{t('q.upNext')}</p>}
+            <p className="text-sm text-ink/80">{pos.serving_token === null ? t('q.noOneServing') : t('q.nowServing', { n: pos.serving_token })}</p>
+            <p className="text-xs text-ink/70">{t('q.live')}</p>
+          </div>
+        )}
         {waitingForTime && <p className="text-xs text-ink/70">{t('my.timePendingHelp')}</p>}
         {expired && (
           <>

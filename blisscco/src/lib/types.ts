@@ -31,6 +31,11 @@ export interface QueueInfo {
   queue_updated_at: string;waiting_count: number;serving_count: number;serving_token: number | null;next_token: number | null;
   walkin_enabled: boolean;appointments_enabled: boolean;slot_minutes: number;max_days_ahead: number;
 }
+/** Live position of the caller's own walk-in token (get_my_queue_positions). position = 1 + people waiting ahead; null once served. */
+export interface QueuePosition {
+  id: string;business_id: string;status: BookingStatus;token: number;position: number | null;serving_token: number | null;
+  queue_status: 'open' | 'paused' | 'closed';est_wait_minutes: number | null;queue_updated_at: string;
+}
 export interface BookingSettings {
   business_id: string;appointments_enabled: boolean;walkin_enabled: boolean;slot_minutes: number;capacity: number;
   max_days_ahead: number;queue_status: 'open' | 'paused' | 'closed';est_wait_minutes: number | null;
