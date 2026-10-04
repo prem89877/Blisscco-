@@ -1,9 +1,12 @@
 /* Blisscco service worker (Phase 10).
-   - Offline: page navigations go to the network; if that fails, /offline.html is shown.
-   - Cache: only the offline page, icons and hashed build files (/assets/*, immutable). NEVER /api/*, Supabase,
-     or any signed-in data, so nothing private is stored on the device by this worker.
+   - Offline: page navigations go to the network; if that fails, the saved app shell (index.html, no user data in it)
+     is served so the app still opens and can show the customer's data saved on the device; if there is no shell yet,
+     /offline.html is shown.
+   - Cache: the offline page, icons, the app shell and hashed build files (/assets/*, immutable). NEVER /api/*, Supabase,
+     or any signed-in data, so nothing private is stored by this worker (the app keeps its own per-user copy, removed on log out).
    - Push: shows a notification and opens the right page when it is tapped. */
-const VERSION = 'v2';
+const VERSION = 'v3';
+const SHELL_KEY = '/index.html';   // every app route returns this same page (SPA)
 const SHELL_CACHE = 'blisscco-shell-' + VERSION;
 const ASSET_CACHE = 'blisscco-assets-' + VERSION;
 const PRECACHE = ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/badge-96.png', '/logo.svg'];
@@ -31,7 +34,15 @@ self.addEventListener('fetch', (event) => {
 
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req).catch(() => caches.match('/offline.html').then((r) => r || Response.error())),
+      fetch(req).then((res) => {
+        const type = res.headers.get('content-type') || '';
+        if (res.ok && res.status === 200 && type.includes('text/html') && !res.redirected) {
+          const copy = res.clone();
+          caches.open(SHELL_CACHE).then((c) => c.put(SHELL_KEY, copy)).catch(() => {});
+        }
+        return res;
+      }).catch(() =>
+        caches.match(SHELL_KEY).then((shell) => shell || caches.match('/offline.html')).then((r) => r || Response.error())),
     );
     return;
   }

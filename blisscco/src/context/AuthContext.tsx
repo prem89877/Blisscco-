@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AuthError, Session } from '@supabase/supabase-js';
+import { clearUserCaches, readCache, writeCache } from '../lib/offlineCache';
 import { forgetPushOnThisDevice } from '../lib/push';
 import { supabase } from '../lib/supabase';
 import type { Lang } from '../i18n';
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => { if (alive) setInitialized(true); });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
-      if (!s) { setProfile(null); setProfileUid(null); }
+      if (!s) { setProfile(null); setProfileUid(null); clearUserCaches(); }
     });
     return () => { alive = false; sub.subscription.unsubscribe(); };
   }, []);
@@ -47,9 +48,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!uid) return;
     let alive = true;
+    // Offline / failed request: fall back to the copy saved on this device so the signed-in customer can still open the app.
+    const fromCache = () => readCache<Profile>(uid, 'profile')?.data ?? null;
     supabase.from('profiles').select('id, role, full_name, language, is_suspended, email_verified').eq('id', uid).maybeSingle()
-      .then(({ data }) => { if (alive) { setProfile((data as Profile | null) ?? null); setProfileUid(uid); } })
-      .then(undefined, () => { if (alive) setProfileUid(uid); });
+      .then(({ data, error }) => {
+        if (!alive) return;
+        if (error) { setProfile(fromCache()); }
+        else { const p = (data as Profile | null) ?? null; setProfile(p); if (p) writeCache(uid, 'profile', p); }
+        setProfileUid(uid);
+      })
+      .then(undefined, () => { if (alive) { setProfile(fromCache()); setProfileUid(uid); } });
     return () => { alive = false; };
   }, [uid]);
 
@@ -77,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    clearUserCaches();                                     // saved offline copies of this account are removed first
     await forgetPushOnThisDevice();                          // this phone stops receiving the account's push before the session ends
     await supabase.auth.signOut();
   }, []);

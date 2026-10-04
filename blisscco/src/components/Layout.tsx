@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
+import { useOnline } from '../lib/offlineCache';
 import { syncPushSubscription } from '../lib/push';
 import { clearRef, getStoredRef } from '../lib/referral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
@@ -13,6 +14,7 @@ import NotificationBell from './NotificationBell';
 export default function Layout() {
   const { session, profile } = useAuth();
   const { t, setLang } = useI18n();
+  const online = useOnline();
 
   // Apply the saved language preference once the profile loads
   useEffect(() => { if (profile?.language) setLang(profile.language); }, [profile?.language, setLang]);
@@ -49,6 +51,8 @@ export default function Layout() {
           </div>
         </div>
       </header>
+
+      {!online && <p role="status" className="bg-amber-100 px-4 py-1.5 text-center text-xs font-medium text-amber-900">{t('off.banner')}</p>}
 
       <InstallPrompt />
 

@@ -895,6 +895,8 @@ const en15: M = {
   'oq.run': 'Run the queue', 'oq.startNext': 'Start Next', 'oq.skip': 'Skip',
   'oq.nowServing': 'Now serving: #{n}', 'oq.nobodyServing': 'Nobody is being served right now.',
   'oq.position': 'No. {n} in queue', 'oq.runHelp': 'Start Next calls the first waiting token. Skip marks the first waiting customer as not arrived. Positions update by themselves.',
+  'off.banner': "You're offline. Showing saved data. Go online to see live updates.", 'off.saved': 'Saved data from {time}.', 'off.needOnline': 'Connect to the internet to see live updates.',
+  'off.queueSaved': 'Saved position, may be outdated. Go online for the live position.',
   'q.youAre': 'You are #{n} in queue', 'q.upNext': "You're next! Please be ready.", 'q.yourTurn': "It's your turn. You are being served now.",
   'q.nowServing': 'Now serving: #{n}', 'q.noOneServing': 'Nobody is being served yet.', 'q.live': 'Live. Updates automatically.',
 };
@@ -903,6 +905,8 @@ const hi15: M = {
   'oq.run': 'कतार चलाएँ', 'oq.startNext': 'अगला शुरू करें', 'oq.skip': 'छोड़ें',
   'oq.nowServing': 'अभी सेवा में: #{n}', 'oq.nobodyServing': 'अभी किसी की सेवा नहीं चल रही।',
   'oq.position': 'कतार में नंबर {n}', 'oq.runHelp': 'अगला शुरू करें पहले प्रतीक्षारत टोकन को बुलाता है। छोड़ें पहले प्रतीक्षारत ग्राहक को "नहीं आए" मार्क करता है। नंबर अपने आप अपडेट होते हैं।',
+  'off.banner': 'आप ऑफ़लाइन हैं। सेव किया हुआ डेटा दिख रहा है। लाइव अपडेट के लिए ऑनलाइन आएँ।', 'off.saved': 'सेव किया हुआ डेटा: {time}।', 'off.needOnline': 'लाइव अपडेट देखने के लिए इंटरनेट से जुड़ें।',
+  'off.queueSaved': 'सेव की हुई पोज़ीशन, पुरानी हो सकती है। लाइव पोज़ीशन के लिए ऑनलाइन आएँ।',
   'q.youAre': 'आप कतार में #{n} पर हैं', 'q.upNext': 'आप अगले हैं! कृपया तैयार रहें।', 'q.yourTurn': 'आपकी बारी है। अभी आपकी सेवा चल रही है।',
   'q.nowServing': 'अभी सेवा में: #{n}', 'q.noOneServing': 'अभी किसी की सेवा शुरू नहीं हुई।', 'q.live': 'लाइव। अपने आप अपडेट होता है।',
 };
@@ -911,6 +915,8 @@ const mr15: M = {
   'oq.run': 'रांग चालवा', 'oq.startNext': 'पुढचा सुरू करा', 'oq.skip': 'वगळा',
   'oq.nowServing': 'आता सेवेत: #{n}', 'oq.nobodyServing': 'सध्या कोणाची सेवा सुरू नाही.',
   'oq.position': 'रांगेत क्रमांक {n}', 'oq.runHelp': 'पुढचा सुरू करा पहिल्या प्रतीक्षेतील टोकनला बोलावतो. वगळा पहिल्या प्रतीक्षेतील ग्राहकाला "आले नाहीत" म्हणून नोंदवतो. क्रमांक आपोआप अपडेट होतात.',
+  'off.banner': 'तुम्ही ऑफलाइन आहात. सेव्ह केलेला डेटा दिसत आहे. लाइव्ह अपडेटसाठी ऑनलाइन या.', 'off.saved': 'सेव्ह केलेला डेटा: {time}.', 'off.needOnline': 'लाइव्ह अपडेट पाहण्यासाठी इंटरनेटशी जोडा.',
+  'off.queueSaved': 'सेव्ह केलेले स्थान, जुने असू शकते. लाइव्ह स्थानासाठी ऑनलाइन या.',
   'q.youAre': 'तुम्ही रांगेत #{n} वर आहात', 'q.upNext': 'तुम्ही पुढे आहात! कृपया तयार रहा.', 'q.yourTurn': 'तुमची पाळी आहे. आता तुमची सेवा सुरू आहे.',
   'q.nowServing': 'आता सेवेत: #{n}', 'q.noOneServing': 'अजून कोणाची सेवा सुरू नाही.', 'q.live': 'थेट. आपोआप अपडेट होते.',
 };

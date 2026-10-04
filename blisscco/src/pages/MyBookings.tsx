@@ -6,12 +6,14 @@ import { Msg } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { bookingErrKey } from '../lib/bookingErrors';
-import { fmtDate, fmtDateTime, rupees } from '../lib/format';
+import { fmtDate, fmtDateTime, fmtTime, rupees } from '../lib/format';
+import { readCache, useOnline, writeCache } from '../lib/offlineCache';
 import { enablePush, pushSupport } from '../lib/push';
 import { supabase } from '../lib/supabase';
 import type { Booking, QueuePosition } from '../lib/types';
 
 const ACTIVE = ['pending', 'confirmed', 'checked_in', 'in_service'];
+interface BookingsCache { rows: Booking[]; reviewed: string[] }
 
 export default function MyBookings() {
   const { t, lang } = useI18n();
@@ -24,6 +26,9 @@ export default function MyBookings() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [positions, setPositions] = useState<Record<string, QueuePosition>>({});   // walk-in booking id -> live position
   const uid = session?.user.id;
+  const online = useOnline();
+  const [savedAt, setSavedAt] = useState<number | null>(null);   // set while we are showing the copy saved on this device
+  const showSaved = !online || savedAt !== null;
 
   const load = useCallback(async () => {
     if (!uid) return;
@@ -31,9 +36,24 @@ export default function MyBookings() {
       supabase.from('bookings').select('*').eq('customer_id', uid).order('created_at', { ascending: false }).limit(50),
       supabase.from('reviews').select('booking_id').eq('customer_id', uid),
     ]);
-    if (b.error) { console.error(b.error); setErrKey('err.generic'); return; }
-    setRows((b.data ?? []) as Booking[]);
-    setReviewed(new Set(((r.data ?? []) as { booking_id: string }[]).map((x) => x.booking_id)));
+    if (b.error) {
+      // no connection: keep showing the copy saved on this device (live data needs internet)
+      const c = readCache<BookingsCache>(uid, 'my-bookings');
+      if (c) { setRows(c.data.rows); setReviewed(new Set(c.data.reviewed)); setSavedAt(c.savedAt); setErrKey(''); return; }
+      console.error(b.error); setErrKey('err.generic'); return;
+    }
+    const list = (b.data ?? []) as Booking[];
+    const done = ((r.data ?? []) as { booking_id: string }[]).map((x) => x.booking_id);
+    setRows(list);
+    setReviewed(new Set(done));
+    setSavedAt(null);
+    writeCache(uid, 'my-bookings', { rows: list, reviewed: done } satisfies BookingsCache);
+  }, [uid]);
+  // show the saved copy immediately (also while offline); the fresh data replaces it as soon as it arrives
+  useEffect(() => {
+    if (!uid) return;
+    const c = readCache<BookingsCache>(uid, 'my-bookings');
+    if (c) { setRows((cur) => cur ?? c.data.rows); setReviewed((cur) => (cur.size ? cur : new Set(c.data.reviewed))); }
   }, [uid]);
   useEffect(() => { void load(); const iv = setInterval(() => void load(), 30000); return () => clearInterval(iv); }, [load]);
 
@@ -42,15 +62,23 @@ export default function MyBookings() {
   const loadPositions = useCallback(async () => {
     if (!uid) return;
     const { data, error } = await supabase.rpc('get_my_queue_positions');
-    if (error) { console.error(error); return; }
-    setPositions(Object.fromEntries(((data ?? []) as QueuePosition[]).map((p) => [p.id, p])));
+    if (error) {   // offline: last saved positions stay on screen, marked as saved
+      const c = readCache<QueuePosition[]>(uid, 'my-positions');
+      if (c) { setPositions(Object.fromEntries(c.data.map((p) => [p.id, p]))); setSavedAt((cur) => cur ?? c.savedAt); }
+      return;
+    }
+    const list = (data ?? []) as QueuePosition[];
+    setPositions(Object.fromEntries(list.map((p) => [p.id, p])));
+    writeCache(uid, 'my-positions', list);
   }, [uid]);
   useEffect(() => {
     if (!hasLiveWalkin) { setPositions({}); return; }
     void loadPositions();
-    const iv = setInterval(() => { if (document.visibilityState === 'visible') void loadPositions(); }, 5000);
+    const iv = setInterval(() => { if (document.visibilityState === 'visible' && navigator.onLine) void loadPositions(); }, 5000);
     return () => clearInterval(iv);
   }, [hasLiveWalkin, loadPositions]);
+  // back online: fetch fresh data right away
+  useEffect(() => { if (online) { void load(); void loadPositions(); } }, [online, load, loadPositions]);
   // Instant update when the shop starts / skips / completes MY token (realtime; the 5 s refresh above covers the rest).
   useEffect(() => {
     if (!uid) return;
@@ -61,7 +89,7 @@ export default function MyBookings() {
   }, [uid, load, loadPositions]);
 
   async function cancel(id: string) {
-    if (busyId) return;
+    if (busyId || !navigator.onLine) return;
     setBusyId(id); setErrKey(''); setNote('');
     const { error } = await supabase.rpc('set_booking_status', { p_booking_id: id, p_new: 'cancelled' });
     setBusyId(null);
@@ -71,7 +99,7 @@ export default function MyBookings() {
 
   /** "Get notified": make sure this phone can receive push (asks permission once), then switch the reminder on. E-mail always works. */
   async function setReminder(id: string, on: boolean) {
-    if (busyId) return;
+    if (busyId || !navigator.onLine) return;
     setBusyId(id); setErrKey(''); setNote('');
     let pushMsg = '';
     if (on && pushSupport() === 'ok') {
@@ -117,7 +145,7 @@ export default function MyBookings() {
             </p>
             {pos.status !== 'in_service' && pos.position === 1 && <p className="text-sm font-medium text-green-800">{t('q.upNext')}</p>}
             <p className="text-sm text-ink/80">{pos.serving_token === null ? t('q.noOneServing') : t('q.nowServing', { n: pos.serving_token })}</p>
-            <p className="text-xs text-ink/70">{t('q.live')}</p>
+            <p className="text-xs text-ink/70">{showSaved ? t('off.queueSaved') : t('q.live')}</p>
           </div>
         )}
         {waitingForTime && <p className="text-xs text-ink/70">{t('my.timePendingHelp')}</p>}
@@ -136,20 +164,21 @@ export default function MyBookings() {
           ? (
             <div className="flex flex-wrap items-center gap-2">
               <span role="status" className="text-sm font-medium text-green-800">✓ {t('my.notifyIsOn')}</span>
-              <button className="btn-text-muted" disabled={busyId === b.id} onClick={() => void setReminder(b.id, false)}>{t('my.notifyOff')}</button>
+              <button className="btn-text-muted" disabled={busyId === b.id || showSaved} onClick={() => void setReminder(b.id, false)}>{t('my.notifyOff')}</button>
             </div>
           )
-          : <button className="btn-confirm" disabled={busyId === b.id} onClick={() => void setReminder(b.id, true)}>🔔 {t('my.getNotified')}</button>)}
+          : <button className="btn-confirm" disabled={busyId === b.id || showSaved} onClick={() => void setReminder(b.id, true)}>🔔 {t('my.getNotified')}</button>)}
 
         {['pending', 'confirmed', 'checked_in'].includes(b.status) && (
-          <button className="btn-secondary" disabled={busyId === b.id} onClick={() => void cancel(b.id)}>{t('my.cancel')}</button>
+          <button className="btn-secondary" disabled={busyId === b.id || showSaved} onClick={() => void cancel(b.id)}>{t('my.cancel')}</button>
         )}
         {(reviewed.has(b.id)
           ? <p className="text-sm text-green-800">{t('rv.reviewed')}</p>
+          : showSaved ? null
           : openReview === b.id
             ? <ReviewForm bookingId={b.id} onDone={load} />
             : <button className="btn-secondary" onClick={() => setOpenReview(b.id)}>{t('rv.write')}</button>)}
-        {['completed', 'cancelled', 'no_show'].includes(b.status) && <DisputeButton bookingId={b.id} />}
+        {!showSaved && ['completed', 'cancelled', 'no_show'].includes(b.status) && <DisputeButton bookingId={b.id} />}
       </li>
     );
   };
@@ -159,6 +188,11 @@ export default function MyBookings() {
   return (
     <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <h1 className="font-display text-2xl font-semibold">{t('my.title')}</h1>
+      {showSaved && rows !== null && (
+        <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+          {t('off.saved', { time: savedAt ? fmtTime(new Date(savedAt).toISOString(), lang) : '' })} {t('off.needOnline')}
+        </p>
+      )}
       <Msg error={errKey ? t(errKey) : ''} ok={note} />
       {rows === null && !errKey && <div className="h-24 animate-pulse rounded-2xl bg-ink/10" />}
       {rows?.length === 0 && <p className="text-ink/70">{t('my.empty')}</p>}
