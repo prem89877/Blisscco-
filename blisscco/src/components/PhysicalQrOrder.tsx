@@ -9,7 +9,7 @@ import { Msg } from './ui';
 const PLAN_CODE = 'physical_qr';
 const TEMPLATE = '/qr-poster-template.jpg';           // 1418 x 2048, the Blisscco poster with an empty white box
 const BOX = { x: 470, y: 692, size: 480 };              // white box inside the black frame (template pixels)
-const NAME_Y = 440;                                     // shop name sits right under the "blisscco" logo
+const NAME_Y = 493;                                     // exact middle between the bottom of the "blisscco" logo (y 332) and the top of the QR frame (y 654)
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -22,7 +22,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 /** Draws the poster: template + shop name under the logo + the shop's own QR in the white box. Returns a PNG data URL. */
 async function renderPoster(name: string, link: string): Promise<string> {
-  const [img] = await Promise.all([loadImage(TEMPLATE), document.fonts?.load('600 80px Poppins').catch(() => undefined)]);
+  const [img] = await Promise.all([loadImage(TEMPLATE), document.fonts?.load('italic 600 80px Lora').catch(() => undefined)]);
   const c = document.createElement('canvas');
   c.width = img.naturalWidth; c.height = img.naturalHeight;
   const g = c.getContext('2d');
@@ -33,16 +33,17 @@ async function renderPoster(name: string, link: string): Promise<string> {
   await QRCode.toCanvas(qr, link, { width: BOX.size, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#2D2A2E', light: '#FFFFFF' } });
   g.drawImage(qr, BOX.x, BOX.y, BOX.size, BOX.size);
 
-  // shop name: one line, shrinks to fit, "…" if still too long
-  let size = 84; const maxW = 980;
-  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#2D2A2E';
-  const font = (px: number) => `600 ${px}px Poppins, 'Noto Sans Devanagari', system-ui, sans-serif`;
+  // shop name: Lora italic, one line, shrinks to fit, "…" if still too long; glyphs centred exactly on NAME_Y
+  let size = 120; const maxW = 1000;
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#2D2A2E';
+  const font = (px: number) => `italic 600 ${px}px Lora, 'Noto Serif Devanagari', Georgia, serif`;
   g.font = font(size);
-  while (g.measureText(name).width > maxW && size > 40) { size -= 4; g.font = font(size); }
+  while (g.measureText(name).width > maxW && size > 48) { size -= 4; g.font = font(size); }
   let text = name;
   while (g.measureText(text).width > maxW && text.length > 1) text = text.slice(0, -1);
   if (text !== name) text = text.trimEnd() + '…';
-  g.fillText(text, c.width / 2, NAME_Y);
+  const m = g.measureText(text);
+  g.fillText(text, c.width / 2, NAME_Y + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
   return c.toDataURL('image/png');
 }
 
