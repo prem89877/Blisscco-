@@ -105,6 +105,7 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
                   </button>
                 ))}
               </div>
+              <p className="mt-2 text-xs text-ink/60">{t('ps.disclaimer')}</p>
             </div>
           )}
           <Msg error={tipErr} />
