@@ -12,6 +12,15 @@
 create extension if not exists pg_trgm with schema extensions;
 create extension if not exists fuzzystrmatch with schema extensions;
 
+-- ============ SCALABILITY INDEXES (search behaviour is NOT changed, only the speed of fetching rows) ============
+-- Already present and still used by search_services (nothing to add): businesses_location_gix (partial GiST, approved only, 5 km filter),
+-- services_business_idx, business_hours unique (business_id, day_of_week), subs_business_idx. See supabase/manual/benchmark_search.sql.
+-- 1) Candidate rows per shop: lets Postgres read price / name / category straight from the index (no table fetch) for the fuzzy score.
+create index if not exists services_search_cover_idx on public.services (business_id)
+  include (price_inr, name, service_category) where is_active;
+-- 2) Cover photo lookup (ORDER BY sort_order, created_at LIMIT 1) is done once per result row.
+create index if not exists business_images_cover_lookup_idx on public.business_images (business_id, sort_order, created_at);
+
 -- Score: -1 = a typed word matched nothing; otherwise sum over typed words (2 = contained in the text, 1 = similar).
 create or replace function public._fuzzy_score(p_tokens text[], p_text text) returns int
 language plpgsql stable set search_path = '' as $$

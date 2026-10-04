@@ -100,6 +100,7 @@ Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons
 - `/` shows a welcome page (Browse shops near you / Login as a business + quotes) to visitors without an account; signed-in users go to discovery.
 - `/explore` is public. It asks for GPS only after the user taps the button, keeps it in memory only, and shows shops within 5 km.
   The 5 km limit is enforced inside the database functions `nearby_businesses` and `search_services` (migration 0008), not in the UI.
+- Search speed: indexes `services_search_cover_idx` and `business_images_cover_lookup_idx` (in 0020) on top of the existing `businesses_location_gix`; measure with `supabase/manual/benchmark_search.sql`.
 - Search matches service, shop name and category (English/Hindi/Marathi). Filters: category, max price, open now. Sort: nearest or lowest price.
 - "Open now" is computed from saved opening hours in India time. Ratings/reviews and PRO/ELITE badges arrive in later phases (cards say "No reviews yet").
 - Opening hours: pick open days and one time; it applies to all open days (per-day override is optional).
@@ -189,6 +190,7 @@ Two things only a real run can prove: (1) that Supabase passes the browser's `Us
 - **Tracking (anonymous):** `analytics_events` stores only shop id, event (profile view / search impression / booking), source (qr / search / referral / direct), time,
   an anonymous session hash and a de-duplication key. No user id, name, phone, email, IP or user-agent. The session hash is `sha256(random per-tab id + India date)`, so it changes daily.
 - **Duplicate filter:** one view or impression per visitor per shop per 30 minutes; one booking event per real booking.
+- **Estimated, not unique:** visitors are anonymous (random tab id, new every day), so the numbers are ESTIMATES. The screen and the AI insights say "estimated visitors" and never "unique visitors". Bookings are real counts.
 - **Bot filter:** crawlers / scripts / link-preview fetchers (by user-agent) and automated browsers are dropped; one anonymous session cannot create more than 300 events per hour;
   the shop's own owner and admins never count; only approved shops count.
 - **Bookings cannot be faked:** `track_event('booking')` only counts for a logged-in customer who really created a booking at that shop in the last 10 minutes.
