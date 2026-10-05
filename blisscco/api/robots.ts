@@ -1,6 +1,6 @@
 // GET /robots.txt  (rewritten to this function in vercel.json so the Sitemap line can hold your real domain)
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { siteUrl } from './_lib/siteUrl';
+import { siteUrl } from './_lib/siteUrl.js';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   const base = siteUrl(req);

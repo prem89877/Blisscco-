@@ -4,7 +4,7 @@
 // No <lastmod> is written: the database has no "last changed" date for a shop page and a made-up date would mislead crawlers.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { siteUrl } from './_lib/siteUrl';
+import { siteUrl } from './_lib/siteUrl.js';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const STATIC_PATHS = ['/', '/explore', '/privacy', '/terms'];
