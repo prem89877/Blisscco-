@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import BookingPanel from '../components/BookingPanel';
 import ReviewForm from '../components/ReviewForm';
+import Seo, { siteOrigin } from '../components/Seo';
 import { RatingLine, ReviewsSection } from '../components/ReviewsSection';
 import Skeleton from '../components/Skeleton';
 import { VerifiedTick } from '../components/TierBadge';
@@ -56,17 +57,20 @@ export default function BusinessProfile() {
   const [loaded, setLoaded] = useState<Record<string, boolean>>({});
   const [hoursOpen, setHoursOpen] = useState(false);
   const [flags, setFlags] = useState<{ is_verified: boolean } | null>(null);
+  const [rating, setRating] = useState<{ avg_rating: number; review_count: number } | null>(null);
 
   useEffect(() => {
     if (!id) { setBiz(null); return; }
     let alive = true;
-    setImgsReady(false); setLoaded({}); setHoursOpen(false);
+    setImgsReady(false); setLoaded({}); setHoursOpen(false); setRating(null);
     void (async () => {
       const b = await supabase.from('public_businesses').select('*').eq('id', id).maybeSingle();
       if (!alive) return;
       if (b.error || !b.data) { setBiz(null); return; }
       setBiz(b.data as Pub);
       trackView(id, sourceFromParam(params.get('src'), !!getStoredRef()));   // anonymous; counted once per 30 min per visitor
+      void supabase.from('public_business_ratings').select('avg_rating,review_count').eq('business_id', id).maybeSingle()
+        .then(({ data }) => { if (alive && data) setRating(data as { avg_rating: number; review_count: number }); });
       void supabase.from('public_business_flags').select('is_verified').eq('business_id', id).maybeSingle()
         .then(({ data }) => { if (alive && data) setFlags(data as { is_verified: boolean }); });
       const [i, h, s] = await Promise.all([
@@ -86,7 +90,7 @@ export default function BusinessProfile() {
   }, [id]);
 
   if (biz === undefined) return <Skeleton />;
-  if (biz === null) return <p role="alert" className="p-6 text-center">{t('biz.notFound')}</p>;
+  if (biz === null) return <><Seo title="Shop not found | Blisscco" noindex /><p role="alert" className="p-6 text-center">{t('biz.notFound')}</p></>;
 
   const cat = (lang === 'hi' ? biz.category_name_hi : lang === 'mr' ? biz.category_name_mr : null) || biz.category_name_en;
   const desc = biz.description_i18n?.[lang] || biz.description;
@@ -98,21 +102,45 @@ export default function BusinessProfile() {
   const address = [biz.address_line, biz.city, biz.state, biz.pincode].filter(Boolean).join(', ');
   const minPrice = services.length ? Math.min(...services.map((s) => s.price_inr)) : null;
 
+  // SEO: text comes only from what this page already shows (English category name so search snippets are consistent)
+  const place = [biz.city, biz.state].filter(Boolean).join(', ');
+  const seoTitle = `${biz.name} - ${biz.category_name_en}${biz.city ? ` in ${biz.city}` : ''} | Blisscco`;
+  const plainDesc = (biz.description_i18n?.en || biz.description || '').replace(/\s+/g, ' ').trim();
+  const seoDesc = (plainDesc
+    ? plainDesc
+    : `${biz.name} is a ${biz.category_name_en.toLowerCase()} business${place ? ` in ${place}` : ''}. See services, prices and opening hours, and book on Blisscco.`
+  ).slice(0, 160);
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const openingHours = hours
+    .filter((h) => !h.is_closed && h.opens_at && h.closes_at)
+    .map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: dayNames[h.day_of_week], opens: hhmm(h.opens_at), closes: hhmm(h.closes_at) }));
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org', '@type': 'LocalBusiness', name: biz.name,
+    url: `${siteOrigin()}/b/${biz.id}`,
+    geo: { '@type': 'GeoCoordinates', latitude: biz.latitude, longitude: biz.longitude },
+    address: { '@type': 'PostalAddress', ...(biz.address_line ? { streetAddress: biz.address_line } : {}), ...(biz.city ? { addressLocality: biz.city } : {}), ...(biz.state ? { addressRegion: biz.state } : {}), ...(biz.pincode ? { postalCode: biz.pincode } : {}), addressCountry: 'IN' },
+  };
+  if (plainDesc) jsonLd.description = plainDesc;
+  if (biz.phone) jsonLd.telephone = biz.phone;                       // only present when the owner chose to show it publicly
+  if (openingHours.length) jsonLd.openingHoursSpecification = openingHours;
+  if (rating && rating.review_count > 0) jsonLd.aggregateRating = { '@type': 'AggregateRating', ratingValue: rating.avg_rating, reviewCount: rating.review_count, bestRating: 5, worstRating: 1 };
+
   return (
     <article className="mx-auto max-w-2xl space-y-5 px-4 pb-10 pt-4">
+      <Seo title={seoTitle} description={seoDesc} path={`/b/${biz.id}`} jsonLd={jsonLd} />
       <div className="relative">
         {!imgsReady ? (
           <NameLoader name={biz.name} className="h-64 w-full rounded-3xl" />
         ) : images.length > 0 ? (
           <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto rounded-3xl pb-1 [scrollbar-width:none]">
-            {images.map((im) => {
+            {images.map((im, idx) => {
               const w = images.length > 1 ? 'w-[85%]' : 'w-full';
               const src = urls[im.storage_path];
               return (
                 <div key={im.id} className={`relative h-64 flex-none snap-center overflow-hidden rounded-3xl ${w}`}>
                   {!loaded[im.id] && <NameLoader name={biz.name} className="absolute inset-0" />}
                   {src && (
-                    <img src={src} alt={biz.name} loading="lazy"
+                    <img src={src} alt={t('biz.photoAlt', { name: biz.name, category: cat, n: idx + 1, total: images.length })} loading="lazy"
                       onLoad={() => setLoaded((p) => ({ ...p, [im.id]: true }))}
                       onError={() => setLoaded((p) => ({ ...p, [im.id]: true }))}
                       className={`h-full w-full object-cover transition-opacity duration-500 ${loaded[im.id] ? 'opacity-100' : 'opacity-0'}`} />

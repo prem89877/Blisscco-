@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom';
 import ReferralBanner from '../components/ReferralBanner';
 import BannerStrip from '../components/BannerStrip';
+import Seo from '../components/Seo';
 import { Stars } from '../components/Stars';
 import { VerifiedTick } from '../components/TierBadge';
 import { Msg } from '../components/ui';
@@ -105,6 +106,7 @@ export default function Explore() {
   if (!coords) {
     return (
       <section className="mx-auto max-w-md space-y-4 px-4 py-10 text-center">
+        <Seo title="Find salons, spas & beauty shops near you | Blisscco" description="Search beauty and personal-care shops within 5 km of you, compare services and prices, and book an appointment or a walk-in token on Blisscco." path="/explore" />
         <h1 className="font-display text-2xl font-semibold">{t('explore.title')}</h1>
         <p className="text-ink/80">{t('explore.why')}</p>
         {status === 'denied' && <Msg error={t('explore.denied')} />}
@@ -119,6 +121,7 @@ export default function Explore() {
 
   return (
     <section className="mx-auto max-w-3xl space-y-4 px-4 py-6">
+      <Seo title="Find salons, spas & beauty shops near you | Blisscco" description="Search beauty and personal-care shops within 5 km of you, compare services and prices, and book an appointment or a walk-in token on Blisscco." path="/explore" />
       <div className="explore-hero">
         <h1 className="font-display text-2xl font-semibold sm:text-3xl">{t('explore.title')}</h1>
         <p className="mt-0.5 flex items-center gap-1.5 text-sm text-ink/70">

@@ -4,7 +4,7 @@ import LegalPage, { H, UL } from './LegalPage';
 export default function Privacy() {
   const mail = <a className="link-text" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
   return (
-    <LegalPage title="Privacy Policy">
+    <LegalPage title="Privacy Policy" path="/privacy" description="How Blisscco collects, uses and protects personal data of customers and business owners, who can see it, how long it is kept, and how to ask for access or deletion.">
       <p>Blisscco is a platform where people discover beauty and personal-care businesses near them and book appointments or walk-in queue tokens. This page explains what personal data we collect, why, who else can see it, and what you can ask us to do. Please also read our Terms.</p>
 
       <H>Who is responsible for your data</H>

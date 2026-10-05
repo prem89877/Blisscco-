@@ -1025,9 +1025,24 @@ const mr18: M = {
 };
 const p18 = { en: en18, hi: hi18, mr: mr18 };
 
+// ---- p19: 404 page + photo alt text (Phase 1 Technical SEO) ----
+const en19: M = {
+  'seo.404.title': 'Page not found', 'seo.404.body': 'The page you are looking for does not exist or has moved.',
+  'biz.photoAlt': '{name} - {category} photo {n} of {total}',
+};
+const hi19: M = {
+  'seo.404.title': 'पेज नहीं मिला', 'seo.404.body': 'आप जो पेज ढूँढ रहे हैं वह मौजूद नहीं है या हटा दिया गया है।',
+  'biz.photoAlt': '{name} - {category} फ़ोटो {n} / {total}',
+};
+const mr19: M = {
+  'seo.404.title': 'पेज सापडले नाही', 'seo.404.body': 'तुम्ही शोधत असलेले पेज अस्तित्वात नाही किंवा हलवले आहे.',
+  'biz.photoAlt': '{name} - {category} फोटो {n} / {total}',
+};
+const p19 = { en: en19, hi: hi19, mr: mr19 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr },
 };

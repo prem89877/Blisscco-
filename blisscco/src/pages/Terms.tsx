@@ -4,7 +4,7 @@ import LegalPage, { H, UL } from './LegalPage';
 export default function Terms() {
   const mail = <a className="link-text" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
   return (
-    <LegalPage title="Terms of Service">
+    <LegalPage title="Terms of Service" path="/terms" description="The terms for using Blisscco as a visitor, customer or business owner: bookings and queues, reviews, listings, paid services, referrals and responsibilities.">
       <p>These terms apply when you use Blisscco as a visitor, customer or business owner. By creating an account or using Blisscco you agree to them and to our Privacy Policy. If you do not agree, please do not use Blisscco.</p>
 
       <H>What Blisscco is</H>

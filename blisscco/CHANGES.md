@@ -1,3 +1,36 @@
+# Blisscco update: Phase 1 Technical SEO
+
+## Vercel environment variables (set once, then redeploy)
+- `SITE_URL=https://YOUR-REAL-DOMAIN` and `VITE_SITE_URL=` (same value). Used for canonical / Open Graph URLs, sitemap.xml, robots.txt and the link-preview image. Without them the site falls back to the Vercel production domain / the address the page is opened on.
+
+## What changed
+- **Per-page metadata** (title, description, canonical, robots, Open Graph, Twitter) through one new component `src/components/Seo.tsx`. Every route renders one, so a noindex can never leak to another page.
+- **Indexable pages:** home, /explore, /privacy, /terms, every approved shop page /b/:id (title = "Shop - Category in City | Blisscco", description from the shop's own description).
+- **noindex:** login / register / forgot / reset / callback pages, all owner / admin / customer account pages, 404, and "shop not found".
+- **sitemap.xml** (`api/sitemap.ts`): home, explore, privacy, terms + all approved shops read from `public_businesses`. **robots.txt** (`api/robots.ts`): blocks admin, owner dashboard, my-bookings, notifications, refer, auth routes and /api/; points to the sitemap.
+- **Structured data (JSON-LD):** Organization + WebSite on home; LocalBusiness on shop pages (name, address, geo, phone only if the owner shows it, opening hours, rating only if reviews exist). No SearchAction / price / image schema because the data is not available as stable public values.
+- **404 page** (`src/pages/NotFound.tsx`): unknown URLs no longer show the home page.
+- **Image alt:** shop photos now have descriptive alt text (EN / HI / MR). Logo and decorative card images stay `alt=""`.
+- **index.html:** better default title / description, Open Graph + Twitter tags, `<noscript>` fallback text.
+- **vercel.json:** rewrites for robots / sitemap, immutable cache for hashed /assets, HSTS and basic security headers.
+
+## Changed files
+- index.html, vite.config.ts, vercel.json, .env.example, CHANGES.md
+- src/App.tsx, src/pages/Landing.tsx, src/pages/Explore.tsx, src/pages/BusinessProfile.tsx
+- src/pages/LegalPage.tsx, src/pages/Privacy.tsx, src/pages/Terms.tsx
+- src/i18n/messages.ts   (new p19 block: EN / HI / MR)
+
+## New files
+- src/components/Seo.tsx, src/pages/NotFound.tsx
+- api/robots.ts, api/sitemap.ts, api/_lib/siteUrl.ts
+
+## Known limits
+- The site is a client-rendered React app (Vite). Google runs the JavaScript and reads the per-page tags, but WhatsApp / Facebook previews do not, so a shared shop link shows the generic Blisscco preview. Real fix = prerender / server-render shop pages (a later phase).
+- Unknown URLs return HTTP 200 (SPA rewrite) with a noindex 404 page, not a real 404 status.
+- Not built / tested here (no network for `npm install`). Run `npm install && npm run build` once.
+
+---
+
 # Blisscco update: Legal-readiness audit (Terms, Privacy Policy, sign-up notice)
 
 Full audit with every finding, risky-wording table and the pre-launch checklist: `LEGAL_AUDIT_REPORT.md`.

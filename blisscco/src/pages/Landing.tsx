@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Seo, { siteOrigin } from '../components/Seo';
 import { useI18n } from '../i18n';
 
 const N = 5;
+const DESC = 'Blisscco helps you discover salons, spas, tattoo studios and other beauty and personal-care businesses near you, see services and prices, and book an appointment or a walk-in token.';
 
 export default function Landing() {
   const { t } = useI18n();
@@ -14,8 +16,15 @@ export default function Landing() {
     return () => clearInterval(id);
   }, []);
 
+  const origin = siteOrigin();
+  const jsonLd = [
+    { '@context': 'https://schema.org', '@type': 'Organization', name: 'Blisscco', url: `${origin}/`, logo: `${origin}/icons/icon-512.png` },
+    { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Blisscco', url: `${origin}/` },
+  ];
+
   return (
     <section className="mx-auto max-w-xl px-4 py-10 text-center">
+      <Seo title="Blisscco - Discover beauty & personal-care services near you" description={DESC} path="/" jsonLd={jsonLd} />
       <p className="text-sm font-medium text-ink/70">{t('app.tagline')}</p>
       <h1 className="mt-2 font-display text-3xl font-semibold leading-tight sm:text-4xl">{t('landing.headline')}</h1>
       <p className="mx-auto mt-3 max-w-md text-ink/80">{t('landing.sub')}</p>
