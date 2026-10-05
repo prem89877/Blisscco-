@@ -56,14 +56,6 @@ export default function NotificationSettings() {
     setMsg({ error: '', ok: t('p10.s.saved') });
   }
 
-  async function sendTest() {
-    setBusy(true); setMsg({ error: '', ok: '' });
-    const { error } = await supabase.rpc('send_test_notification');
-    setBusy(false);
-    if (error) { setMsg({ error: error.message.includes('rate_limited') ? t('p10.err.rate_limited') : t('err.generic'), ok: '' }); return; }
-    setMsg({ error: '', ok: t('p10.s.testDone') });
-  }
-
   const toggleCat = (c: string, on: boolean) =>
     setPrefs((p) => (p ? { ...p, muted_categories: on ? p.muted_categories.filter((x) => x !== c) : [...p.muted_categories.filter((x) => x !== c), c] } : p));
 
@@ -102,11 +94,6 @@ export default function NotificationSettings() {
           <button className="btn-primary" disabled={busy} onClick={() => void save()}>{t('p10.s.save')}</button>
         </Section>
       )}
-
-      <Section title={t('p10.s.testTitle')}>
-        <p className="text-sm text-ink/70">{t('p10.s.testHint')}</p>
-        <button className="btn-secondary" disabled={busy} onClick={() => void sendTest()}>{t('p10.s.test')}</button>
-      </Section>
     </div>
   );
 }

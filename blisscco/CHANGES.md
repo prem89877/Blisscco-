@@ -1,3 +1,10 @@
+# Blisscco update: test-notification button removed, operator name
+
+- Removed the "Send a test notification" box from Notifications > Settings (`src/pages/NotificationSettings.tsx`). The database function `send_test_notification` and the unused text keys are left in place (harmless).
+- Privacy Policy and Terms now say Blisscco is run by **Janvi** (`OPERATOR_NAME` in `src/lib/site.ts`). The Grievance Officer is Prem Talekar, listed as Customer Care Employee (`GRIEVANCE_OFFICER`). `CONTACT_EMAIL` is unchanged.
+
+---
+
 # Blisscco update: Phase 1 Technical SEO
 
 ## Vercel environment variables (set once, then redeploy)
