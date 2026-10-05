@@ -2,7 +2,7 @@
   "rewrites": [
     { "source": "/robots.txt", "destination": "/api/robots" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/((?!api/|sw\\.js|manifest\\.webmanifest|offline\\.html|icons/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|_vercel/|sw\\.js|manifest\\.webmanifest|offline\\.html|icons/).*)", "destination": "/index.html" }
   ],
   "functions": {
     "api/ai-insights.ts": { "maxDuration": 30 },
