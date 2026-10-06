@@ -63,7 +63,7 @@ export default function Privacy() {
       <p>Push and email notifications are turned on by default for bookings, approvals, reviews, payments and reminders. Push works only if you allow notifications in your browser; we then store your browser's push address and keys, and the browser type, so we can deliver messages to that device. Email notifications go to your account email. You can switch push or email off, or mute categories, under Notifications &gt; Settings in the app. A notification marked "sent" in our records means the push or email provider accepted it; it does not prove you received or read it. In-app notifications and their delivery records are deleted after 90 days. When you log out, we try to remove this device from push.</p>
 
       <H>Payments (business owners)</H>
-      <p>Customers do not pay Blisscco and Blisscco does not hold customer money: you pay the shop directly. Business owners can buy paid Blisscco services (the blue badge, extra banners and the physical QR poster) through Razorpay, using UPI. Razorpay collects and processes your payment details; Blisscco does not receive or store your UPI PIN or card details. We store the order and payment IDs, amount, status, refunds, date and which service and shop it was for. We also store the payment notifications Razorpay sends us in full, and these may include contact details you gave at checkout (for example email, phone number or UPI ID). Payment records are kept for accounting and dispute purposes.</p>
+      <p>Customers do not pay Blisscco and Blisscco does not hold customer money: you pay the shop directly. Business owners can buy paid Blisscco services (the blue badge, extra banners and the physical QR poster) through Cashfree Payments, using UPI. Cashfree Payments collects and processes your payment details; Blisscco does not receive or store your UPI PIN or card details. We store the order and payment IDs, amount, status, refunds, date and which service and shop it was for. We also store the payment notifications Cashfree Payments sends us in full, and these may include contact details you gave at checkout (for example email, phone number or UPI ID). Payment records are kept for accounting and dispute purposes.</p>
 
       <H>Cookies and browser storage</H>
       <p>Blisscco does not use advertising or tracking cookies. Our sign-in service keeps your login session in your browser's local storage. We also store on your device: your language choice, a remembered referral code, a "install the app" reminder time, sign-in return information, and (for signed-in customers) a saved copy of recent data so the app can open offline. Saved copies are removed when you log out. The browser tab ID used for visit statistics lives only in session storage and disappears when the tab is closed. The app installs a service worker that saves the app's own files for offline use; it does not save your private data. Companies whose tools we load (see below) may set their own cookies or identifiers.</p>
@@ -73,7 +73,7 @@ export default function Privacy() {
         <li>Supabase: database, sign-in, and private file storage (photos, banners, documents).</li>
         <li>Vercel: hosts the website and our server functions.</li>
         <li>Google: "Continue with Google" sign-in, and Google Fonts, which your browser loads when you open the site (this lets Google receive your IP address and browser details).</li>
-        <li>Razorpay: payments from business owners. Razorpay's checkout script is loaded when an owner pays.</li>
+        <li>Cashfree Payments: payments from business owners. Cashfree's checkout script is loaded when an owner pays.</li>
         <li>Resend: sends our notification emails, so it receives your email address and the email's text.</li>
         <li>Browser push services (such as those run by Google, Apple or Mozilla): carry push notifications to your device.</li>
         <li>An AI provider, used only by business owners for the optional "AI insights" and "AI price suggestion" tools. We send only summary visit numbers, a service name, the shop's city and state, and the shop's other service prices. No customer data is sent. The AI provider we use is Google Gemini (Google AI Studio).</li>
@@ -82,12 +82,12 @@ export default function Privacy() {
       <p>We do not sell your personal data. We share it with these companies only so Blisscco can work, with shops as described above, and with authorities when the law requires.</p>
 
       <H>Where data is processed</H>
-      <p>Our Supabase project and our Vercel functions run in India (Mumbai). Some of the other companies above (for example Google, Razorpay, Resend and browser push services) may store or process data outside India.</p>
+      <p>Our Supabase project and our Vercel functions run in India (Mumbai). Some of the other companies above (for example Google, Cashfree Payments, Resend and browser push services) may store or process data outside India.</p>
 
       <H>How long we keep data</H>
       <UL>
         <li>Account, bookings, reviews and referral records: kept while your account exists, and afterwards as needed for disputes, fraud prevention and legal reasons, for a maximum of 7 years after your account is deleted.</li>
-        <li>Payment records and Razorpay notifications: kept for accounting and legal reasons for 7 years after the transaction.</li>
+        <li>Payment records and Cashfree Payments notifications: kept for accounting and legal reasons for 7 years after the transaction.</li>
         <li>Blue badge documents: kept while needed to show how a badge decision was made, and for 2 years after the badge expires or is revoked.</li>
         <li>In-app notifications and their delivery records: 90 days.</li>
         <li>Visit statistics rows: 400 days (about 13 months).</li>

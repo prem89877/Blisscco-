@@ -48,8 +48,8 @@ export default function Terms() {
 
       <H>Paid services for business owners</H>
       <UL>
-        <li>Blisscco currently offers three optional paid services: the blue badge, extra banners, and a personalised physical QR poster. Prices are shown before you pay and may change for future purchases. You pay Blisscco through Razorpay by UPI. All prices are inclusive of applicable GST. A GST-compliant invoice/receipt will be provided electronically after payment.</li>
-        <li>A service starts only after Razorpay confirms the payment to us, which can take a short while. If a payment fails, the payment provider handles any return of money.</li>
+        <li>Blisscco currently offers three optional paid services: the blue badge, extra banners, and a personalised physical QR poster. Prices are shown before you pay and may change for future purchases. You pay Blisscco through Cashfree Payments by UPI. All prices are inclusive of applicable GST. A GST-compliant invoice/receipt will be provided electronically after payment.</li>
+        <li>A service starts only after Cashfree Payments confirms the payment to us, which can take a short while. If a payment fails, the payment provider handles any return of money.</li>
         <li>Refunds and cancellations: Payments are non-refundable and cannot be cancelled after successful payment. Physical QR poster orders cannot be cancelled once processing has started. If a payment is refunded in full, the blue badge or banner credit it gave is removed.</li>
       </UL>
 

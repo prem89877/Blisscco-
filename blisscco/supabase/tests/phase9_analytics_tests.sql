@@ -6,10 +6,10 @@ create function pg_temp.activate(p_owner uuid, p_biz uuid, p_plan text, p_amount
 declare tx jsonb; r text;
 begin
   tx := public.create_payment_txn(p_owner, p_biz, p_plan, 'rc-' || p_tag);
-  perform public.attach_razorpay_order((tx ->> 'txn_id')::uuid, 'order_' || p_tag);
-  r := public.process_razorpay_event('evt_' || p_tag, 'payment.captured', jsonb_build_object('event', 'payment.captured', 'payload',
-         jsonb_build_object('payment', jsonb_build_object('entity', jsonb_build_object('id', 'pay_' || p_tag, 'order_id', 'order_' || p_tag,
-           'amount', p_amount, 'currency', 'INR', 'status', 'captured')))));
+  perform public.attach_gateway_order((tx ->> 'txn_id')::uuid, 'order_' || p_tag);
+  r := public.process_cashfree_event('evt_' || p_tag, 'PAYMENT_SUCCESS_WEBHOOK', jsonb_build_object('type', 'PAYMENT_SUCCESS_WEBHOOK', 'data',
+         jsonb_build_object('order', jsonb_build_object('order_id', 'order_' || p_tag),
+           'payment', jsonb_build_object('cf_payment_id', 'pay_' || p_tag, 'payment_amount', p_amount / 100.0, 'payment_currency', 'INR', 'payment_status', 'SUCCESS'))));
   if r <> 'activated' then raise exception 'TEST SETUP: plan not activated (%)', r; end if;
 end $f$;
 do $$

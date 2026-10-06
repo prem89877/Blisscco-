@@ -61,12 +61,12 @@ begin
   declare tx jsonb; res text;
   begin
     tx := public.create_payment_txn(o1, biz, 'pro', 'rc-t10');
-    perform public.attach_razorpay_order((tx ->> 'txn_id')::uuid, 'order_t10');
-    res := public.process_razorpay_event('evt_t10', 'payment.captured', jsonb_build_object('event', 'payment.captured', 'payload',
-      jsonb_build_object('payment', jsonb_build_object('entity', jsonb_build_object('id', 'pay_t10', 'order_id', 'order_t10',
-        'amount', 49900, 'currency', 'INR', 'status', 'captured')))));
+    perform public.attach_gateway_order((tx ->> 'txn_id')::uuid, 'order_t10');
+    res := public.process_cashfree_event('evt_t10', 'PAYMENT_SUCCESS_WEBHOOK', jsonb_build_object('type', 'PAYMENT_SUCCESS_WEBHOOK', 'data',
+      jsonb_build_object('order', jsonb_build_object('order_id', 'order_t10'),
+        'payment', jsonb_build_object('cf_payment_id', 'pay_t10', 'payment_amount', 499, 'payment_currency', 'INR', 'payment_status', 'SUCCESS'))));
     if res <> 'activated' then raise exception 'TEST SETUP: payment not activated (%)', res; end if;
-    res := public.process_razorpay_event('evt_t10', 'payment.captured', '{}'::jsonb);   -- replay
+    res := public.process_cashfree_event('evt_t10', 'PAYMENT_SUCCESS_WEBHOOK', '{}'::jsonb);   -- replay
   end;
   select count(*) into n from public.notifications where user_id = o1 and type = 'payment_success';
   if n <> 1 then raise exception 'TEST FAIL T4: payment_success count %', n; end if;

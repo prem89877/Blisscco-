@@ -130,3 +130,39 @@ Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new fro
 - src/lib/india.ts   (coordinate check, state list, PIN rules, address validation)
 - supabase/migrations/0023_india_validation.sql
 - supabase/tests/phase11c_india_tests.sql   (test project only; rolls back; not run by the assistant)
+
+---
+
+# Blisscco update: Razorpay replaced by Cashfree Payments
+
+## Vercel environment variables
+- Add: `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY` (Sensitive). Optional `CASHFREE_ENV` = `sandbox` (default) or `production`.
+- Remove (no longer used): `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`. Redeploy after changing variables.
+
+## Setup steps
+1. Supabase SQL editor: run `supabase/migrations/0026_cashfree_gateway.sql` BEFORE deploying the new code (it renames the razorpay_* columns to gateway_* and replaces the two payment functions). Do not re-run 0011 afterwards.
+2. Cashfree Dashboard > Developers > Webhooks > Add endpoint: `https://YOUR-SITE/api/cashfree-webhook`, events: Payment Success, Refund Status. (create-order also sends this URL as `notify_url` on https sites.)
+3. Test in sandbox: buy a plan, `/admin/payments` should show `activated`. Resend the webhook from the Cashfree dashboard to see `duplicate`.
+4. Go live: complete Cashfree KYC, put the LIVE App ID / Secret Key in Vercel and set `CASHFREE_ENV=production`, add the webhook in the live dashboard.
+
+## How it works now
+- `/api/create-order` creates a Cashfree order (order id = our receipt id, amount converted paise > rupees) and returns a `payment_session_id`; the browser opens Cashfree checkout (JS SDK v3) as a popup. Physical QR poster orders are limited to UPI (`order_meta.payment_methods = upi`).
+- `/api/cashfree-webhook` verifies `base64(HMAC-SHA256(x-webhook-timestamp + rawBody, CASHFREE_SECRET_KEY))`, then `process_cashfree_event` (service-role only) activates / refunds inside ONE transaction. Event ids are built from the payload (`payment:<cf_payment_id>:<status>` / `refund:<cf_refund_id>:<status>`) so replays stay harmless. Only `PAYMENT_SUCCESS_WEBHOOK` and `REFUND_STATUS_WEBHOOK` (status SUCCESS) change anything; other events are stored and ignored.
+- Nothing activates from the browser callback; the page waits for the webhook exactly like before.
+- Customer phone sent to Cashfree = the shop's phone (last 10 digits); if the shop has none, a placeholder 9999999999 is used.
+
+## Changed files
+- api/create-order.ts, .env.example, README.md, CHANGES.md
+- src/pages/owner/OwnerPlans.tsx, src/components/PhysicalQrOrder.tsx
+- src/pages/Privacy.tsx, src/pages/Terms.tsx, src/pages/admin/AdminReports.tsx (text only), public/sw.js (comment only)
+- supabase/RUN_LOG.md, supabase/tests/phase8_payments_tests.sql, phase9_analytics_tests.sql, phase10_notifications_tests.sql
+
+## New files
+- api/cashfree-webhook.ts, src/lib/cashfree.ts, supabase/migrations/0026_cashfree_gateway.sql
+
+## Removed files
+- api/razorpay-webhook.ts, src/lib/razorpay.ts
+
+## Known limits
+- Not run against a live database or the Cashfree sandbox here (no network). Test one sandbox payment end to end before going live.
+- The business listing terms stored in the database (migration 0025) still say "Razorpay"; update them with a new terms version if you want that text changed.

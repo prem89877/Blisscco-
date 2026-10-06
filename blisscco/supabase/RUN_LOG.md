@@ -27,6 +27,7 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0024 | migrations/0024_physical_qr.sql | Physical QR poster product: new plan kind `physical_qr`, plan row `physical_qr` = Rs 50 (5000 paise), plan_duration check updated | NOT YET - run this | Run after 0023, BEFORE deploying the new frontend; safe to re-run. Re-uses Razorpay create-order + webhook (no API change) |
 | 0022 | migrations/0022_auto_queue.sql | Automatic walk-in queue: owner_queue_start_next / owner_queue_complete / owner_queue_skip, get_my_queue_positions (live position), set_booking_status re-defined with a serving guard, realtime on bookings | NOT YET - run this | Run after 0021; safe to re-run; no table/column/RLS change. Run it BEFORE deploying the new frontend |
 | 0025 | migrations/0025_business_listing_terms_v2.sql | Replaces the PLACEHOLDER business listing terms (v1) with real text (v2) and makes v2 the current version (data only, no schema change) | NOT YET - run this | Run before onboarding shops; safe to re-run. Must match src/pages/Terms.tsx |
+| 0026 | migrations/0026_cashfree_gateway.sql | Razorpay > Cashfree: renames razorpay_* columns to gateway_*, attach_gateway_order(), process_cashfree_event() (old razorpay functions dropped) | NOT YET - run this | Run after 0025, BEFORE deploying the new code; safe to re-run. Do not re-run 0011 after this |
 | - | tests/phase11c_india_tests.sql | India polygon / PIN code / businesses trigger tests (test project only) | Run after 0023 | Rolls back |
 | - | manual/benchmark_search.sql | Search benchmark (time + EXPLAIN) to run before and after the 0020 indexes | Run by hand on a test project | Read-only, changes nothing |
 | - | tests/phase11a_admin_tests.sql | Phase 11 Part 1 admin tests (test project only) | Run after 0014 | Rolls back |
@@ -50,4 +51,5 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 - (0022 done: automatic walk-in queue)
 - (0023 done: India-only location + PIN validation)
 - (0024 done: physical QR poster, Rs 50 via UPI)
+- (0026 done: Cashfree payment gateway)
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)

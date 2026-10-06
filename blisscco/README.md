@@ -130,7 +130,8 @@ Business onboarding form (Phase 4), GPS search (5), booking/queue (6), PWA icons
 
 ---
 
-# Phase 8 - Plans, Razorpay payments, banners, blue badge (migration 0011 + Vercel API routes)
+# Phase 8 - Plans, payments, banners, blue badge (migration 0011 + Vercel API routes)
+> **Payment gateway is now Cashfree Payments** (migration 0026). Where this section says Razorpay, read Cashfree; see the "Cashfree payments" section at the end of CHANGES.md for the current setup.
 
 ## Status (honest)
 Written but **not run**: I had no database, npm or network here. A syntax-only TypeScript check passed; a real

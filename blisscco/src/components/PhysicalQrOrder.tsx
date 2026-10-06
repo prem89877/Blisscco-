@@ -2,7 +2,7 @@ import QRCode from 'qrcode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n';
 import { rupees } from '../lib/format';
-import { CHECKOUT_LOGO, loadRazorpay, PLAN_ERRORS, UPI_ONLY, type OrderResponse } from '../lib/razorpay';
+import { openCheckout, PLAN_ERRORS, wasDismissed, type OrderResponse } from '../lib/cashfree';
 import { supabase } from '../lib/supabase';
 import { Msg } from './ui';
 
@@ -101,32 +101,30 @@ export default function PhysicalQrOrder({ businessId, businessName, link, approv
   async function pay() {
     if (busy || waiting) return;
     setBusy(true); setMsg({ error: '', ok: '' });
-    let opened = false;
+    let handedOff = false;   // true once the page redirects or the payment-confirmation wait takes over the busy state
     try {
       const { data: s } = await supabase.auth.getSession();
       const token = s.session?.access_token;
       if (!token) { setMsg({ error: t('p8.err.unauthorized'), ok: '' }); return; }
       const r = await fetch('/api/create-order', {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ business_id: businessId, plan_code: PLAN_CODE }),
+        body: JSON.stringify({ business_id: businessId, plan_code: PLAN_CODE, upi_only: true, return_path: window.location.pathname }),
       });
       const j = (await r.json().catch(() => ({}))) as Partial<OrderResponse> & { error?: string };
-      if (!r.ok || !j.order_id) { setMsg({ error: t(j.error && PLAN_ERRORS.includes(j.error) ? `p8.err.${j.error}` : 'err.generic'), ok: '' }); return; }
+      if (!r.ok || !j.order_id || !j.payment_session_id) { setMsg({ error: t(j.error && PLAN_ERRORS.includes(j.error) ? `p8.err.${j.error}` : 'err.generic'), ok: '' }); return; }
       const order = j as OrderResponse;
-      if (!(await loadRazorpay()) || !window.Razorpay) { setMsg({ error: t('p8.err.gateway_error'), ok: '' }); return; }
-      const rz = new window.Razorpay({
-        key: order.key_id, amount: order.amount, currency: order.currency, name: 'Blisscco', description: order.description,
-        order_id: order.order_id, image: CHECKOUT_LOGO, theme: { color: '#FF91A4' }, config: UPI_ONLY,
-        handler: () => { void waitForPaid(order.txn_id); },
-        modal: { ondismiss: () => { if (alive.current) setBusy(false); } },
-      });
-      rz.on('payment.failed', () => setMsg({ error: t('pq.failed'), ok: '' }));
-      opened = true;
-      rz.open();
+      const result = await openCheckout(order.payment_session_id, order.mode);
+      if (!result) { setMsg({ error: t('p8.err.gateway_error'), ok: '' }); return; }
+      if (result.error) {
+        if (alive.current) { setBusy(false); if (!wasDismissed(result)) setMsg({ error: t('pq.failed'), ok: '' }); }
+        return;
+      }
+      if (result.redirect) { handedOff = true; return; }   // Cashfree is redirecting the page (UPI app hand-off); activation happens through the webhook
+      handedOff = true; void waitForPaid(order.txn_id);
     } catch (e) {
       console.error(e); setMsg({ error: t('err.network'), ok: '' });
     } finally {
-      if (!opened) setBusy(false);
+      if (!handedOff) setBusy(false);
     }
   }
 
