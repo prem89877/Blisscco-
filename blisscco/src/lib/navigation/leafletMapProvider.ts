@@ -25,14 +25,23 @@ function makeShopIcon(photoUrl: string | null): L.DivIcon {
   root.className = 'bc-shop';
   root.innerHTML = SHOP_PIN + SHOP_LETTER;
   if (photoUrl) {
-    const img = document.createElement('img');
-    img.className = 'bc-shop-photo';
-    img.alt = '';
-    img.decoding = 'async';
-    img.addEventListener('load', () => { root.classList.add('has-photo'); });
-    img.addEventListener('error', () => { img.remove(); root.classList.remove('has-photo'); });
-    img.src = photoUrl;
-    root.appendChild(img);
+    // A fixed-size round box with the photo as its background (cover): whatever the photo's shape (wide, tall, square, logo),
+    // it is cropped to the circle and can never spill outside the pin. Size and clipping are inline + !important so no page CSS can override them.
+    const box = document.createElement('div');
+    box.className = 'bc-shop-photo';
+    const set = (k: string, v: string) => box.style.setProperty(k, v, 'important');
+    set('position', 'absolute'); set('left', '10px'); set('top', '8px');
+    set('width', '20px'); set('height', '20px'); set('min-width', '20px'); set('min-height', '20px'); set('max-width', '20px'); set('max-height', '20px');
+    set('box-sizing', 'border-box'); set('border-radius', '9999px'); set('overflow', 'hidden'); set('clip-path', 'circle(50%)');
+    set('border', '1.5px solid #fff'); set('background-color', '#FDF8F5');
+    set('background-position', 'center'); set('background-size', 'cover'); set('background-repeat', 'no-repeat');
+    box.style.setProperty('background-image', `url("${photoUrl.replace(/"/g, '%22')}")`, 'important');
+    // only hide the "B" once the picture has really loaded; a broken picture keeps the "B"
+    const probe = new Image();
+    probe.onload = () => { root.classList.add('has-photo'); };
+    probe.onerror = () => { box.remove(); root.classList.remove('has-photo'); };
+    probe.src = photoUrl;
+    root.appendChild(box);
   }
   return L.divIcon({ className: 'bc-marker', html: root, iconSize: [40, 48], iconAnchor: [20, 46] });
 }

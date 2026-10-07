@@ -21,9 +21,12 @@
 
 /* shop: branded pin. The round window holds the shop's first photo (small), or the "B" when there is none. */
 .bc-shop { position: relative; width: 40px; height: 48px; }
+.bc-shop-b { z-index: 0; }
+.bc-shop-photo { z-index: 1; }
 .bc-shop svg { display: block; filter: drop-shadow(0 3px 4px rgba(45, 42, 46, 0.3)); }
 .bc-shop-b { position: absolute; left: 0; right: 0; top: 7px; text-align: center; font: 700 14px/22px 'Playfair Display', serif; color: #2D2A2E; }
-.bc-shop-photo { position: absolute; left: 9px; top: 7px; width: 22px; height: 22px; box-sizing: border-box; border-radius: 9999px; object-fit: cover; border: 1.5px solid #fff; background: #FDF8F5; }
+/* size / clipping of the photo circle are set inline in leafletMapProvider.ts (cannot be overridden); this is only a fallback */
+.bc-shop-photo { position: absolute; left: 10px; top: 8px; width: 20px; height: 20px; border-radius: 9999px; overflow: hidden; }
 .bc-shop.has-photo .bc-shop-b { display: none; }
 
 @media (prefers-reduced-motion: reduce) { .bc-user-pulse { animation: none; opacity: 0.35; } }
