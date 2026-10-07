@@ -10,6 +10,7 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminHome from './pages/admin/AdminHome';
+import AdminNotify from './pages/admin/AdminNotify';
 import AdminPayments from './pages/admin/AdminPayments';
 import AdminVerifications from './pages/admin/AdminVerifications';
 import AdminReferrals from './pages/admin/AdminReferrals';
@@ -93,6 +94,7 @@ export default function App() {
         <Route path="/admin/banners" element={admin(<AdminBanners />)} />
         <Route path="/admin/verifications" element={admin(<AdminVerifications />)} />
         <Route path="/admin/payments" element={admin(<AdminPayments />)} />
+        <Route path="/admin/notify" element={admin(<AdminNotify />)} />
         <Route path="/refer" element={customer(<Refer />)} />
         <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
         <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />
