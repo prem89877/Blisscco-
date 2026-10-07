@@ -267,3 +267,25 @@ Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new fro
 
 ## New files
 - None.
+
+---
+
+# Blisscco fix: "Map data not yet available" on the satellite map
+
+## What was wrong
+At some places (small towns / rural areas) the satellite provider has no pictures at the deepest zoom and answers with a grey "Map data not yet available" tile instead. Also the map credit text ran under the back button / shop name bar.
+
+## What changes
+- The map now checks, around the shop, how deep **real** satellite pictures go (it looks at the pixels of a test tile) and requests tiles only down to that zoom. Deeper zoom stretches the last real picture, so the grey placeholder is never shown. The same check runs for the streets / names overlay.
+- If the check cannot be done (offline / provider blocks it) the configured zoom is used; after 3.5 s the map is shown anyway.
+- Map credit shortened to "© Esri, Maxar" and moved below the top bar so it no longer overlaps the buttons.
+- `VITE_MAP_TILE_NATIVE_ZOOM` default is now 19 (the starting point of the check).
+
+## Changed files
+- src/lib/navigation/leafletMapProvider.ts
+- src/lib/navigation/config.ts
+- src/lib/navigation/navigation.css
+- CHANGES.md
+
+## New files
+- None.
