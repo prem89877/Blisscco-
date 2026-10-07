@@ -17,6 +17,7 @@ export default function AdminHome() {
       <Link to="/admin/disputes" className="card block font-medium">Booking disputes</Link>
       <Link to="/admin/promotions" className="card block font-medium">Promotions</Link>
       <Link to="/admin/reports" className="card block font-medium">Earnings report</Link>
+      <Link to="/admin/notify" className="card block font-medium">Send notification</Link>
       <Link to="/admin/audit" className="card block font-medium">Audit log</Link>
     </section>
   );
