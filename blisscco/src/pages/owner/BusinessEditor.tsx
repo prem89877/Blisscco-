@@ -1,21 +1,40 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import DetailsSection from '../../components/editor/DetailsSection';
 import HoursSection from '../../components/editor/HoursSection';
 import PhotosSection from '../../components/editor/PhotosSection';
 import ServicesSection from '../../components/editor/ServicesSection';
 import SubmitSection from '../../components/editor/SubmitSection';
 import Skeleton from '../../components/Skeleton';
+import Tutorial, { TutorialButton, useTutorial } from '../../components/Tutorial';
 import { StatusBadge } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { supabase } from '../../lib/supabase';
 import type { BizImage, Business, Category, Hour, Loaded, Service } from '../../lib/types';
 
+const STEPS = ['basic', 'contact', 'photos', 'hours', 'services', 'submit'] as const;
+type Step = (typeof STEPS)[number];
+const HINT: Record<Step, string> = {
+  basic: 'step.hintBasic', contact: 'step.hintContact', photos: 'step.hintPhotos',
+  hours: 'step.hintHours', services: 'step.hintServices', submit: 'step.hintSubmit',
+};
+const TUT_NEW: [string, string][] = [['tut.ed.1t', 'tut.ed.1b'], ['tut.ed.2t', 'tut.ed.2b'], ['tut.ed.3t', 'tut.ed.3b'], ['tut.ed.4t', 'tut.ed.4b']];
+const TUT_LIVE: [string, string][] = [['tut.live.1t', 'tut.live.1b'], ['tut.live.2t', 'tut.live.2b'], ['tut.live.3t', 'tut.live.3b']];
+
+/** Every step stays mounted (only hidden), so nothing typed is lost when the owner goes Back or Next. */
+function Pane({ show, children }: { show: boolean; children: ReactNode }) {
+  return <div hidden={!show}>{children}</div>;
+}
+
 export default function BusinessEditor() {
   const { id } = useParams();
   const { t } = useI18n();
+  const [params] = useSearchParams();
   const [data, setData] = useState<Loaded | null>(null);
   const [missing, setMissing] = useState(false);
+  const [step, setStep] = useState<Step>('basic');
+  const draftTut = useTutorial('edit-business');
+  const liveTut = useTutorial('edit-business-live');
 
   const load = useCallback(async () => {
     if (!id) { setMissing(true); return; }
@@ -34,30 +53,86 @@ export default function BusinessEditor() {
   }, [id]);
   useEffect(() => { void load(); }, [load]);
 
+  const goTo = (s: Step) => { setStep(s); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const idx = STEPS.indexOf(step);
+  const next = () => { if (idx < STEPS.length - 1) goTo(STEPS[idx + 1]); };
+  const back = () => { if (idx > 0) goTo(STEPS[idx - 1]); };
+
+  // "Edit profile" on the dashboard opens this page with ?edit=1: jump straight to the details form
+  useEffect(() => {
+    if (data && params.get('edit') === '1') document.getElementById('details-form')?.scrollIntoView({ block: 'start' });
+  }, [data, params]);
+
   if (missing) return <p role="alert" className="p-6 text-center">{t('owner.notFound')}</p>;
   if (!data) return <Skeleton />;
 
   const b = data.business;
   const editable = b.status === 'draft' || b.status === 'rejected';
+  const live = b.status === 'approved' || b.status === 'inactive';
+  const tut = editable ? draftTut : liveTut;
 
-  return (
-    <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+  const header = (
+    <>
       <Link to="/owner" className="text-sm btn-text">← {t('owner.title')}</Link>
       <div className="flex items-center justify-between gap-2">
         <h1 className="font-display text-2xl font-semibold">{b.name}</h1>
         <StatusBadge status={b.status} />
       </div>
+      <div><TutorialButton onClick={tut.show} /></div>
       {b.status === 'rejected' && b.rejection_reason && (
         <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm"><strong>{t('owner.reason')}:</strong> {b.rejection_reason}</p>
       )}
       {b.status === 'pending_review' && <p className="text-sm">{t('owner.pendingNote')}</p>}
-      {!editable && <p className="text-sm text-ink/70">{t('ed.readOnly')}</p>}
+      {!editable && !live && <p className="text-sm text-ink/70">{t('ed.readOnly')}</p>}
+    </>
+  );
 
-      <DetailsSection data={data} editable={editable} reload={load} />
-      <PhotosSection data={data} editable={editable} reload={load} />
-      <HoursSection data={data} editable={b.status !== 'suspended'} reload={load} />
-      <ServicesSection data={data} reload={load} />
-      {editable && <SubmitSection data={data} reload={load} />}
+  // Approved / hidden / under review / suspended: one page, as before; a live shop can edit its contact details.
+  if (!editable) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+        <Tutorial open={tut.open} onClose={tut.close} titleKey="owner.editProfile" steps={TUT_LIVE} />
+        {header}
+        <div id="details-form"><DetailsSection data={data} editable={false} live={live} reload={load} /></div>
+        <PhotosSection data={data} editable={false} reload={load} />
+        <HoursSection data={data} editable={b.status !== 'suspended'} reload={load} />
+        <ServicesSection data={data} reload={load} />
+      </div>
+    );
+  }
+
+  // Draft / rejected: one small step at a time.
+  const pct = Math.round(((idx + 1) / STEPS.length) * 100);
+  return (
+    <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+      <Tutorial open={tut.open} onClose={tut.close} titleKey="tut.ed.title" steps={TUT_NEW} />
+      {header}
+
+      <div className="space-y-2" aria-label={t('step.progress', { n: idx + 1, total: STEPS.length, name: t(`step.${step}`) })}>
+        <div className="flex gap-1.5">
+          {STEPS.map((s, k) => (
+            <button key={s} type="button" onClick={() => goTo(s)} aria-label={t(`step.${s}`)} aria-current={k === idx ? 'step' : undefined}
+              className={`h-2 flex-1 rounded-full ${k <= idx ? 'bg-blush' : 'bg-ink/10'}`} />
+          ))}
+        </div>
+        <p className="text-sm font-medium">{t('step.progress', { n: idx + 1, total: STEPS.length, name: t(`step.${step}`) })} <span className="text-ink/50">· {pct}%</span></p>
+        <p className="text-sm text-ink/70">{t(HINT[step])}</p>
+      </div>
+
+      <Pane show={step === 'basic' || step === 'contact'}>
+        <div id="details-form">
+          <DetailsSection data={data} editable reload={load} part={step === 'contact' ? 'contact' : 'basic'} onSaved={next} />
+        </div>
+      </Pane>
+      <Pane show={step === 'photos'}><PhotosSection data={data} editable reload={load} /></Pane>
+      <Pane show={step === 'hours'}><HoursSection data={data} editable reload={load} onSaved={next} /></Pane>
+      <Pane show={step === 'services'}><ServicesSection data={data} reload={load} /></Pane>
+      <Pane show={step === 'submit'}><SubmitSection data={data} reload={load} /></Pane>
+
+      <div className="flex gap-3">
+        {idx > 0 && <button type="button" className="btn-secondary flex-1" onClick={back}>← {t('step.back')}</button>}
+        {(step === 'photos' || step === 'services') && <button type="button" className="btn-solid flex-1" onClick={next}>{t('step.next')} →</button>}
+      </div>
     </div>
   );
 }

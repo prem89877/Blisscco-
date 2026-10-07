@@ -8,7 +8,8 @@ import type { Status } from '../../lib/types';
 interface Row { id: string; name: string; status: Status; rejection_reason: string | null; city: string | null }
 
 const ICONS: Record<string, string> = {
-  manage: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z',
+  manage: 'M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0M14 4v4M8 10v4M18 16v4',
+  edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z',
   queue: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
   reviews: 'm12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9Z',
   coupons: 'M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01',
@@ -80,6 +81,7 @@ export default function OwnerDashboard() {
           )}
           {r.status === 'approved' || r.status === 'inactive' ? (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              <TileLink to={`/owner/business/${r.id}?edit=1`} icon="edit" label={t('owner.editProfile')} />
               <TileLink to={`/owner/business/${r.id}`} icon="manage" label={t('owner.manage')} />
               <TileLink to={`/owner/business/${r.id}/queue`} icon="queue" label={t('oq.title')} />
               <TileLink to={`/owner/business/${r.id}/reviews`} icon="reviews" label={t('rv.title')} />
