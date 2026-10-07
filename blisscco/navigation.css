@@ -1,0 +1,20 @@
+/* Blisscco navigation map: Leaflet look & feel in the Blisscco palette (cream #FDF8F5, ink #2D2A2E, blush #FF91A4). */
+.bc-map { font-family: inherit; background: #FDF8F5; }
+.bc-map .leaflet-control-attribution { font-size: 10px; color: rgba(45, 42, 46, 0.7); background: rgba(253, 248, 245, 0.9); border-radius: 9999px; padding: 2px 9px; margin: 8px; }
+.bc-map .leaflet-control-attribution a { color: #2D2A2E; }
+.bc-map .leaflet-bar { border: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 24px rgba(45, 42, 46, 0.12); }
+.bc-map .leaflet-bar a { color: #2D2A2E; background: #fff; }
+.bc-map .leaflet-top.leaflet-right { margin-top: calc(env(safe-area-inset-top, 0px) + 4px); }
+
+.bc-marker { background: transparent; border: 0; }
+
+/* customer: ink dot, white ring, soft blush pulse */
+.bc-user { position: relative; width: 28px; height: 28px; }
+.bc-user-pulse { position: absolute; inset: 0; border-radius: 9999px; background: rgba(255, 145, 164, 0.5); animation: bc-pulse 2s ease-out infinite; }
+.bc-user-dot { position: absolute; inset: 6px; box-sizing: border-box; border-radius: 9999px; background: #2D2A2E; border: 3px solid #fff; box-shadow: 0 1px 6px rgba(45, 42, 46, 0.45); }
+@keyframes bc-pulse { 0% { transform: scale(0.55); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
+
+/* shop: branded pin */
+.bc-shop svg { display: block; filter: drop-shadow(0 3px 4px rgba(45, 42, 46, 0.3)); }
+
+@media (prefers-reduced-motion: reduce) { .bc-user-pulse { animation: none; opacity: 0.35; } }
