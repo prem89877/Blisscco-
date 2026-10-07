@@ -245,3 +245,25 @@ Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new fro
 
 ## New files
 - None. No new package, no new environment variable, no database change.
+
+---
+
+# Blisscco update: satellite map
+
+## What changes
+- The navigation map now uses **satellite imagery** (Esri World Imagery) instead of the plain street map.
+- Streets, small lanes (galiyan) and place names are drawn on top of the satellite picture (Esri transportation + places overlay).
+- The route line is now white-edged blush pink so it stays visible on dark satellite images.
+- Where satellite pictures are not available at the deepest zoom, the last available picture is stretched instead of showing a blank tile.
+- Optional env variables (all have defaults): `VITE_MAP_LABELS_URL` (overlay, `none` to hide), `VITE_MAP_TILE_NATIVE_ZOOM`. To go back to the street map set `VITE_MAP_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png`, `VITE_MAP_LABELS_URL=none` and the OSM attribution.
+
+## Changed files
+- src/lib/navigation/config.ts
+- src/lib/navigation/MapProvider.ts
+- src/lib/navigation/leafletMapProvider.ts
+- src/lib/navigation/navigation.css
+- .env.example (comments only)
+- CHANGES.md
+
+## New files
+- None.
