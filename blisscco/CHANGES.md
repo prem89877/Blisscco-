@@ -289,3 +289,26 @@ At some places (small towns / rural areas) the satellite provider has no picture
 
 ## New files
 - None.
+
+---
+
+# Blisscco update: live moving dot with direction arrow
+
+## What was wrong
+- The arrow on the "you" dot only appeared when the phone's GPS reported a heading, which most phones do not (it is empty while standing or walking slowly).
+- The dot moved only after "Start navigation", and only with the readings the navigation service accepted for guidance (small moves and weak-accuracy readings were skipped).
+
+## What changes
+- **Dot moves in real time**: every GPS reading moves the dot straight away (smooth glide), already in the route preview and during navigation. Guidance (turns, off-route, arrival) still uses its own filtered readings, so nothing there changed.
+- **Arrow always shows the way you face**: uses the GPS heading when the phone gives one, otherwise the direction you are moving (worked out from your last positions, ignoring GPS jitter under 5 m). When you stand still it follows the phone compass where the browser allows it (Android Chrome; iOS Safari when available). No extra permission is asked.
+- The arrow turns the short way round and is now blush pink with a dark edge so it is visible on the satellite map.
+
+## Changed files
+- src/lib/navigation/leafletMapProvider.ts
+- src/components/navigation/NavMap.tsx
+- src/pages/Navigate.tsx
+- src/lib/navigation/navigation.css
+- CHANGES.md
+
+## New files
+- None.
