@@ -331,3 +331,24 @@ A wide (landscape) shop photo was drawn at its own shape on the map pin and spil
 
 ## New files
 - None.
+
+---
+
+# Blisscco fix: "Payment gateway is not reachable" now shows the real reason
+
+## What was wrong
+That message appears when the server could not create the order at Cashfree (or the Cashfree checkout script could not load). The real reason (wrong keys, sandbox/live mismatch, IP not allowed, bad return address...) was hidden, so it could not be fixed.
+
+## What changes
+- `/api/create-order` now reads Cashfree's own error (status, code, message) and returns it as a short `gateway_detail`; it is also written to the Vercel function logs together with the mode (sandbox / production). Keys are never included.
+- The payment screens (Plans, Physical QR order) show it in brackets after the message, e.g. "Payment gateway is not reachable. Try again. (401 authentication_error authentication Failed)". If the Cashfree checkout script itself is blocked, it says "(checkout script blocked)".
+- `return_url` and `notify_url` are now sent only for https addresses (Cashfree live mode rejects http and fails the whole order).
+
+## Changed files
+- api/create-order.ts
+- src/pages/owner/OwnerPlans.tsx
+- src/components/PhysicalQrOrder.tsx
+- CHANGES.md
+
+## New files
+- None.
