@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useI18n } from '../../i18n';
+import { watchLocation } from '../../lib/navigation/LocationService';
 import { loadMapProvider, mapCreateDefaults, type MapController } from '../../lib/navigation/MapProvider';
 import type { Destination, Route, UserLocation } from '../../lib/navigation/types';
 
@@ -17,12 +18,14 @@ interface Props {
   navigating: boolean;
   /** Follow mode: the map keeps the customer in view. Turned off by the customer moving / zooming the map, back on by Recenter. */
   following: boolean;
+  /** Route is ready or navigation is running: keep the "you" dot moving with every GPS reading (location is already allowed by then). */
+  liveDot?: boolean;
   onManualMove: () => void;
   onError: () => void;
 }
 
 /** Full-size map. Created only when this component mounts (i.e. when the navigation screen opens); the map library is loaded lazily. */
-const NavMap = forwardRef<NavMapHandle, Props>(function NavMap({ destination, photoUrl = null, userLocation, route, insets, navigating, following, onManualMove, onError }, ref) {
+const NavMap = forwardRef<NavMapHandle, Props>(function NavMap({ destination, photoUrl = null, userLocation, route, insets, navigating, following, liveDot = false, onManualMove, onError }, ref) {
   const { t } = useI18n();
   const box = useRef<HTMLDivElement>(null);
   const [ctrl, setCtrl] = useState<MapController | null>(null);
@@ -81,6 +84,15 @@ const NavMap = forwardRef<NavMapHandle, Props>(function NavMap({ destination, ph
     // During navigation a new route (after a wrong turn) must not throw the camera around: the customer's own view stays.
     if (route && !navigatingRef.current) ctrl.fitToRoute(insetsRef.current);
   }, [ctrl, route]);
+
+  // Real-time dot: every GPS reading moves the dot at once (the navigation service filters readings for guidance, the dot should not wait for that).
+  useEffect(() => {
+    if (!ctrl || !liveDot) return;
+    return watchLocation(
+      (l) => { if (l.accuracyMeters === null || l.accuracyMeters <= 500) ctrl.setUserLocation(l.position, l.accuracyMeters, l.headingDegrees); },
+      () => undefined,   // errors are already shown by the navigation card
+    );
+  }, [ctrl, liveDot]);
 
   useEffect(() => { ctrl?.setInsets(insets); }, [ctrl, insets]);
 
