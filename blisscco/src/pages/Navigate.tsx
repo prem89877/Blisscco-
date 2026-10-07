@@ -139,7 +139,7 @@ export default function Navigate() {
       {!mapFailed && (
         <div className="absolute inset-0 isolate">
           <NavMap key={mapKey} ref={mapRef} destination={dest} photoUrl={photoUrl} userLocation={userLocation} route={route}
-            insets={insets} navigating={navigating} following={following}
+            insets={insets} navigating={navigating} following={following} liveDot={st === 'route_ready' || navigating}
             onManualMove={() => { if (navigating) setFollowing(false); }} onError={() => setMapFailed(true)} />
         </div>
       )}
