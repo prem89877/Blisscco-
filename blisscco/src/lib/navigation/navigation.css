@@ -1,7 +1,7 @@
 /* Blisscco navigation map: Leaflet look & feel in the Blisscco palette (cream #FDF8F5, ink #2D2A2E, blush #FF91A4). */
 .bc-map { font-family: inherit; background: #FF91A4; }
-/* a touch more contrast so thin lanes (galiyan) stay readable on a phone */
-.bc-map .bc-tiles { filter: contrast(1.06) saturate(1.12); }
+/* satellite picture: slightly richer colours; the street/place-name overlay stays crisp on top */
+.bc-map .bc-tiles { filter: saturate(1.08) contrast(1.04); }
 .bc-map .leaflet-control-attribution { font-size: 10px; color: rgba(45, 42, 46, 0.7); background: rgba(253, 248, 245, 0.9); border-radius: 9999px; padding: 2px 9px; margin: 8px; }
 .bc-map .leaflet-control-attribution a { color: #2D2A2E; }
 .bc-map .leaflet-bar { border: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 24px rgba(45, 42, 46, 0.12); }

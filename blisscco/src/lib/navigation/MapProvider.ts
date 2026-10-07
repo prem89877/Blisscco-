@@ -7,7 +7,7 @@ import type { LatLng } from './types';
 export interface MapCreateOptions {
   center: LatLng;
   zoom: number;
-  tile: { url: string; attribution: string; maxZoom: number; subdomains: string };
+  tile: { url: string; attribution: string; maxZoom: number; nativeZoom: number; subdomains: string; overlays: string[] };
   reducedMotion: boolean;
   labels: { destination: string; you: string };
 }
@@ -38,7 +38,7 @@ export interface MapProvider {
 
 export function mapCreateDefaults(): Pick<MapCreateOptions, 'tile' | 'zoom' | 'reducedMotion'> {
   return {
-    tile: { url: navConfig.tileUrl, attribution: navConfig.tileAttribution, maxZoom: navConfig.tileMaxZoom, subdomains: navConfig.tileSubdomains },
+    tile: { url: navConfig.tileUrl, attribution: navConfig.tileAttribution, maxZoom: navConfig.tileMaxZoom, nativeZoom: navConfig.tileNativeZoom, subdomains: navConfig.tileSubdomains, overlays: [...navConfig.overlayUrls] },
     zoom: 17,   // close enough that small lanes (galiyan) are drawn from the first view
     reducedMotion: typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
   };

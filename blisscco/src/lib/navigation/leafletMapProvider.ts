@@ -67,7 +67,12 @@ class LeafletController implements MapController {
       center: ll(o.center), zoom: o.zoom, zoomControl: false, attributionControl: false,
       zoomAnimation: !o.reducedMotion, fadeAnimation: !o.reducedMotion, markerZoomAnimation: !o.reducedMotion,
     });
-    L.tileLayer(o.tile.url, { attribution: o.tile.attribution, maxZoom: o.tile.maxZoom, subdomains: o.tile.subdomains, detectRetina: true, className: 'bc-tiles' }).addTo(this.map);
+    const layerOpts = { maxZoom: o.tile.maxZoom, maxNativeZoom: Math.min(o.tile.nativeZoom, o.tile.maxZoom), subdomains: o.tile.subdomains, detectRetina: true };
+    L.tileLayer(o.tile.url, { ...layerOpts, attribution: o.tile.attribution, className: 'bc-tiles' }).addTo(this.map);
+    // streets, lanes and place names on top of the satellite picture (own pane so they always stay above the imagery)
+    this.map.createPane('bcLabels').style.zIndex = '250';
+    this.map.getPane('bcLabels')!.style.pointerEvents = 'none';
+    o.tile.overlays.forEach((url) => L.tileLayer(url, { ...layerOpts, pane: 'bcLabels', className: 'bc-labels' }).addTo(this.map));
     if (!L.Browser.mobile) L.control.zoom({ position: 'topright' }).addTo(this.map);
     L.control.attribution({ position: 'topright', prefix: false }).addTo(this.map);
 
@@ -201,8 +206,8 @@ class LeafletController implements MapController {
     this.routeLine?.remove(); this.routeLine = null;
     if (!path || path.length < 2) return;
     const pts = path.map(ll);
-    this.routeCasing = L.polyline(pts, { color: '#FF91A4', weight: 10, opacity: 0.95, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(this.map);
-    this.routeLine = L.polyline(pts, { color: '#2D2A2E', weight: 5, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(this.map);
+    this.routeCasing = L.polyline(pts, { color: '#FFFFFF', weight: 11, opacity: 0.95, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(this.map);
+    this.routeLine = L.polyline(pts, { color: '#FF91A4', weight: 6, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(this.map);
   }
 
   fitToRoute(insets: { top: number; bottom: number }): void {
