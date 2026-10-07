@@ -1154,14 +1154,14 @@ const en22: M = {
   'tut.ed.4t': 'Check and submit', 'tut.ed.4b': 'The last step shows what is still missing with a tick list. When all are ticked, accept the terms and submit.',
   'tut.live.1t': 'Edit your live profile', 'tut.live.1b': 'You can change your description, phone and e-mail here any time. Changes show on your public page right away.',
   'tut.live.2t': 'Name, address and location', 'tut.live.2b': 'These are locked while your shop is live. To change them, please contact support.',
-  'tut.live.3t': 'Timings and services', 'tut.live.3b': 'Opening hours and services below can also be changed any time.',
+  'tut.live.3t': 'Photos, timings and services', 'tut.live.3b': 'You can change or add photos (keep at least 3), and edit opening hours and services any time.',
   'new.hint': 'Just two things to begin. You will add the rest in easy steps.', 'new.nameHint': 'The name customers will see, e.g. "Priya Beauty Parlour"',
   'step.basic': 'About', 'step.contact': 'Contact', 'step.photos': 'Photos', 'step.hours': 'Timings', 'step.services': 'Services', 'step.submit': 'Submit',
   'step.progress': 'Step {n} of {total}: {name}', 'step.next': 'Next', 'step.back': 'Back', 'step.saveNext': 'Save & next', 'step.saveBack': 'Back to my businesses',
   'step.hintBasic': 'Tell customers who you are.', 'step.hintContact': 'How customers can reach and find you.', 'step.hintPhotos': 'Add at least 3 clear photos.',
   'step.hintHours': 'Tap the days you are open and set your timings.', 'step.hintServices': 'Add at least one service with its price.', 'step.hintSubmit': 'Check the list and send it for review.',
   'owner.editProfile': 'Edit profile', 'ed.liveNote': 'Your shop is live. You can edit description, phone and e-mail here. Name, address and location are locked.',
-  'ed.lockedLive': 'Locked while live',
+  'ed.lockedLive': 'Locked while live', 'ed.changePhoto': 'Change', 'ed.photosMin': 'Keep at least {n} photos while your shop is live. To swap a photo, use Change.',
 };
 const hi22: M = {
   'tut.show': 'कैसे करें', 'tut.skip': 'छोड़ें', 'tut.next': 'आगे', 'tut.back': 'पीछे', 'tut.done': 'समझ गया',
@@ -1177,14 +1177,14 @@ const hi22: M = {
   'tut.ed.4t': 'जाँचें और जमा करें', 'tut.ed.4b': 'आख़िरी स्टेप में टिक-लिस्ट दिखती है कि क्या बाकी है। सब टिक हो जाएँ तो नियम स्वीकार करके जमा करें।',
   'tut.live.1t': 'लाइव प्रोफ़ाइल बदलें', 'tut.live.1b': 'यहाँ आप विवरण, फ़ोन और ईमेल कभी भी बदल सकते हैं। बदलाव आपके सार्वजनिक पेज पर तुरंत दिखते हैं।',
   'tut.live.2t': 'नाम, पता और लोकेशन', 'tut.live.2b': 'दुकान लाइव होने पर ये लॉक रहते हैं। इन्हें बदलने के लिए कृपया सपोर्ट से संपर्क करें।',
-  'tut.live.3t': 'समय और सेवाएँ', 'tut.live.3b': 'नीचे दिए गए खुलने का समय और सेवाएँ भी कभी भी बदली जा सकती हैं।',
+  'tut.live.3t': 'फ़ोटो, समय और सेवाएँ', 'tut.live.3b': 'आप फ़ोटो बदल या जोड़ सकते हैं (कम से कम 3 रखें), और खुलने का समय व सेवाएँ कभी भी बदल सकते हैं।',
   'new.hint': 'शुरू करने के लिए बस दो चीज़ें। बाकी आप आसान स्टेप में भरेंगे।', 'new.nameHint': 'ग्राहकों को दिखने वाला नाम, जैसे "प्रिया ब्यूटी पार्लर"',
   'step.basic': 'जानकारी', 'step.contact': 'संपर्क', 'step.photos': 'फ़ोटो', 'step.hours': 'समय', 'step.services': 'सेवाएँ', 'step.submit': 'जमा करें',
   'step.progress': 'स्टेप {n} / {total}: {name}', 'step.next': 'आगे', 'step.back': 'पीछे', 'step.saveNext': 'सेव करें और आगे', 'step.saveBack': 'मेरे व्यवसायों पर लौटें',
   'step.hintBasic': 'ग्राहकों को बताएँ कि आप कौन हैं।', 'step.hintContact': 'ग्राहक आपसे कैसे संपर्क करें और आपको कैसे ढूँढें।', 'step.hintPhotos': 'कम से कम 3 साफ़ फ़ोटो जोड़ें।',
   'step.hintHours': 'जिन दिन खुले हैं उन्हें दबाएँ और समय चुनें।', 'step.hintServices': 'कम से कम एक सेवा उसकी कीमत के साथ जोड़ें।', 'step.hintSubmit': 'लिस्ट देखें और समीक्षा के लिए भेजें।',
   'owner.editProfile': 'प्रोफ़ाइल बदलें', 'ed.liveNote': 'आपकी दुकान लाइव है। यहाँ आप विवरण, फ़ोन और ईमेल बदल सकते हैं। नाम, पता और लोकेशन लॉक हैं।',
-  'ed.lockedLive': 'लाइव होने पर लॉक',
+  'ed.lockedLive': 'लाइव होने पर लॉक', 'ed.changePhoto': 'बदलें', 'ed.photosMin': 'दुकान लाइव होने पर कम से कम {n} फ़ोटो रखें। फ़ोटो बदलने के लिए "बदलें" दबाएँ।',
 };
 const mr22: M = {
   'tut.show': 'कसे करायचे', 'tut.skip': 'वगळा', 'tut.next': 'पुढे', 'tut.back': 'मागे', 'tut.done': 'समजले',
@@ -1200,14 +1200,14 @@ const mr22: M = {
   'tut.ed.4t': 'तपासा आणि सादर करा', 'tut.ed.4b': 'शेवटच्या टप्प्यात काय बाकी आहे ते टिक-यादीत दिसते. सर्व टिक झाले की अटी मान्य करून सादर करा.',
   'tut.live.1t': 'लाइव्ह प्रोफाइल बदला', 'tut.live.1b': 'येथे तुम्ही वर्णन, फोन आणि ईमेल केव्हाही बदलू शकता. बदल सार्वजनिक पानावर लगेच दिसतात.',
   'tut.live.2t': 'नाव, पत्ता आणि लोकेशन', 'tut.live.2b': 'दुकान लाइव्ह असताना हे लॉक असतात. बदलण्यासाठी कृपया सपोर्टशी संपर्क करा.',
-  'tut.live.3t': 'वेळ आणि सेवा', 'tut.live.3b': 'खालील उघडण्याची वेळ आणि सेवा केव्हाही बदलता येतात.',
+  'tut.live.3t': 'फोटो, वेळ आणि सेवा', 'tut.live.3b': 'तुम्ही फोटो बदलू किंवा जोडू शकता (किमान 3 ठेवा), आणि उघडण्याची वेळ व सेवा केव्हाही बदलू शकता.',
   'new.hint': 'सुरुवातीला फक्त दोन गोष्टी. बाकी तुम्ही सोप्या टप्प्यांत भराल.', 'new.nameHint': 'ग्राहकांना दिसणारे नाव, उदा. "प्रिया ब्युटी पार्लर"',
   'step.basic': 'माहिती', 'step.contact': 'संपर्क', 'step.photos': 'फोटो', 'step.hours': 'वेळ', 'step.services': 'सेवा', 'step.submit': 'सादर करा',
   'step.progress': 'टप्पा {n} / {total}: {name}', 'step.next': 'पुढे', 'step.back': 'मागे', 'step.saveNext': 'जतन करा आणि पुढे', 'step.saveBack': 'माझ्या व्यवसायांकडे परत',
   'step.hintBasic': 'ग्राहकांना सांगा तुम्ही कोण आहात.', 'step.hintContact': 'ग्राहक तुमच्याशी कसा संपर्क करतील आणि तुम्हाला कसे शोधतील.', 'step.hintPhotos': 'किमान 3 स्पष्ट फोटो जोडा.',
   'step.hintHours': 'ज्या दिवशी उघडे आहात ते दाबा आणि वेळ निवडा.', 'step.hintServices': 'किमान एक सेवा तिच्या किमतीसह जोडा.', 'step.hintSubmit': 'यादी तपासा आणि पुनरावलोकनासाठी पाठवा.',
   'owner.editProfile': 'प्रोफाइल बदला', 'ed.liveNote': 'तुमचे दुकान लाइव्ह आहे. येथे तुम्ही वर्णन, फोन आणि ईमेल बदलू शकता. नाव, पत्ता आणि लोकेशन लॉक आहेत.',
-  'ed.lockedLive': 'लाइव्ह असताना लॉक',
+  'ed.lockedLive': 'लाइव्ह असताना लॉक', 'ed.changePhoto': 'बदला', 'ed.photosMin': 'दुकान लाइव्ह असताना किमान {n} फोटो ठेवा. फोटो बदलण्यासाठी "बदला" दाबा.',
 };
 const p22 = { en: en22, hi: hi22, mr: mr22 };
 
