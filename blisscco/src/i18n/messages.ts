@@ -1040,9 +1040,63 @@ const mr19: M = {
 };
 const p19 = { en: en19, hi: hi19, mr: mr19 };
 
+// ============ messages20: in-website navigation (Part 1) ============
+const en20: M = {
+  'biz.navigate': 'Navigate',
+  'nav.title': 'Navigate', 'nav.back': 'Back', 'nav.recenter': 'Recenter map', 'nav.mapLabel': 'Map', 'nav.you': 'Your location',
+  'nav.loading': 'Opening navigation…', 'nav.start': 'Start navigation', 'nav.startHint': 'Blisscco will ask for your location to show the way to this shop.',
+  'nav.requesting': 'Allow location access', 'nav.requestingHint': 'Tap "Allow" when your browser asks.',
+  'nav.locating': 'Finding your location…', 'nav.calculating': 'Finding the best route…',
+  'nav.refresh': 'Update route', 'nav.retry': 'Try again', 'nav.backToShop': 'Back to shop',
+  'nav.err.denied.title': 'Location access is off', 'nav.err.denied.body': 'Allow location for Blisscco in your browser settings, then try again.',
+  'nav.err.unavailable.title': 'We can\'t find your location', 'nav.err.unavailable.body': 'Check that location is turned on for your device, or move to an open area, then try again.',
+  'nav.err.timeout.title': 'Location is taking too long', 'nav.err.timeout.body': 'We could not get your location in time. Please try again.',
+  'nav.err.destination.title': 'This shop\'s location isn\'t available', 'nav.err.destination.body': 'We could not find a valid location for this shop yet.',
+  'nav.err.route.title': 'No route found', 'nav.err.route.body': 'We could not find a way to this shop from where you are.',
+  'nav.err.network.title': 'You\'re offline', 'nav.err.network.body': 'Check your internet connection and try again.',
+  'nav.err.provider.title': 'Directions are unavailable', 'nav.err.provider.body': 'We could not calculate the route right now. Please try again in a little while.',
+  'nav.err.unsupported.title': 'Location isn\'t supported', 'nav.err.unsupported.body': 'This browser can\'t share your location. Try another browser, or open Blisscco over a secure (https) connection.',
+  'nav.err.map.title': 'The map could not load', 'nav.err.map.body': 'Please check your connection and try again.',
+};
+const hi20: M = {
+  'biz.navigate': 'नेविगेट करें',
+  'nav.title': 'नेविगेट', 'nav.back': 'वापस', 'nav.recenter': 'मैप को केंद्र में लाएँ', 'nav.mapLabel': 'मैप', 'nav.you': 'आपकी लोकेशन',
+  'nav.loading': 'नेविगेशन खुल रहा है…', 'nav.start': 'नेविगेशन शुरू करें', 'nav.startHint': 'इस दुकान तक का रास्ता दिखाने के लिए Blisscco आपकी लोकेशन माँगेगा।',
+  'nav.requesting': 'लोकेशन की अनुमति दें', 'nav.requestingHint': 'ब्राउज़र पूछे तो "Allow" दबाएँ।',
+  'nav.locating': 'आपकी लोकेशन ढूँढ रहे हैं…', 'nav.calculating': 'सबसे अच्छा रास्ता ढूँढ रहे हैं…',
+  'nav.refresh': 'रास्ता अपडेट करें', 'nav.retry': 'फिर कोशिश करें', 'nav.backToShop': 'दुकान पर वापस',
+  'nav.err.denied.title': 'लोकेशन की अनुमति बंद है', 'nav.err.denied.body': 'ब्राउज़र सेटिंग में Blisscco के लिए लोकेशन की अनुमति दें, फिर दोबारा कोशिश करें।',
+  'nav.err.unavailable.title': 'आपकी लोकेशन नहीं मिल रही', 'nav.err.unavailable.body': 'जाँचें कि आपके डिवाइस में लोकेशन चालू है, या खुली जगह पर जाएँ, फिर दोबारा कोशिश करें।',
+  'nav.err.timeout.title': 'लोकेशन मिलने में बहुत समय लग रहा है', 'nav.err.timeout.body': 'समय पर आपकी लोकेशन नहीं मिल सकी। कृपया फिर कोशिश करें।',
+  'nav.err.destination.title': 'इस दुकान की लोकेशन उपलब्ध नहीं है', 'nav.err.destination.body': 'इस दुकान की सही लोकेशन अभी नहीं मिल सकी।',
+  'nav.err.route.title': 'कोई रास्ता नहीं मिला', 'nav.err.route.body': 'आप जहाँ हैं वहाँ से इस दुकान तक का रास्ता नहीं मिल सका।',
+  'nav.err.network.title': 'आप ऑफ़लाइन हैं', 'nav.err.network.body': 'अपना इंटरनेट कनेक्शन जाँचें और फिर कोशिश करें।',
+  'nav.err.provider.title': 'रास्ता अभी उपलब्ध नहीं है', 'nav.err.provider.body': 'अभी रास्ता नहीं निकाला जा सका। कृपया थोड़ी देर बाद फिर कोशिश करें।',
+  'nav.err.unsupported.title': 'लोकेशन सपोर्ट नहीं है', 'nav.err.unsupported.body': 'यह ब्राउज़र आपकी लोकेशन साझा नहीं कर सकता। दूसरा ब्राउज़र आज़माएँ, या Blisscco को सुरक्षित (https) कनेक्शन पर खोलें।',
+  'nav.err.map.title': 'मैप लोड नहीं हो सका', 'nav.err.map.body': 'कृपया अपना कनेक्शन जाँचें और फिर कोशिश करें।',
+};
+const mr20: M = {
+  'biz.navigate': 'नेव्हिगेट करा',
+  'nav.title': 'नेव्हिगेट', 'nav.back': 'मागे', 'nav.recenter': 'नकाशा मध्यभागी आणा', 'nav.mapLabel': 'नकाशा', 'nav.you': 'तुमचे लोकेशन',
+  'nav.loading': 'नेव्हिगेशन उघडत आहे…', 'nav.start': 'नेव्हिगेशन सुरू करा', 'nav.startHint': 'या दुकानापर्यंतचा रस्ता दाखवण्यासाठी Blisscco तुमचे लोकेशन मागेल.',
+  'nav.requesting': 'लोकेशनची परवानगी द्या', 'nav.requestingHint': 'ब्राउझरने विचारल्यावर "Allow" दाबा.',
+  'nav.locating': 'तुमचे लोकेशन शोधत आहोत…', 'nav.calculating': 'सर्वोत्तम रस्ता शोधत आहोत…',
+  'nav.refresh': 'रस्ता अपडेट करा', 'nav.retry': 'पुन्हा प्रयत्न करा', 'nav.backToShop': 'दुकानाकडे परत',
+  'nav.err.denied.title': 'लोकेशनची परवानगी बंद आहे', 'nav.err.denied.body': 'ब्राउझर सेटिंग्जमध्ये Blisscco साठी लोकेशनची परवानगी द्या, मग पुन्हा प्रयत्न करा.',
+  'nav.err.unavailable.title': 'तुमचे लोकेशन सापडत नाही', 'nav.err.unavailable.body': 'तुमच्या डिव्हाइसवर लोकेशन चालू आहे का ते तपासा, किंवा मोकळ्या जागी जा, मग पुन्हा प्रयत्न करा.',
+  'nav.err.timeout.title': 'लोकेशन मिळायला खूप वेळ लागत आहे', 'nav.err.timeout.body': 'वेळेत तुमचे लोकेशन मिळू शकले नाही. कृपया पुन्हा प्रयत्न करा.',
+  'nav.err.destination.title': 'या दुकानाचे लोकेशन उपलब्ध नाही', 'nav.err.destination.body': 'या दुकानाचे योग्य लोकेशन अजून सापडले नाही.',
+  'nav.err.route.title': 'रस्ता सापडला नाही', 'nav.err.route.body': 'तुम्ही जिथे आहात तिथून या दुकानापर्यंतचा रस्ता सापडला नाही.',
+  'nav.err.network.title': 'तुम्ही ऑफलाइन आहात', 'nav.err.network.body': 'तुमचे इंटरनेट कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.',
+  'nav.err.provider.title': 'रस्ता सध्या उपलब्ध नाही', 'nav.err.provider.body': 'सध्या रस्ता काढता आला नाही. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा.',
+  'nav.err.unsupported.title': 'लोकेशन सपोर्ट नाही', 'nav.err.unsupported.body': 'हा ब्राउझर तुमचे लोकेशन शेअर करू शकत नाही. दुसरा ब्राउझर वापरा, किंवा Blisscco सुरक्षित (https) कनेक्शनवर उघडा.',
+  'nav.err.map.title': 'नकाशा लोड होऊ शकला नाही', 'nav.err.map.body': 'कृपया तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.',
+};
+const p20 = { en: en20, hi: hi20, mr: mr20 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr },
 };

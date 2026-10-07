@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import Seo from './components/Seo';
@@ -43,6 +44,9 @@ import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
 import Terms from './pages/Terms';
 
+// Navigation (map library included) is loaded only when a customer opens it.
+const Navigate = lazy(() => import('./pages/Navigate'));
+
 // Private and sign-in pages are kept out of search results (robots.txt also blocks the dashboards from being crawled).
 const hidden = (title: string, el: JSX.Element) => <><Seo title={`${title} | Blisscco`} noindex />{el}</>;
 const owner = (el: JSX.Element) => <RequireRole roles={['owner']}>{hidden('Owner dashboard', el)}</RequireRole>;
@@ -53,6 +57,8 @@ const admin = (el: JSX.Element) => <RequireRole roles={['admin']}>{hidden('Admin
 export default function App() {
   return (
     <Routes>
+      {/* Full-screen navigation: outside <Layout> so the map owns the whole screen */}
+      <Route path="/b/:id/navigate" element={<Suspense fallback={<div className="fixed inset-0 bg-cream" role="status" aria-busy="true" />}><Navigate /></Suspense>} />
       <Route element={<Layout />}>
         <Route path="/" element={<HomeGate />} />
         <Route path="/explore" element={<Explore />} />
