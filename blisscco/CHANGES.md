@@ -1,3 +1,26 @@
+# Blisscco update: QR Rs 100, simple add-business steps, Edit profile, tutorial
+
+## What changes
+- **Physical QR poster price is now Rs 100** (was Rs 50). The price is stored only in the database (`plans.physical_qr`), so run migration 0027; no code change is needed for the price itself.
+- **Add / edit business is now step by step** (draft or rejected shop): About > Contact > Photos > Timings > Services > Submit, with a progress bar, "Save & next" and Back. Nothing typed is lost when going back and forth. The first page (name + category) got short helper texts.
+- **New "Edit profile" tile** (pencil icon) on every approved / hidden shop in My businesses, next to Manage (Manage now has a sliders icon). A live shop can now change description, phone, e-mail and the two "show publicly" switches. Name, category, address and map location stay locked (they need admin review).
+- **Tutorial** (3-4 short cards, English / Hindi / Marathi) shows on its own the first time on the Add business page and on the Edit business page (separate one for a live shop). A **"How it works"** button on both pages opens it again any time. "Seen" is remembered in the browser (localStorage).
+
+## Setup
+- Run `supabase/migrations/0027_qr_price_100_live_edit.sql` BEFORE deploying (safe to re-run). No new package, no new environment variable.
+
+## Changed files
+- src/pages/owner/BusinessEditor.tsx, src/pages/owner/NewBusiness.tsx, src/pages/owner/OwnerDashboard.tsx
+- src/components/editor/DetailsSection.tsx, src/components/editor/HoursSection.tsx
+- src/i18n/messages.ts (new p22 block, EN / HI / MR)
+- supabase/RUN_LOG.md, CHANGES.md
+
+## New files
+- src/components/Tutorial.tsx
+- supabase/migrations/0027_qr_price_100_live_edit.sql
+
+---
+
 # Blisscco update: live navigation (Part 2)
 
 ## What the customer gets
