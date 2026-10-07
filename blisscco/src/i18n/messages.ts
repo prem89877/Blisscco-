@@ -34,6 +34,9 @@ const en: Record<string, string> = {
   'dash.owner': 'Business dashboard', 'dash.admin': 'Admin dashboard',
   'dash.soon': 'This section is built in the next phase.', 'dash.unauthorized': "You don't have access to this page.",
   'lang.label': 'Language',
+  'ed.required': 'Please fill in: {field}', 'ed.needPhotos': 'Add at least 3 photos before you continue.',
+  'ed.needHours': 'Keep at least one day open before you continue.', 'ed.needService': 'Add at least one service with its price before you continue.',
+  'ed.finishFirst': 'Please complete the current step first.',
 };
 
 const hi: Record<string, string> = {
@@ -65,6 +68,9 @@ const hi: Record<string, string> = {
   'dash.owner': 'व्यवसाय डैशबोर्ड', 'dash.admin': 'एडमिन डैशबोर्ड',
   'dash.soon': 'यह भाग अगले चरण में बनेगा।', 'dash.unauthorized': 'आपको इस पेज तक पहुँच की अनुमति नहीं है।',
   'lang.label': 'भाषा',
+  'ed.required': 'कृपया भरें: {field}', 'ed.needPhotos': 'आगे बढ़ने से पहले कम से कम 3 फ़ोटो जोड़ें।',
+  'ed.needHours': 'आगे बढ़ने से पहले कम से कम एक दिन खुला रखें।', 'ed.needService': 'आगे बढ़ने से पहले कीमत के साथ कम से कम एक सेवा जोड़ें।',
+  'ed.finishFirst': 'कृपया पहले मौजूदा स्टेप पूरा करें।',
 };
 
 const mr: Record<string, string> = {
@@ -96,6 +102,9 @@ const mr: Record<string, string> = {
   'dash.owner': 'व्यवसाय डॅशबोर्ड', 'dash.admin': 'अॅडमिन डॅशबोर्ड',
   'dash.soon': 'हा भाग पुढील टप्प्यात तयार होईल.', 'dash.unauthorized': 'तुम्हाला या पेजची परवानगी नाही.',
   'lang.label': 'भाषा',
+  'ed.required': 'कृपया भरा: {field}', 'ed.needPhotos': 'पुढे जाण्यापूर्वी किमान 3 फोटो जोडा.',
+  'ed.needHours': 'पुढे जाण्यापूर्वी किमान एक दिवस उघडा ठेवा.', 'ed.needService': 'पुढे जाण्यापूर्वी किंमतीसह किमान एक सेवा जोडा.',
+  'ed.finishFirst': 'कृपया आधी सध्याचा टप्पा पूर्ण करा.',
 };
 
 type M = Record<string, string>;
