@@ -6,18 +6,20 @@
 - **New "Edit profile" tile** (pencil icon) on every approved / hidden shop in My businesses, next to Manage (Manage now has a sliders icon). A live shop can now change description, phone, e-mail and the two "show publicly" switches. Name, category, address and map location stay locked (they need admin review).
 - **Tutorial** (3-4 short cards, English / Hindi / Marathi) shows on its own the first time on the Add business page and on the Edit business page (separate one for a live shop). A **"How it works"** button on both pages opens it again any time. "Seen" is remembered in the browser (localStorage).
 
+- **Photos can be edited on a live shop**: each photo has **Change** and **Remove**, plus **Upload**. At least 3 photos must stay while live. A changed photo is saved first, the old one is removed after.
+
 ## Setup
-- Run `supabase/migrations/0027_qr_price_100_live_edit.sql` BEFORE deploying (safe to re-run). No new package, no new environment variable.
+- Run `supabase/migrations/0027_qr_price_100_live_edit.sql` and then `0028_live_photos_edit.sql` BEFORE deploying (both safe to re-run). No new package, no new environment variable.
 
 ## Changed files
 - src/pages/owner/BusinessEditor.tsx, src/pages/owner/NewBusiness.tsx, src/pages/owner/OwnerDashboard.tsx
-- src/components/editor/DetailsSection.tsx, src/components/editor/HoursSection.tsx
+- src/components/editor/DetailsSection.tsx, src/components/editor/HoursSection.tsx, src/components/editor/PhotosSection.tsx
 - src/i18n/messages.ts (new p22 block, EN / HI / MR)
 - supabase/RUN_LOG.md, CHANGES.md
 
 ## New files
 - src/components/Tutorial.tsx
-- supabase/migrations/0027_qr_price_100_live_edit.sql
+- supabase/migrations/0027_qr_price_100_live_edit.sql, supabase/migrations/0028_live_photos_edit.sql
 
 ---
 
