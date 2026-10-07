@@ -68,12 +68,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const base = siteUrl(req);
   const orderMeta: Record<string, string> = {};
   if (base) {
-    orderMeta.return_url = `${base}${returnPath}?cf_order_id={order_id}`;
-    if (base.startsWith('https://')) orderMeta.notify_url = `${base}/api/cashfree-webhook`;
+    // Cashfree live mode only accepts https addresses (an http one makes the whole order fail), so both are sent only for https
+    if (base.startsWith('https://')) {
+      orderMeta.return_url = `${base}${returnPath}?cf_order_id={order_id}`;
+      orderMeta.notify_url = `${base}/api/cashfree-webhook`;
+    }
   }
   if (upiOnly) orderMeta.payment_methods = 'upi';
 
   let order: { order_id?: string; payment_session_id?: string } = {};
+  let gatewayDetail = 'network';   // short reason shown to the shop owner when Cashfree refuses (never contains keys)
   try {
     const rr = await fetch(`${CF_BASE}/orders`, {
       method: 'POST',
@@ -92,13 +96,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         order_tags: { txn_id: t.txn_id, business_id: businessId, plan_code: planCode },
       }),
     });
-    if (!rr.ok) throw new Error(`cashfree ${rr.status}`);
+    if (!rr.ok) {
+      const eb = (await rr.json().catch(() => ({}))) as { message?: string; code?: string; type?: string };
+      gatewayDetail = `${rr.status} ${eb.code ?? eb.type ?? ''} ${eb.message ?? ''}`.replace(/\s+/g, ' ').trim().slice(0, 140);
+      throw new Error(`cashfree ${gatewayDetail} (env=${isProd ? 'production' : 'sandbox'})`);
+    }
     order = (await rr.json()) as { order_id?: string; payment_session_id?: string };
     if (!order.order_id || !order.payment_session_id) throw new Error('cashfree no session id');
   } catch (e) {
     console.error('cashfree order failed', e instanceof Error ? e.message : 'unknown');
     await admin.rpc('mark_txn_failed', { p_txn_id: t.txn_id });
-    return res.status(502).json({ error: 'gateway_error' });
+    return res.status(502).json({ error: 'gateway_error', gateway_detail: gatewayDetail });
   }
 
   const { error: ae } = await admin.rpc('attach_gateway_order', { p_txn_id: t.txn_id, p_order_id: order.order_id });
