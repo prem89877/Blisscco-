@@ -9,8 +9,9 @@ import { resolveDestination } from '../lib/navigation/GeocodingProvider';
 import { useNavigation } from '../lib/navigation/useNavigation';
 import { NavigationError, type Destination, type NavigationErrorCode } from '../lib/navigation/types';
 import { supabase } from '../lib/supabase';
+import { signedUrlMap } from '../lib/storage';
 
-const round = 'flex h-12 w-12 items-center justify-center rounded-full bg-white text-ink shadow-card ring-1 ring-ink/10 transition active:scale-95';
+const round = 'flex h-12 w-12 items-center justify-center rounded-full bg-white text-ink shadow-card ring-2 ring-white/70 transition active:scale-95';
 
 /** Customer navigation screen: /b/:id/navigate. Opened from the shop profile's "Navigate" button.
  *  Location permission is asked only after the Navigate tap (router state `autostart`) or the "Start navigation" button. */
@@ -28,6 +29,7 @@ export default function Navigate() {
 
   const [dest, setDest] = useState<Destination | null | undefined>(undefined);   // undefined = loading, null = unavailable
   const [destError, setDestError] = useState<NavigationErrorCode>('destination_unavailable');
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);   // owner's first business photo (small, shown on the map pin and cards)
   const [mapFailed, setMapFailed] = useState(false);
   const [mapKey, setMapKey] = useState(0);
   const [bottomInset, setBottomInset] = useState(280);
@@ -54,6 +56,23 @@ export default function Navigate() {
       }
     })();
     return () => ctrl.abort();
+  }, [id]);
+
+  // the shop's first photo (same order as the profile page: sort_order). Optional: without it the pin keeps its "B".
+  useEffect(() => {
+    if (!id) { setPhotoUrl(null); return; }
+    let cancelled = false;
+    setPhotoUrl(null);
+    void (async () => {
+      try {
+        const { data } = await supabase.from('business_images').select('storage_path').eq('business_id', id).order('sort_order').limit(1);
+        const path = (data as { storage_path: string }[] | null)?.[0]?.storage_path;
+        if (!path) return;
+        const urls = await signedUrlMap([path]);
+        if (!cancelled && urls[path]) setPhotoUrl(urls[path]);
+      } catch { /* the photo is only decoration */ }
+    })();
+    return () => { cancelled = true; };
   }, [id]);
 
   // Opened through the Navigate button: begin now (this is the moment location is requested), then drop the flag
@@ -94,7 +113,7 @@ export default function Navigate() {
 
   if (dest === undefined || dest === null) {
     return (
-      <div className="fixed inset-0 flex flex-col bg-cream p-3">
+      <div className="fixed inset-0 flex flex-col bg-blush p-3">
         <Seo title={`${t('nav.title')} | Blisscco`} noindex />
         <div>{backButton}</div>
         <div className="flex flex-1 items-center justify-center px-1">
@@ -114,12 +133,12 @@ export default function Navigate() {
   const tracking = navigating && following;
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-cream">
+    <div className="fixed inset-0 overflow-hidden bg-blush">
       <Seo title={`${t('nav.title')} · ${dest.name} | Blisscco`} noindex />
 
       {!mapFailed && (
         <div className="absolute inset-0 isolate">
-          <NavMap key={mapKey} ref={mapRef} destination={dest} userLocation={userLocation} route={route}
+          <NavMap key={mapKey} ref={mapRef} destination={dest} photoUrl={photoUrl} userLocation={userLocation} route={route}
             insets={insets} navigating={navigating} following={following}
             onManualMove={() => { if (navigating) setFollowing(false); }} onError={() => setMapFailed(true)} />
         </div>
@@ -127,14 +146,19 @@ export default function Navigate() {
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 p-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}>
         <div className="pointer-events-auto">{backButton}</div>
-        <p className="pointer-events-auto max-w-[50vw] truncate rounded-full bg-white px-4 py-2.5 text-sm font-medium shadow-card ring-1 ring-ink/10 sm:max-w-sm">{dest.name}</p>
+        <div className="pointer-events-auto flex h-12 min-w-0 max-w-[68vw] items-center gap-2 rounded-full bg-white py-1 pl-1 pr-4 shadow-card ring-2 ring-white/70 sm:max-w-sm">
+          {photoUrl
+            ? <img src={photoUrl} alt="" className="h-10 w-10 flex-none rounded-full object-cover ring-1 ring-ink/10" onError={() => setPhotoUrl(null)} />
+            : <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-blush font-display text-lg font-semibold" aria-hidden="true">B</span>}
+          <p className="truncate text-sm font-semibold">{dest.name}</p>
+        </div>
       </div>
 
       <div ref={stack} className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 p-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}>
         {canRecenter && (
           <button
             type="button" onClick={recenter} aria-label={t('nav.recenter')} aria-pressed={navigating ? tracking : undefined}
-            className={`pointer-events-auto flex min-h-[48px] items-center gap-2 self-end rounded-full px-4 text-sm font-medium shadow-card ring-1 ring-ink/10 transition active:scale-95 ${tracking ? 'bg-ink text-white' : 'bg-white text-ink'}`}
+            className={`pointer-events-auto flex min-h-[48px] items-center gap-2 self-end rounded-full px-4 text-sm font-medium shadow-card ring-2 ring-white/70 transition active:scale-95 ${tracking ? 'bg-ink text-white' : 'bg-white text-ink'}`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <circle cx="12" cy="12" r="3" fill={tracking ? 'currentColor' : 'none'} /><circle cx="12" cy="12" r="8" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
@@ -145,7 +169,7 @@ export default function Navigate() {
         <div className="pointer-events-auto flex w-full justify-center">
           {mapFailed
             ? <div className="card w-full max-w-md"><NavErrorState code="map_unavailable" onRetry={() => { setMapFailed(false); setMapKey((k) => k + 1); }} onBack={toShop} /></div>
-            : <NavInfoCard snapshot={snapshot} shopName={dest.name} address={dest.address} onStart={start} onBegin={begin} onEnd={end} onViewShop={toShop} onRetry={retry} onBack={toShop} />}
+            : <NavInfoCard snapshot={snapshot} shopName={dest.name} photoUrl={photoUrl} address={dest.address} onStart={start} onBegin={begin} onEnd={end} onViewShop={toShop} onRetry={retry} onBack={toShop} />}
         </div>
       </div>
     </div>
