@@ -94,7 +94,7 @@ export default function BusinessEditor() {
         <Tutorial open={tut.open} onClose={tut.close} titleKey="owner.editProfile" steps={TUT_LIVE} />
         {header}
         <div id="details-form"><DetailsSection data={data} editable={false} live={live} reload={load} /></div>
-        <PhotosSection data={data} editable={false} reload={load} />
+        <PhotosSection data={data} editable={live} minKeep={live ? 3 : 0} reload={load} />
         <HoursSection data={data} editable={b.status !== 'suspended'} reload={load} />
         <ServicesSection data={data} reload={load} />
       </div>
