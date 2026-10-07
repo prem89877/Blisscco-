@@ -37,6 +37,61 @@ function makeShopIcon(photoUrl: string | null): L.DivIcon {
   return L.divIcon({ className: 'bc-marker', html: root, iconSize: [40, 48], iconAnchor: [20, 46] });
 }
 
+
+/** Tile coordinates of a point at zoom z (standard web-mercator tiling). */
+function tileOf(p: LatLng, z: number): { x: number; y: number } {
+  const n = 2 ** z;
+  const x = Math.floor(((p.lng + 180) / 360) * n);
+  const rad = (p.lat * Math.PI) / 180;
+  const y = Math.floor(((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * n);
+  return { x, y };
+}
+
+/** Loads one tile and tells whether it is a real picture. Tile servers answer "Map data not yet available" with a
+ *  flat grey tile (HTTP 200), so Leaflet cannot see it as an error: we look at the pixels instead.
+ *  Returns null when the pixels cannot be read (no CORS / network); the caller then keeps its configured zoom. */
+function realTile(url: string): Promise<boolean | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    const timer = setTimeout(() => resolve(null), 4000);
+    img.onload = () => {
+      clearTimeout(timer);
+      try {
+        const c = document.createElement('canvas');
+        c.width = 64; c.height = 64;
+        const g = c.getContext('2d', { willReadFrequently: true });
+        if (!g) { resolve(null); return; }
+        g.drawImage(img, 0, 0, 64, 64);
+        const d = g.getImageData(0, 0, 64, 64).data;
+        const r0 = d[0], g0 = d[1], b0 = d[2], a0 = d[3];
+        if (a0 < 10) { resolve(true); return; }   // transparent overlay tile: nothing wrong with it
+        const grey = Math.abs(r0 - g0) < 8 && Math.abs(g0 - b0) < 8 && r0 > 140 && r0 < 240;
+        let same = 0;
+        const total = 64 * 64;
+        for (let i = 0; i < d.length; i += 4) {
+          if (Math.abs(d[i] - r0) < 8 && Math.abs(d[i + 1] - g0) < 8 && Math.abs(d[i + 2] - b0) < 8) same++;
+        }
+        resolve(!(grey && same / total > 0.8));
+      } catch { resolve(null); }
+    };
+    img.onerror = () => { clearTimeout(timer); resolve(null); };
+    img.src = url;
+  });
+}
+
+/** Deepest zoom (<= `from`) at which this tile layer really has pictures around `at`. */
+async function deepestRealZoom(template: string, subdomain: string, at: LatLng, from: number): Promise<number> {
+  for (let z = from; z >= 10; z--) {
+    const { x, y } = tileOf(at, z);
+    const url = template.replace('{s}', subdomain).replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
+    const ok = await realTile(url);
+    if (ok === null) return from;   // cannot tell: keep the configured value
+    if (ok) return z;
+  }
+  return 10;
+}
+
 const ll = (p: LatLng): L.LatLngTuple => [p.lat, p.lng];
 /** Rough distance in metres, good enough to tell a glide from a jump. */
 const distanceApprox = (a: LatLng, b: LatLng): number => Math.hypot((a.lat - b.lat) * 110574, (a.lng - b.lng) * 105000);
@@ -44,6 +99,7 @@ const distanceApprox = (a: LatLng, b: LatLng): number => Math.hypot((a.lat - b.l
 class LeafletController implements MapController {
   private readonly map: L.Map;
   private readonly resizeObserver: ResizeObserver | null;
+  private destroyed = false;
   private destMarker: L.Marker | null = null;
   private destName = '';
   private photoUrl: string | null = null;
@@ -67,12 +123,23 @@ class LeafletController implements MapController {
       center: ll(o.center), zoom: o.zoom, zoomControl: false, attributionControl: false,
       zoomAnimation: !o.reducedMotion, fadeAnimation: !o.reducedMotion, markerZoomAnimation: !o.reducedMotion,
     });
-    const layerOpts = { maxZoom: o.tile.maxZoom, maxNativeZoom: Math.min(o.tile.nativeZoom, o.tile.maxZoom), subdomains: o.tile.subdomains, detectRetina: true };
-    L.tileLayer(o.tile.url, { ...layerOpts, attribution: o.tile.attribution, className: 'bc-tiles' }).addTo(this.map);
-    // streets, lanes and place names on top of the satellite picture (own pane so they always stay above the imagery)
+    // Satellite pictures do not exist at every zoom everywhere (small towns often stop at 16-17): ask the tile server what it
+    // really has around the shop, then request tiles only down to that zoom (deeper zoom stretches the last real picture).
     this.map.createPane('bcLabels').style.zIndex = '250';
     this.map.getPane('bcLabels')!.style.pointerEvents = 'none';
-    o.tile.overlays.forEach((url) => L.tileLayer(url, { ...layerOpts, pane: 'bcLabels', className: 'bc-labels' }).addTo(this.map));
+    const sub = (o.tile.subdomains || 'a')[0];
+    const base = { maxZoom: o.tile.maxZoom, subdomains: o.tile.subdomains };
+    const addLayers = (zooms: number[]) => {
+      if (this.destroyed) return;
+      L.tileLayer(o.tile.url, { ...base, maxNativeZoom: zooms[0], attribution: o.tile.attribution, className: 'bc-tiles' }).addTo(this.map);
+      o.tile.overlays.forEach((url, i) => L.tileLayer(url, { ...base, maxNativeZoom: zooms[i + 1], pane: 'bcLabels', className: 'bc-labels' }).addTo(this.map));
+    };
+    const native = Math.min(o.tile.nativeZoom, o.tile.maxZoom);
+    const fallback = [native, ...o.tile.overlays.map(() => native)];
+    void Promise.race([
+      Promise.all([o.tile.url, ...o.tile.overlays].map((u) => deepestRealZoom(u, sub, o.center, native))),
+      new Promise<number[]>((r) => setTimeout(() => r(fallback), 3500)),
+    ]).then(addLayers, () => addLayers(fallback));
     if (!L.Browser.mobile) L.control.zoom({ position: 'topright' }).addTo(this.map);
     L.control.attribution({ position: 'topright', prefix: false }).addTo(this.map);
 
@@ -223,6 +290,7 @@ class LeafletController implements MapController {
   }
 
   destroy(): void {
+    this.destroyed = true;
     this.stopGlide();
     this.manualCb = null;
     this.resizeObserver?.disconnect();

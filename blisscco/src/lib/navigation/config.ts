@@ -7,7 +7,7 @@
 //                              Set it to 'none' to hide the overlay (e.g. when using a street map).
 //   VITE_MAP_TILE_ATTRIBUTION  HTML attribution text required by the tile provider
 //   VITE_MAP_TILE_MAX_ZOOM     default 19
-//   VITE_MAP_TILE_NATIVE_ZOOM  deepest zoom the tile server really has pictures for (default 18); deeper zoom stretches the last picture instead of going blank
+//   VITE_MAP_TILE_NATIVE_ZOOM  deepest zoom to try (default 19). The map checks around the shop how deep real pictures go and uses that; deeper zoom stretches the last real picture
 //   VITE_MAP_TILE_SUBDOMAINS   only if the tile URL contains {s}
 //   VITE_ROUTING_ENDPOINT      default /api/route  (our own server function; the real routing provider is chosen there)
 //   VITE_GEOCODE_ENDPOINT      default /api/geocode
@@ -31,10 +31,10 @@ export const navConfig = {
   })(),
   tileAttribution: text(
     env.VITE_MAP_TILE_ATTRIBUTION,
-    'Imagery &copy; <a href="https://www.esri.com" target="_blank" rel="noopener noreferrer">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
+    '&copy; <a href="https://www.esri.com" target="_blank" rel="noopener noreferrer">Esri</a>, Maxar',
   ),
   tileMaxZoom: Number(env.VITE_MAP_TILE_MAX_ZOOM) > 0 ? Number(env.VITE_MAP_TILE_MAX_ZOOM) : 19,
-  tileNativeZoom: Number(env.VITE_MAP_TILE_NATIVE_ZOOM) > 0 ? Number(env.VITE_MAP_TILE_NATIVE_ZOOM) : 18,
+  tileNativeZoom: Number(env.VITE_MAP_TILE_NATIVE_ZOOM) > 0 ? Number(env.VITE_MAP_TILE_NATIVE_ZOOM) : 19,
   tileSubdomains: text(env.VITE_MAP_TILE_SUBDOMAINS, 'abc'),
   routingEndpoint: text(env.VITE_ROUTING_ENDPOINT, '/api/route'),
   geocodeEndpoint: text(env.VITE_GEOCODE_ENDPOINT, '/api/geocode'),

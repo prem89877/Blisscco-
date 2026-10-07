@@ -6,7 +6,7 @@
 .bc-map .leaflet-control-attribution a { color: #2D2A2E; }
 .bc-map .leaflet-bar { border: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 24px rgba(45, 42, 46, 0.12); }
 .bc-map .leaflet-bar a { color: #2D2A2E; background: #fff; }
-.bc-map .leaflet-top.leaflet-right { margin-top: calc(env(safe-area-inset-top, 0px) + 4px); }
+.bc-map .leaflet-top.leaflet-right { margin-top: calc(env(safe-area-inset-top, 0px) + 76px); }   /* below the back button / shop name bar */
 
 .bc-marker { background: transparent; border: 0; }
 
