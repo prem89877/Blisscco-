@@ -110,11 +110,11 @@ export default function PhysicalQrOrder({ businessId, businessName, link, approv
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ business_id: businessId, plan_code: PLAN_CODE, upi_only: true, return_path: window.location.pathname }),
       });
-      const j = (await r.json().catch(() => ({}))) as Partial<OrderResponse> & { error?: string };
-      if (!r.ok || !j.order_id || !j.payment_session_id) { setMsg({ error: t(j.error && PLAN_ERRORS.includes(j.error) ? `p8.err.${j.error}` : 'err.generic'), ok: '' }); return; }
+      const j = (await r.json().catch(() => ({}))) as Partial<OrderResponse> & { error?: string; gateway_detail?: string };
+      if (!r.ok || !j.order_id || !j.payment_session_id) { setMsg({ error: t(j.error && PLAN_ERRORS.includes(j.error) ? `p8.err.${j.error}` : 'err.generic') + (j.gateway_detail ? ` (${j.gateway_detail})` : ''), ok: '' }); return; }
       const order = j as OrderResponse;
       const result = await openCheckout(order.payment_session_id, order.mode);
-      if (!result) { setMsg({ error: t('p8.err.gateway_error'), ok: '' }); return; }
+      if (!result) { setMsg({ error: `${t('p8.err.gateway_error')} (checkout script blocked)`, ok: '' }); return; }
       if (result.error) {
         if (alive.current) { setBusy(false); if (!wasDismissed(result)) setMsg({ error: t('pq.failed'), ok: '' }); }
         return;
