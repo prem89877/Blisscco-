@@ -269,6 +269,9 @@ export function templateKey(type: string, data: NotifData): string {
 
 export function composeNotification(type: string, data: NotifData, langIn: string): { title: string; body: string } {
   const lang: NotifLang = langIn === 'hi' || langIn === 'mr' ? langIn : 'en';
+  if (type === 'admin_message') {                           // custom message written by an admin: shown exactly as typed, no translation
+    return { title: str(data.title) || 'Blisscco', body: str(data.body) };
+  }
   const tpl = T[templateKey(type, data)];
   if (!tpl) return { title: 'Blisscco', body: '' };
 
