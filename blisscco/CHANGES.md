@@ -312,3 +312,22 @@ At some places (small towns / rural areas) the satellite provider has no picture
 
 ## New files
 - None.
+
+---
+
+# Blisscco fix: shop photo stays inside the map pin
+
+## What was wrong
+A wide (landscape) shop photo was drawn at its own shape on the map pin and spilled outside the round window of the pin.
+
+## What changes
+- The photo is now drawn in a fixed 20 px round box (photo as "cover" background, centred), clipped to a circle with size set inline, so any photo shape (wide, tall, square, logo) is cropped inside the pin's round window and can never come out of it.
+- The "B" is hidden only after the photo has really loaded; if the photo fails, the "B" stays.
+
+## Changed files
+- src/lib/navigation/leafletMapProvider.ts
+- src/lib/navigation/navigation.css
+- CHANGES.md
+
+## New files
+- None.
