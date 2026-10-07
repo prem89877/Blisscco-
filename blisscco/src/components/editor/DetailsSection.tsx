@@ -10,7 +10,13 @@ import { addressErrorKey, checkIndiaCoords, coordErrorKey, stateFromPincode, val
 
 const r6 = (n: number) => Math.round(n * 1e6) / 1e6;
 
-export default function DetailsSection({ data, editable, reload }: { data: Loaded; editable: boolean; reload: () => Promise<void> }) {
+type Part = 'all' | 'basic' | 'contact';
+
+/** part: which fields to show (the wizard shows 'basic' then 'contact'; all values stay in one form state).
+ *  live: the shop is approved/hidden, so only description / phone / e-mail can be changed (name, category, address, location are locked). */
+export default function DetailsSection({ data, editable, reload, part = 'all', live = false, onSaved }: {
+  data: Loaded; editable: boolean; reload: () => Promise<void>; part?: Part; live?: boolean; onSaved?: () => void;
+}) {
   const { t, lang } = useI18n();
   const b = data.business;
   const [f, setF] = useState({
@@ -47,6 +53,21 @@ export default function DetailsSection({ data, editable, reload }: { data: Loade
     if (busy) return;
     setError(''); setOk('');
     const phone = f.phone.replace(/[\s-]/g, '');
+    if (live) {
+      if (phone && !/^\+?[0-9]{10,13}$/.test(phone)) return setError(t('ed.invalidPhone'));
+      if (f.email.trim() && !isEmail(f.email)) return setError(t('err.invalidEmail'));
+      setBusy(true);
+      const { error: lerr } = await supabase.rpc('owner_update_live_details', {
+        p_business_id: b.id, p_description: f.description, p_phone: phone, p_email: f.email,
+        p_show_phone: f.show_phone_publicly, p_show_email: f.show_email_publicly,
+      });
+      setBusy(false);
+      if (lerr) { console.error(lerr); setError(t('err.generic')); return; }
+      setOk(t('common.saved'));
+      await reload();
+      onSaved?.();
+      return;
+    }
     if (f.name.trim().length < 2) return setError(t('err.nameRequired'));
     if (phone && !/^\+?[0-9]{10,13}$/.test(phone)) return setError(t('ed.invalidPhone'));
     if (f.email.trim() && !isEmail(f.email)) return setError(t('err.invalidEmail'));
@@ -76,42 +97,52 @@ export default function DetailsSection({ data, editable, reload }: { data: Loade
     set('state', stateName);
     setOk(t('common.saved'));
     await reload();
+    onSaved?.();
   }
 
   const d = !editable || busy;
+  const lockedD = d || live;                 // name / category / address / location are locked on a live shop
+  const showBasic = part === 'all' || part === 'basic';
+  const showContact = part === 'all' || part === 'contact';
+  const canSave = editable || live;
   return (
-    <Section title={t('ed.details')}>
+    <Section title={part === 'basic' ? t('step.basic') : part === 'contact' ? t('step.contact') : t('ed.details')}>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        <Field id="name" label={t('ed.name')} value={f.name} onChange={(v) => set('name', v)} disabled={d} />
-        <Select id="cat" label={t('ed.category')} value={f.category_id} onChange={(v) => set('category_id', v)} disabled={d}
-          placeholder={t('common.select')} options={data.categories.map((c) => ({ value: c.id, label: catName(c, lang) }))} />
-        <TextArea id="desc" label={t('ed.description')} value={f.description} onChange={(v) => set('description', v)} disabled={d} />
-        <Field id="phone" label={t('ed.phone')} autoComplete="tel" value={f.phone} onChange={(v) => set('phone', v)} disabled={d} />
-        <Check id="sp" label={t('ed.showPhone')} checked={f.show_phone_publicly} onChange={(v) => set('show_phone_publicly', v)} disabled={d} />
-        <Field id="bemail" label={t('ed.email')} type="email" value={f.email} onChange={(v) => set('email', v)} disabled={d} />
-        <Check id="se" label={t('ed.showEmail')} checked={f.show_email_publicly} onChange={(v) => set('show_email_publicly', v)} disabled={d} />
-        <Field id="addr" label={t('ed.address')} value={f.address_line} onChange={(v) => set('address_line', v)} disabled={d} />
-        <div className="grid grid-cols-2 gap-3">
-          <Field id="city" label={t('ed.city')} value={f.city} onChange={(v) => set('city', v)} disabled={d} />
-          <Field id="state" label={t('ed.state')} value={f.state} onChange={(v) => set('state', v)} disabled={d} />
-        </div>
-        <Field id="pin" label={t('ed.pincode')} value={f.pincode} disabled={d}
-          onChange={(v) => {
-            const pin = v.replace(/\D/g, '').slice(0, 6);
-            set('pincode', pin);
-            if (!f.state.trim()) { const s = stateFromPincode(pin); if (s) set('state', s); }   // fill state when the PIN has only one possible state
-          }} />
+        {live && <p className="rounded-xl bg-cream p-3 text-sm">{t('ed.liveNote')}</p>}
+        {showBasic && <>
+          <Field id="name" label={t('ed.name')} value={f.name} onChange={(v) => set('name', v)} disabled={lockedD} />
+          <Select id="cat" label={t('ed.category')} value={f.category_id} onChange={(v) => set('category_id', v)} disabled={lockedD}
+            placeholder={t('common.select')} options={data.categories.map((c) => ({ value: c.id, label: catName(c, lang) }))} />
+          <TextArea id="desc" label={t('ed.description')} value={f.description} onChange={(v) => set('description', v)} disabled={d} />
+        </>}
+        {showContact && <>
+          <Field id="phone" label={t('ed.phone')} autoComplete="tel" value={f.phone} onChange={(v) => set('phone', v)} disabled={d} />
+          <Check id="sp" label={t('ed.showPhone')} checked={f.show_phone_publicly} onChange={(v) => set('show_phone_publicly', v)} disabled={d} />
+          <Field id="bemail" label={t('ed.email')} type="email" value={f.email} onChange={(v) => set('email', v)} disabled={d} />
+          <Check id="se" label={t('ed.showEmail')} checked={f.show_email_publicly} onChange={(v) => set('show_email_publicly', v)} disabled={d} />
+          <Field id="addr" label={t('ed.address')} value={f.address_line} onChange={(v) => set('address_line', v)} disabled={lockedD} />
+          <div className="grid grid-cols-2 gap-3">
+            <Field id="city" label={t('ed.city')} value={f.city} onChange={(v) => set('city', v)} disabled={lockedD} />
+            <Field id="state" label={t('ed.state')} value={f.state} onChange={(v) => set('state', v)} disabled={lockedD} />
+          </div>
+          <Field id="pin" label={t('ed.pincode')} value={f.pincode} disabled={lockedD}
+            onChange={(v) => {
+              const pin = v.replace(/\D/g, '').slice(0, 6);
+              set('pincode', pin);
+              if (!f.state.trim()) { const s = stateFromPincode(pin); if (s) set('state', s); }   // fill state when the PIN has only one possible state
+            }} />
 
-        <div className="space-y-2 rounded-xl bg-cream p-3">
-          <p className="text-sm font-medium">{t('ed.location')}</p>
-          <p className="text-sm text-ink/70">{t('ed.gpsWhy')}</p>
-          <p className="text-sm">{lat !== null && lng !== null ? t('ed.gpsSet', { lat, lng }) : t('ed.noLocation')}</p>
-          {editable && <button type="button" className="btn-secondary" onClick={useGps}>{t('ed.useGps')}</button>}
-          <Msg error={gpsMsg} />
-        </div>
+          <div className="space-y-2 rounded-xl bg-cream p-3">
+            <p className="text-sm font-medium">{t('ed.location')}</p>
+            {!live && <p className="text-sm text-ink/70">{t('ed.gpsWhy')}</p>}
+            <p className="text-sm">{lat !== null && lng !== null ? t('ed.gpsSet', { lat, lng }) : t('ed.noLocation')}</p>
+            {editable && !live && <button type="button" className="btn-secondary" onClick={useGps}>{t('ed.useGps')}</button>}
+            <Msg error={gpsMsg} />
+          </div>
+        </>}
 
         <Msg error={error} ok={ok} />
-        {editable && <button type="submit" className="btn-primary w-full" disabled={busy}>{busy ? t('common.loading') : t('common.save')}</button>}
+        {canSave && <button type="submit" className="btn-solid w-full" disabled={busy}>{busy ? t('common.loading') : onSaved && !live ? t('step.saveNext') : t('common.save')}</button>}
       </form>
     </Section>
   );

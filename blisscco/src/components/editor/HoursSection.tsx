@@ -8,7 +8,7 @@ import type { Loaded } from '../../lib/types';
 
 interface Row { day: number; closed: boolean; opens: string; closes: string }
 
-export default function HoursSection({ data, editable, reload }: { data: Loaded; editable: boolean; reload: () => Promise<void> }) {
+export default function HoursSection({ data, editable, reload, onSaved }: { data: Loaded; editable: boolean; reload: () => Promise<void>; onSaved?: () => void }) {
   const { t } = useI18n();
   const [rows, setRows] = useState<Row[]>(() =>
     Array.from({ length: 7 }, (_, day) => {
@@ -43,6 +43,7 @@ export default function HoursSection({ data, editable, reload }: { data: Loaded;
     if (err) { console.error(err); setError(t('err.generic')); return; }
     setOk(t('common.saved'));
     await reload();
+    onSaved?.();
   }
 
   const d = !editable || busy;
@@ -83,7 +84,7 @@ export default function HoursSection({ data, editable, reload }: { data: Loaded;
       </details>
 
       <Msg error={error} ok={ok} />
-      {editable && <button className="btn-primary w-full" disabled={busy} onClick={() => void save()}>{busy ? t('common.loading') : t('common.save')}</button>}
+      {editable && <button className="btn-primary w-full" disabled={busy} onClick={() => void save()}>{busy ? t('common.loading') : onSaved ? t('step.saveNext') : t('common.save')}</button>}
     </Section>
   );
 }
