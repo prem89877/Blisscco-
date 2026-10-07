@@ -68,10 +68,28 @@ export default function DetailsSection({ data, editable, reload, part = 'all', l
       onSaved?.();
       return;
     }
-    if (f.name.trim().length < 2) return setError(t('err.nameRequired'));
+    // Every box of the step must be filled before "Save & next" moves on.
+    const needBasic = part === 'all' || part === 'basic';
+    const needContact = part === 'all' || part === 'contact';
+    const missing: string[] = [];
+    if (needBasic) {
+      if (f.name.trim().length < 2) missing.push(t('ed.name'));
+      if (!f.category_id) missing.push(t('ed.category'));
+      if (!f.description.trim()) missing.push(t('ed.description'));
+    } else if (f.name.trim().length < 2) return setError(t('err.nameRequired'));
+    if (needContact) {
+      if (!phone) missing.push(t('ed.phone'));
+      if (!f.email.trim()) missing.push(t('ed.email'));
+      if (!f.address_line.trim()) missing.push(t('ed.address'));
+      if (!f.city.trim()) missing.push(t('ed.city'));
+      if (!f.state.trim()) missing.push(t('ed.state'));
+      if (!f.pincode.trim()) missing.push(t('ed.pincode'));
+      if (lat === null || lng === null) missing.push(t('ed.location'));
+    }
+    if (missing.length) return setError(t('ed.required', { field: missing.join(', ') }));
     if (phone && !/^\+?[0-9]{10,13}$/.test(phone)) return setError(t('ed.invalidPhone'));
     if (f.email.trim() && !isEmail(f.email)) return setError(t('err.invalidEmail'));
-    const addr = validateAddress(f, false);   // checks only what was typed; state must match the PIN code
+    const addr = validateAddress(f, needContact);   // contact step: everything required; state must match the PIN code
     if (addr.errors.length) return setError(t(addressErrorKey(addr.errors[0])));
     if (lat !== null || lng !== null) {
       const c = checkIndiaCoords(lat, lng);

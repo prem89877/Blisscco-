@@ -34,6 +34,7 @@ export default function HoursSection({ data, editable, reload, onSaved }: { data
   async function save() {
     if (busy) return;
     setError(''); setOk('');
+    if (rows.every((r) => r.closed)) return setError(t('ed.needHours'));
     if (rows.some((r) => !r.closed && r.closes <= r.opens)) return setError(t('ed.hoursInvalid'));
     setBusy(true);
     const { error: err } = await supabase.from('business_hours').upsert(
