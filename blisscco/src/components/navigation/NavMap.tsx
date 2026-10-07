@@ -7,6 +7,8 @@ export interface NavMapHandle { recenter: () => void }
 
 interface Props {
   destination: Destination;
+  /** First shop photo (signed URL), shown small inside the shop pin. */
+  photoUrl?: string | null;
   userLocation: UserLocation | null;
   route: Route | null;
   /** Space (px) covered by the top bar / bottom info card, so the route is fitted into the visible part of the map. */
@@ -20,7 +22,7 @@ interface Props {
 }
 
 /** Full-size map. Created only when this component mounts (i.e. when the navigation screen opens); the map library is loaded lazily. */
-const NavMap = forwardRef<NavMapHandle, Props>(function NavMap({ destination, userLocation, route, insets, navigating, following, onManualMove, onError }, ref) {
+const NavMap = forwardRef<NavMapHandle, Props>(function NavMap({ destination, photoUrl = null, userLocation, route, insets, navigating, following, onManualMove, onError }, ref) {
   const { t } = useI18n();
   const box = useRef<HTMLDivElement>(null);
   const [ctrl, setCtrl] = useState<MapController | null>(null);
@@ -65,6 +67,7 @@ const NavMap = forwardRef<NavMapHandle, Props>(function NavMap({ destination, us
   }, [lat, lng]);
 
   useEffect(() => { ctrl?.setDestination({ lat, lng }, destination.name); }, [ctrl, lat, lng, destination.name]);
+  useEffect(() => { ctrl?.setDestinationPhoto(photoUrl); }, [ctrl, photoUrl]);
 
   useEffect(() => {
     if (!ctrl) return;

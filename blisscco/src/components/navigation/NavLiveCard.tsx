@@ -9,7 +9,7 @@ export function instructionText(t: (k: string, v?: Record<string, string | numbe
   return i.distanceMeters >= 30 ? t('nav.inDistance', { action, distance: formatDistance(i.distanceMeters, lang) }) : action;
 }
 
-const iconBox = 'flex h-12 w-12 flex-none items-center justify-center rounded-full bg-blush/25 text-ink';
+const iconBox = 'flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-ink text-white shadow-card';
 
 function Banner({ icon, text, spin }: { icon: 'wifi' | 'gps' | 'route'; text: string; spin?: boolean }) {
   return (
@@ -46,7 +46,7 @@ export default function NavLiveCard({ snapshot, shopName, onEnd }: { snapshot: N
   const announce = status ? status.text : `${guideText}${street ? ` ${street}` : ''}`;
 
   return (
-    <div className="card w-full max-w-md space-y-3 !p-4" role="region" aria-label={t('nav.liveLabel')}>
+    <div className="card w-full max-w-md space-y-3 !rounded-[28px] !p-4 ring-2 ring-white/70" role="region" aria-label={t('nav.liveLabel')}>
       {/* announced politely to screen readers; the distance counting down is not part of it, so it does not chatter */}
       <p className="sr-only" role="status" aria-live="polite">{announce}</p>
 
@@ -73,9 +73,9 @@ export default function NavLiveCard({ snapshot, shopName, onEnd }: { snapshot: N
       <div
         role="progressbar" aria-label={t('nav.progress')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPercent}
         aria-valuetext={t('nav.progressValue', { percent: progressPercent })}
-        className="h-2 overflow-hidden rounded-full bg-ink/10"
+        className="h-2.5 overflow-hidden rounded-full bg-blush/25"
       >
-        <div className="h-full rounded-full bg-ink transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${progressPercent}%` }} />
+        <div className="h-full rounded-full bg-blush transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${progressPercent}%` }} />
       </div>
 
       <button type="button" className="btn-secondary min-h-[48px] w-full text-base" onClick={onEnd}>{t('nav.end')}</button>
