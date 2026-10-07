@@ -9,6 +9,7 @@ import Skeleton from '../../components/Skeleton';
 import Tutorial, { TutorialButton, useTutorial } from '../../components/Tutorial';
 import { StatusBadge } from '../../components/ui';
 import { useI18n } from '../../i18n';
+import { checkIndiaCoords, validateAddress } from '../../lib/india';
 import { supabase } from '../../lib/supabase';
 import type { BizImage, Business, Category, Hour, Loaded, Service } from '../../lib/types';
 
@@ -33,6 +34,7 @@ export default function BusinessEditor() {
   const [data, setData] = useState<Loaded | null>(null);
   const [missing, setMissing] = useState(false);
   const [step, setStep] = useState<Step>('basic');
+  const [stepError, setStepError] = useState('');
   const draftTut = useTutorial('edit-business');
   const liveTut = useTutorial('edit-business-live');
 
@@ -53,9 +55,42 @@ export default function BusinessEditor() {
   }, [id]);
   useEffect(() => { void load(); }, [load]);
 
-  const goTo = (s: Step) => { setStep(s); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const goTo = (s: Step) => { setStepError(''); setStep(s); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const idx = STEPS.indexOf(step);
   const next = () => { if (idx < STEPS.length - 1) goTo(STEPS[idx + 1]); };
+
+  // Is a step really filled in (as saved in the database)? Used to stop the owner from skipping ahead.
+  const isDone = (s: Step): boolean => {
+    if (!data) return false;
+    const b0 = data.business;
+    if (s === 'basic') return b0.name.trim().length >= 2 && !!b0.category_id && !!b0.description?.trim();
+    if (s === 'contact') {
+      const a = validateAddress({ address_line: b0.address_line ?? '', city: b0.city ?? '', state: b0.state ?? '', pincode: b0.pincode ?? '' }, true);
+      return !!b0.phone && !!b0.email && a.errors.length === 0 && checkIndiaCoords(b0.latitude, b0.longitude).ok;
+    }
+    if (s === 'photos') return data.images.length >= 3;
+    if (s === 'hours') return data.hours.some((h) => !h.is_closed);
+    if (s === 'services') return data.services.some((x) => x.is_active);
+    return true;
+  };
+  const STEP_MSG: Partial<Record<Step, string>> = { photos: 'ed.needPhotos', services: 'ed.needService' };
+  // Going back is always free. Going forward needs every step before the target to be complete.
+  const jump = (target: Step) => {
+    const to = STEPS.indexOf(target);
+    if (to > idx) {
+      const blocker = STEPS.slice(0, to).find((s) => !isDone(s));
+      if (blocker) {
+        if (blocker !== step) goTo(blocker);
+        setStepError(t('ed.finishFirst'));
+        return;
+      }
+    }
+    goTo(target);
+  };
+  const nextChecked = () => {
+    if (!isDone(step)) { setStepError(t(STEP_MSG[step] ?? 'ed.finishFirst')); return; }
+    next();
+  };
   const back = () => { if (idx > 0) goTo(STEPS[idx - 1]); };
 
   // "Edit profile" on the dashboard opens this page with ?edit=1: jump straight to the details form
@@ -111,7 +146,7 @@ export default function BusinessEditor() {
       <div className="space-y-2" aria-label={t('step.progress', { n: idx + 1, total: STEPS.length, name: t(`step.${step}`) })}>
         <div className="flex gap-1.5">
           {STEPS.map((s, k) => (
-            <button key={s} type="button" onClick={() => goTo(s)} aria-label={t(`step.${s}`)} aria-current={k === idx ? 'step' : undefined}
+            <button key={s} type="button" onClick={() => jump(s)} aria-label={t(`step.${s}`)} aria-current={k === idx ? 'step' : undefined}
               className={`h-2 flex-1 rounded-full ${k <= idx ? 'bg-blush' : 'bg-ink/10'}`} />
           ))}
         </div>
@@ -129,9 +164,10 @@ export default function BusinessEditor() {
       <Pane show={step === 'services'}><ServicesSection data={data} reload={load} /></Pane>
       <Pane show={step === 'submit'}><SubmitSection data={data} reload={load} /></Pane>
 
+      {stepError && <p role="alert" className="text-sm font-medium text-red-700">{stepError}</p>}
       <div className="flex gap-3">
         {idx > 0 && <button type="button" className="btn-secondary flex-1" onClick={back}>← {t('step.back')}</button>}
-        {(step === 'photos' || step === 'services') && <button type="button" className="btn-solid flex-1" onClick={next}>{t('step.next')} →</button>}
+        {(step === 'photos' || step === 'services') && <button type="button" className="btn-solid flex-1" onClick={nextChecked}>{t('step.next')} →</button>}
       </div>
     </div>
   );
