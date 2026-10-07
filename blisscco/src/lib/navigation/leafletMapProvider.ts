@@ -92,6 +92,14 @@ async function deepestRealZoom(template: string, subdomain: string, at: LatLng, 
   return 10;
 }
 
+/** Compass bearing in degrees (0 = north, clockwise) from a to b. */
+function bearingBetween(a: LatLng, b: LatLng): number {
+  const r = Math.PI / 180;
+  const y = Math.sin((b.lng - a.lng) * r) * Math.cos(b.lat * r);
+  const x = Math.cos(a.lat * r) * Math.sin(b.lat * r) - Math.sin(a.lat * r) * Math.cos(b.lat * r) * Math.cos((b.lng - a.lng) * r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+
 const ll = (p: LatLng): L.LatLngTuple => [p.lat, p.lng];
 /** Rough distance in metres, good enough to tell a glide from a jump. */
 const distanceApprox = (a: LatLng, b: LatLng): number => Math.hypot((a.lat - b.lat) * 110574, (a.lng - b.lng) * 105000);
@@ -115,6 +123,11 @@ class LeafletController implements MapController {
   private manualCb: (() => void) | null = null;
   private programmatic = 0;
   private anim: number | null = null;
+  private heading: number | null = null;     // where the arrow points (degrees, 0 = north)
+  private shownAngle = 0;                      // continuous angle drawn, so the arrow turns the short way round
+  private anchor: LatLng | null = null;        // last point used to work out the direction of travel
+  private lastMoveAt = 0;
+  private compassOff: (() => void) | null = null;
   private shown: LatLng | null = null;   // where the marker is drawn right now (differs from `user` while it glides)
 
   constructor(container: HTMLElement, private readonly o: MapCreateOptions) {
@@ -146,11 +159,50 @@ class LeafletController implements MapController {
     // the screen is full height and can change size (browser bars, rotation): keep the map in sync
     this.resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => this.map.invalidateSize()) : null;
     this.resizeObserver?.observe(container);
+    this.startCompass();
 
     // A drag, or a zoom the app did not start itself, is the customer taking control: follow mode must back off.
     // (The app's own pans / zooms run inside move(), which raises `programmatic` while Leaflet fires its start events.)
     this.map.on('dragstart', () => this.manual());
     this.map.on('zoomstart', () => { if (this.programmatic === 0) this.manual(); });
+  }
+
+  /** Phone compass (Android Chrome / iOS Safari when the browser already allows it). Used only while the customer is standing still:
+   *  once moving, the direction of travel is the better source. Never asks for any permission. */
+  private startCompass(): void {
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+    let lastAt = 0;
+    const onOrientation = (e: Event) => {
+      const ev = e as DeviceOrientationEvent & { webkitCompassHeading?: number };
+      const now = Date.now();
+      if (now - lastAt < 120 || now - this.lastMoveAt < 4000 || !this.userMarker) return;
+      let h: number | null = null;
+      if (typeof ev.webkitCompassHeading === 'number') h = ev.webkitCompassHeading;                                    // iOS
+      else if (ev.absolute && typeof ev.alpha === 'number') h = (360 - ev.alpha + (screen.orientation?.angle ?? 0) + 720) % 360;   // Android
+      if (h === null || !Number.isFinite(h)) return;
+      const cur = this.heading;
+      if (cur !== null && Math.abs(((h - cur + 540) % 360) - 180) < 3) return;   // ignore tiny wobble
+      lastAt = now;
+      this.heading = h;
+      this.applyHeading();
+    };
+    window.addEventListener('deviceorientationabsolute', onOrientation as EventListener);
+    window.addEventListener('deviceorientation', onOrientation as EventListener);
+    this.compassOff = () => {
+      window.removeEventListener('deviceorientationabsolute', onOrientation as EventListener);
+      window.removeEventListener('deviceorientation', onOrientation as EventListener);
+    };
+  }
+
+  /** Turns the little arrow on the "you" dot. Hidden until a direction is known. */
+  private applyHeading(): void {
+    const arrow = this.userMarker?.getElement()?.querySelector<HTMLElement>('.bc-user-heading');
+    if (!arrow) return;
+    if (this.heading === null) { arrow.hidden = true; return; }
+    const delta = ((this.heading - this.shownAngle + 540) % 360) - 180;
+    this.shownAngle += delta;
+    arrow.hidden = false;
+    arrow.style.transform = `rotate(${Math.round(this.shownAngle)}deg)`;
   }
 
   private manual(): void {
@@ -186,6 +238,7 @@ class LeafletController implements MapController {
       this.userMarker?.remove(); this.userMarker = null;
       this.accuracyCircle?.remove(); this.accuracyCircle = null;
       this.shown = null;
+      this.heading = null; this.anchor = null;
       return;
     }
     if (!this.userMarker) {
@@ -203,11 +256,16 @@ class LeafletController implements MapController {
       this.accuracyCircle?.remove(); this.accuracyCircle = null;
     }
 
-    const arrow = this.userMarker.getElement()?.querySelector<HTMLElement>('.bc-user-heading');
-    if (arrow) {
-      if (headingDegrees === null) arrow.hidden = true;
-      else { arrow.hidden = false; arrow.style.transform = `rotate(${Math.round(headingDegrees)}deg)`; }
+    // direction: the device's own heading when it gives one, otherwise worked out from how the customer moved
+    const now = Date.now();
+    if (headingDegrees !== null && Number.isFinite(headingDegrees)) {
+      this.heading = headingDegrees; this.anchor = position; this.lastMoveAt = now;
+    } else if (!this.anchor) {
+      this.anchor = position;
+    } else if (distanceApprox(this.anchor, position) >= 5) {   // ignore GPS jitter smaller than 5 m
+      this.heading = bearingBetween(this.anchor, position); this.anchor = position; this.lastMoveAt = now;
     }
+    this.applyHeading();
     this.followUser(false);
   }
 
@@ -291,6 +349,7 @@ class LeafletController implements MapController {
 
   destroy(): void {
     this.destroyed = true;
+    this.compassOff?.(); this.compassOff = null;
     this.stopGlide();
     this.manualCb = null;
     this.resizeObserver?.disconnect();

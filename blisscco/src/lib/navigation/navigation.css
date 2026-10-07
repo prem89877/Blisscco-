@@ -15,7 +15,7 @@
 .bc-user-pulse { position: absolute; inset: 0; border-radius: 9999px; background: rgba(255, 145, 164, 0.5); animation: bc-pulse 2s ease-out infinite; }
 .bc-user-dot { position: absolute; inset: 6px; box-sizing: border-box; border-radius: 9999px; background: #2D2A2E; border: 3px solid #fff; box-shadow: 0 1px 6px rgba(45, 42, 46, 0.45); }
 /* optional direction arrow; only shown when the device reports a heading */
-.bc-user-heading { position: absolute; left: 50%; top: -7px; width: 0; height: 0; margin-left: -6px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #2D2A2E; transform-origin: 6px 21px; }
+.bc-user-heading { position: absolute; left: 50%; top: -7px; width: 0; height: 0; margin-left: -6px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 11px solid #FF91A4; filter: drop-shadow(0 0 1.5px #2D2A2E); transform-origin: 6px 21px; transition: transform 0.25s ease-out; }
 .bc-user-heading[hidden] { display: none; }
 @keyframes bc-pulse { 0% { transform: scale(0.55); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
 
