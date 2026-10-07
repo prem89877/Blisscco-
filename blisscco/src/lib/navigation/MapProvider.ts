@@ -14,6 +14,8 @@ export interface MapCreateOptions {
 
 export interface MapController {
   setDestination(position: LatLng, name: string): void;
+  /** Shows the shop's first photo (small, round) inside the shop pin instead of the "B" letter. `null` brings the "B" back. */
+  setDestinationPhoto(url: string | null): void;
   /** Moves the "you" marker smoothly. `headingDegrees` is optional (no compass needed): when given, the marker shows a small direction arrow. */
   setUserLocation(position: LatLng | null, accuracyMeters: number | null, headingDegrees?: number | null): void;
   setRoute(path: LatLng[] | null): void;
@@ -37,7 +39,7 @@ export interface MapProvider {
 export function mapCreateDefaults(): Pick<MapCreateOptions, 'tile' | 'zoom' | 'reducedMotion'> {
   return {
     tile: { url: navConfig.tileUrl, attribution: navConfig.tileAttribution, maxZoom: navConfig.tileMaxZoom, subdomains: navConfig.tileSubdomains },
-    zoom: 15,
+    zoom: 17,   // close enough that small lanes (galiyan) are drawn from the first view
     reducedMotion: typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
   };
 }

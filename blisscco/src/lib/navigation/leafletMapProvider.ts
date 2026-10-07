@@ -13,16 +13,29 @@ const userIcon = L.divIcon({
   iconAnchor: [14, 14],
 });
 
-const shopIcon = L.divIcon({
-  className: 'bc-marker',
-  html: '<div class="bc-shop"><svg viewBox="0 0 40 48" width="40" height="48" aria-hidden="true">'
-    + '<path d="M20 46C20 46 4 30 4 18a16 16 0 0 1 32 0c0 12-16 28-16 28Z" fill="#FF91A4" stroke="#2D2A2E" stroke-width="2.5" stroke-linejoin="round"/>'
-    + '<circle cx="20" cy="18" r="9" fill="#FDF8F5"/>'
-    + '<text x="20" y="23" text-anchor="middle" font-size="14" font-weight="700" fill="#2D2A2E" font-family="\'Playfair Display\', serif">B</text>'
-    + '</svg></div>',
-  iconSize: [40, 48],
-  iconAnchor: [20, 46],
-});
+const SHOP_PIN = '<svg viewBox="0 0 40 48" width="40" height="48" aria-hidden="true">'
+  + '<path d="M20 46C20 46 4 30 4 18a16 16 0 0 1 32 0c0 12-16 28-16 28Z" fill="#FF91A4" stroke="#2D2A2E" stroke-width="2.5" stroke-linejoin="round"/>'
+  + '<circle cx="20" cy="18" r="11" fill="#FDF8F5"/>'
+  + '</svg>';
+const SHOP_LETTER = '<span class="bc-shop-b">B</span>';
+
+/** Shop pin. With a photo the first shop image sits in the round window of the pin; without one (or if it fails to load) the "B" is shown. */
+function makeShopIcon(photoUrl: string | null): L.DivIcon {
+  const root = document.createElement('div');
+  root.className = 'bc-shop';
+  root.innerHTML = SHOP_PIN + SHOP_LETTER;
+  if (photoUrl) {
+    const img = document.createElement('img');
+    img.className = 'bc-shop-photo';
+    img.alt = '';
+    img.decoding = 'async';
+    img.addEventListener('load', () => { root.classList.add('has-photo'); });
+    img.addEventListener('error', () => { img.remove(); root.classList.remove('has-photo'); });
+    img.src = photoUrl;
+    root.appendChild(img);
+  }
+  return L.divIcon({ className: 'bc-marker', html: root, iconSize: [40, 48], iconAnchor: [20, 46] });
+}
 
 const ll = (p: LatLng): L.LatLngTuple => [p.lat, p.lng];
 /** Rough distance in metres, good enough to tell a glide from a jump. */
@@ -32,6 +45,8 @@ class LeafletController implements MapController {
   private readonly map: L.Map;
   private readonly resizeObserver: ResizeObserver | null;
   private destMarker: L.Marker | null = null;
+  private destName = '';
+  private photoUrl: string | null = null;
   private userMarker: L.Marker | null = null;
   private accuracyCircle: L.Circle | null = null;
   private routeCasing: L.Polyline | null = null;
@@ -52,7 +67,7 @@ class LeafletController implements MapController {
       center: ll(o.center), zoom: o.zoom, zoomControl: false, attributionControl: false,
       zoomAnimation: !o.reducedMotion, fadeAnimation: !o.reducedMotion, markerZoomAnimation: !o.reducedMotion,
     });
-    L.tileLayer(o.tile.url, { attribution: o.tile.attribution, maxZoom: o.tile.maxZoom, subdomains: o.tile.subdomains }).addTo(this.map);
+    L.tileLayer(o.tile.url, { attribution: o.tile.attribution, maxZoom: o.tile.maxZoom, subdomains: o.tile.subdomains, detectRetina: true, className: 'bc-tiles' }).addTo(this.map);
     if (!L.Browser.mobile) L.control.zoom({ position: 'topright' }).addTo(this.map);
     L.control.attribution({ position: 'topright', prefix: false }).addTo(this.map);
 
@@ -81,8 +96,15 @@ class LeafletController implements MapController {
 
   setDestination(position: LatLng, name: string): void {
     this.dest = position;
+    this.destName = name;
     if (this.destMarker) { this.destMarker.setLatLng(ll(position)); return; }
-    this.destMarker = L.marker(ll(position), { icon: shopIcon, title: name, alt: name, keyboard: false, zIndexOffset: 500 }).addTo(this.map);
+    this.destMarker = L.marker(ll(position), { icon: makeShopIcon(this.photoUrl), title: name, alt: name, keyboard: false, zIndexOffset: 500 }).addTo(this.map);
+  }
+
+  setDestinationPhoto(url: string | null): void {
+    if (url === this.photoUrl) return;
+    this.photoUrl = url;
+    this.destMarker?.setIcon(makeShopIcon(url));
   }
 
   setUserLocation(position: LatLng | null, accuracyMeters: number | null, headingDegrees: number | null = null): void {
@@ -161,7 +183,7 @@ class LeafletController implements MapController {
     const size = this.map.getSize();
     const { top, bottom } = this.insets;
     if (force) {
-      const z = Math.max(this.map.getZoom(), 17);
+      const z = Math.max(this.map.getZoom(), 18);
       const centre = this.map.project(ll(this.user), z).add([0, (bottom - top) / 2]);
       this.move(() => this.map.setView(this.map.unproject(centre, z), z, { animate: !this.o.reducedMotion }));
       return;
@@ -191,7 +213,7 @@ class LeafletController implements MapController {
     this.map.invalidateSize();
     if (points.length === 1) { this.move(() => this.map.setView(points[0], this.o.zoom, { animate: !this.o.reducedMotion })); return; }
     this.move(() => this.map.fitBounds(L.latLngBounds(points), {
-      paddingTopLeft: [32, insets.top], paddingBottomRight: [32, insets.bottom], maxZoom: 17, animate: !this.o.reducedMotion,
+      paddingTopLeft: [32, insets.top], paddingBottomRight: [32, insets.bottom], maxZoom: 18, animate: !this.o.reducedMotion,
     }));
   }
 
