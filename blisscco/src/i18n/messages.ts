@@ -1094,9 +1094,54 @@ const mr20: M = {
 };
 const p20 = { en: en20, hi: hi20, mr: mr20 };
 
+// ============ messages21: live navigation + turn-by-turn (Part 2) ============
+const en21: M = {
+  'nav.recenterShort': 'Recenter', 'nav.end': 'End navigation', 'nav.liveLabel': 'Navigation',
+  'nav.ins.straight': 'Continue straight', 'nav.ins.left': 'Turn left', 'nav.ins.right': 'Turn right',
+  'nav.ins.slight_left': 'Turn slightly left', 'nav.ins.slight_right': 'Turn slightly right',
+  'nav.ins.sharp_left': 'Turn sharp left', 'nav.ins.sharp_right': 'Turn sharp right',
+  'nav.ins.uturn': 'Make a U-turn', 'nav.ins.keep_left': 'Keep left', 'nav.ins.keep_right': 'Keep right',
+  'nav.ins.roundabout': 'Take the roundabout', 'nav.ins.arrive': 'Arrive at destination',
+  'nav.inDistance': '{action} in {distance}', 'nav.ins.onto': 'onto {street}',
+  'nav.ins.fallback': 'Follow the route to {shop}',
+  'nav.progress': 'Route progress', 'nav.progressValue': '{percent}% done',
+  'nav.rerouting': 'Recalculating route...', 'nav.connectionLost': 'Connection lost. Trying again...',
+  'nav.gpsWeak': 'Weak GPS signal. Still looking for your location...',
+  'nav.arrived.title': 'You\'re here', 'nav.arrived.body': 'Destination reached', 'nav.viewShop': 'View shop',
+};
+const hi21: M = {
+  'nav.recenterShort': 'मेरी लोकेशन', 'nav.end': 'नेविगेशन खत्म करें', 'nav.liveLabel': 'नेविगेशन',
+  'nav.ins.straight': 'सीधे चलते रहें', 'nav.ins.left': 'बाएँ मुड़ें', 'nav.ins.right': 'दाएँ मुड़ें',
+  'nav.ins.slight_left': 'थोड़ा बाएँ मुड़ें', 'nav.ins.slight_right': 'थोड़ा दाएँ मुड़ें',
+  'nav.ins.sharp_left': 'तेज़ बाएँ मुड़ें', 'nav.ins.sharp_right': 'तेज़ दाएँ मुड़ें',
+  'nav.ins.uturn': 'यू-टर्न लें', 'nav.ins.keep_left': 'बाएँ रहें', 'nav.ins.keep_right': 'दाएँ रहें',
+  'nav.ins.roundabout': 'गोल चक्कर में प्रवेश करें', 'nav.ins.arrive': 'मंज़िल पर पहुँचें',
+  'nav.inDistance': '{distance} में {action}', 'nav.ins.onto': '{street} पर',
+  'nav.ins.fallback': '{shop} तक रास्ते पर चलते रहें',
+  'nav.progress': 'रास्ते की प्रगति', 'nav.progressValue': '{percent}% पूरा',
+  'nav.rerouting': 'रास्ता दोबारा निकाल रहे हैं…', 'nav.connectionLost': 'कनेक्शन टूट गया। फिर कोशिश कर रहे हैं…',
+  'nav.gpsWeak': 'GPS सिग्नल कमज़ोर है। आपकी लोकेशन ढूँढ रहे हैं…',
+  'nav.arrived.title': 'आप पहुँच गए', 'nav.arrived.body': 'मंज़िल आ गई', 'nav.viewShop': 'दुकान देखें',
+};
+const mr21: M = {
+  'nav.recenterShort': 'माझे लोकेशन', 'nav.end': 'नेव्हिगेशन थांबवा', 'nav.liveLabel': 'नेव्हिगेशन',
+  'nav.ins.straight': 'सरळ चालू ठेवा', 'nav.ins.left': 'डावीकडे वळा', 'nav.ins.right': 'उजवीकडे वळा',
+  'nav.ins.slight_left': 'थोडे डावीकडे वळा', 'nav.ins.slight_right': 'थोडे उजवीकडे वळा',
+  'nav.ins.sharp_left': 'तीव्र डावीकडे वळा', 'nav.ins.sharp_right': 'तीव्र उजवीकडे वळा',
+  'nav.ins.uturn': 'यू-टर्न घ्या', 'nav.ins.keep_left': 'डावीकडे राहा', 'nav.ins.keep_right': 'उजवीकडे राहा',
+  'nav.ins.roundabout': 'वर्तुळाकार चौकात प्रवेश करा', 'nav.ins.arrive': 'ठिकाणी पोहोचा',
+  'nav.inDistance': '{distance} नंतर {action}', 'nav.ins.onto': '{street} वर',
+  'nav.ins.fallback': '{shop} पर्यंत रस्त्यावर चालू ठेवा',
+  'nav.progress': 'रस्त्याची प्रगती', 'nav.progressValue': '{percent}% पूर्ण',
+  'nav.rerouting': 'रस्ता पुन्हा काढत आहोत…', 'nav.connectionLost': 'कनेक्शन तुटले. पुन्हा प्रयत्न करत आहोत…',
+  'nav.gpsWeak': 'GPS सिग्नल कमकुवत आहे. तुमचे लोकेशन शोधत आहोत…',
+  'nav.arrived.title': 'तुम्ही पोहोचलात', 'nav.arrived.body': 'ठिकाण आले', 'nav.viewShop': 'दुकान पहा',
+};
+const p21 = { en: en21, hi: hi21, mr: mr21 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr },
 };

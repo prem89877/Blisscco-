@@ -10,7 +10,7 @@
 //   VITE_GEOCODE_ENDPOINT      default /api/geocode
 // Secret keys never go here: routing and geocoding providers are called from /api/route and /api/geocode.
 
-const env = import.meta.env as Record<string, string | undefined>;
+const env: Record<string, string | undefined> = (import.meta as { env?: Record<string, string | undefined> }).env ?? {};   // `?? {}` only matters outside Vite (unit tests)
 const text = (v: string | undefined, fallback: string): string => (v && v.trim() ? v.trim() : fallback);
 
 export const navConfig = {

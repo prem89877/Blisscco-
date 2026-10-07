@@ -1,3 +1,33 @@
+# Blisscco update: live navigation (Part 2)
+
+## What the customer gets
+- Shop page > Navigate > location permission > route > **Start navigation** > live tracking > turn-by-turn > **You're here**. The customer never leaves Blisscco (no Google / Apple Maps).
+- Compact bottom card: remaining distance and time, next instruction in plain words ("Turn right in 150 m"), a progress bar and an End button.
+- Wrong turn: after 3 fixes in a row far from the route a quiet "Recalculating route..." message shows and ONE new route is requested; the last good route stays on the map if that fails.
+- Weak signal / offline messages ("Weak GPS signal...", "Connection lost. Trying again...") never stop navigation; progress is calculated on the phone, so it keeps working offline.
+- Map follows the customer gently; moving or zooming the map by hand stops following; the **Recenter** button (large, labelled) turns it back on.
+- Arrival (within ~30 m of the shop): "You're here" card with the shop name and a View shop button; GPS tracking stops.
+- Texts in English, Hindi and Marathi. No coordinates are shown anywhere.
+
+## Setup
+- No SQL, no new environment variable, no new package. Optional server variable `ROUTE_MAX_KM` (default 400).
+- `/api/route` now reads the shop's saved location from the database when the page sends `shopId`.
+
+## Changed files
+- api/route.ts, api/_lib/routing.ts, .env.example, CHANGES.md, package.json (only a `test` script)
+- src/i18n/messages.ts (new p21 block, EN / HI / MR)
+- src/pages/Navigate.tsx
+- src/components/navigation/NavInfoCard.tsx, src/components/navigation/NavMap.tsx
+- src/lib/navigation/types.ts, NavigationService.ts, LocationService.ts, RoutingProvider.ts, MapProvider.ts, leafletMapProvider.ts, navigation.css, config.ts
+
+## New files
+- api/_lib/shopLocation.ts
+- src/lib/navigation/geo.ts, instructions.ts, DeviceServices.ts
+- src/components/navigation/NavLiveCard.tsx, NavArrivedCard.tsx, DirectionIcon.tsx
+- tests/navigation/helpers.ts, navigation.test.ts, units.test.ts   (run with `npm test`)
+
+---
+
 # Blisscco update: test-notification button removed, operator name
 
 - Removed the "Send a test notification" box from Notifications > Settings (`src/pages/NotificationSettings.tsx`). The database function `send_test_notification` and the unused text keys are left in place (harmless).

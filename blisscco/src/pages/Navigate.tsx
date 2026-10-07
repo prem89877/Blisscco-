@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import NavErrorState from '../components/navigation/NavErrorState';
 import NavInfoCard from '../components/navigation/NavInfoCard';
@@ -10,7 +10,7 @@ import { useNavigation } from '../lib/navigation/useNavigation';
 import { NavigationError, type Destination, type NavigationErrorCode } from '../lib/navigation/types';
 import { supabase } from '../lib/supabase';
 
-const round = 'flex h-11 w-11 items-center justify-center rounded-full bg-white text-ink shadow-card ring-1 ring-ink/10 transition active:scale-95';
+const round = 'flex h-12 w-12 items-center justify-center rounded-full bg-white text-ink shadow-card ring-1 ring-ink/10 transition active:scale-95';
 
 /** Customer navigation screen: /b/:id/navigate. Opened from the shop profile's "Navigate" button.
  *  Location permission is asked only after the Navigate tap (router state `autostart`) or the "Start navigation" button. */
@@ -31,6 +31,8 @@ export default function Navigate() {
   const [mapFailed, setMapFailed] = useState(false);
   const [mapKey, setMapKey] = useState(0);
   const [bottomInset, setBottomInset] = useState(280);
+  // follow mode: the map keeps the customer in view while navigating; moving the map by hand turns it off, Recenter turns it on
+  const [following, setFollowing] = useState(true);
 
   // shop data (same public view the profile page uses)
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function Navigate() {
         if (ctrl.signal.aborted) return;
         if (error || !data) { setDestError(navigator.onLine === false ? 'network_unavailable' : 'destination_unavailable'); setDest(null); return; }
         const d = await resolveDestination(data as Parameters<typeof resolveDestination>[0], ctrl.signal);
-        if (!ctrl.signal.aborted) setDest(d);
+        if (!ctrl.signal.aborted) setDest({ ...d, shopId: id });   // the routing backend checks the shop's saved location from this id
       } catch (e) {
         if (ctrl.signal.aborted) return;
         setDestError(e instanceof NavigationError ? e.code : 'destination_unavailable');
@@ -79,6 +81,10 @@ export default function Navigate() {
 
   const start = useCallback(() => { if (dest) void service.start(dest); }, [dest, service]);
   const retry = useCallback(() => { void service.retry(); }, [service]);
+  const begin = useCallback(() => { setFollowing(true); service.beginNavigation(); }, [service]);
+  const end = useCallback(() => { service.endNavigation(); }, [service]);
+  const recenter = useCallback(() => { setFollowing(true); mapRef.current?.recenter(); }, []);
+  const insets = useMemo(() => ({ top: 96, bottom: bottomInset }), [bottomInset]);
 
   const backButton = (
     <button type="button" className={round} onClick={back} aria-label={t('nav.back')}>
@@ -103,7 +109,9 @@ export default function Navigate() {
   }
 
   const { navigationStatus: st, userLocation, route } = snapshot;
-  const canRecenter = !mapFailed && (st === 'route_ready' || st === 'navigating' || st === 'completed');
+  const navigating = st === 'navigating';
+  const canRecenter = !mapFailed && (st === 'route_ready' || navigating);
+  const tracking = navigating && following;
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-cream">
@@ -112,7 +120,8 @@ export default function Navigate() {
       {!mapFailed && (
         <div className="absolute inset-0 isolate">
           <NavMap key={mapKey} ref={mapRef} destination={dest} userLocation={userLocation} route={route}
-            insets={{ top: 96, bottom: bottomInset }} onError={() => setMapFailed(true)} />
+            insets={insets} navigating={navigating} following={following}
+            onManualMove={() => { if (navigating) setFollowing(false); }} onError={() => setMapFailed(true)} />
         </div>
       )}
 
@@ -123,14 +132,20 @@ export default function Navigate() {
 
       <div ref={stack} className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 p-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}>
         {canRecenter && (
-          <button type="button" className={`${round} pointer-events-auto self-end`} onClick={() => mapRef.current?.recenter()} aria-label={t('nav.recenter')} title={t('nav.recenter')}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3" /><circle cx="12" cy="12" r="8" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
+          <button
+            type="button" onClick={recenter} aria-label={t('nav.recenter')} aria-pressed={navigating ? tracking : undefined}
+            className={`pointer-events-auto flex min-h-[48px] items-center gap-2 self-end rounded-full px-4 text-sm font-medium shadow-card ring-1 ring-ink/10 transition active:scale-95 ${tracking ? 'bg-ink text-white' : 'bg-white text-ink'}`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="3" fill={tracking ? 'currentColor' : 'none'} /><circle cx="12" cy="12" r="8" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
+            {t('nav.recenterShort')}
           </button>
         )}
         <div className="pointer-events-auto flex w-full justify-center">
           {mapFailed
             ? <div className="card w-full max-w-md"><NavErrorState code="map_unavailable" onRetry={() => { setMapFailed(false); setMapKey((k) => k + 1); }} onBack={toShop} /></div>
-            : <NavInfoCard snapshot={snapshot} shopName={dest.name} address={dest.address} onStart={start} onRetry={retry} onBack={toShop} />}
+            : <NavInfoCard snapshot={snapshot} shopName={dest.name} address={dest.address} onStart={start} onBegin={begin} onEnd={end} onViewShop={toShop} onRetry={retry} onBack={toShop} />}
         </div>
       </div>
     </div>

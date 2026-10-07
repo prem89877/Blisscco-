@@ -74,3 +74,12 @@ export function validIndiaPoint(p: unknown): p is LatLng {
     && Number.isFinite(o.lat) && Number.isFinite(o.lng)
     && o.lat >= 6.5 && o.lat <= 35.9 && o.lng >= 68 && o.lng <= 97.5;
 }
+
+/** Straight-line limit between start and destination (default 400 km, env ROUTE_MAX_KM). Navigation to a shop is local, so this
+ *  also stops the endpoint from being used as a general-purpose long-distance router. */
+export function withinServiceRange(from: LatLng, to: LatLng): boolean {
+  const max = Number(process.env.ROUTE_MAX_KM) > 0 ? Number(process.env.ROUTE_MAX_KM) : 400;
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const h = Math.sin(rad(to.lat - from.lat) / 2) ** 2 + Math.cos(rad(from.lat)) * Math.cos(rad(to.lat)) * Math.sin(rad(to.lng - from.lng) / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(h))) <= max;
+}

@@ -39,11 +39,12 @@ function toError(err: GeolocationPositionError): NavigationError {
 }
 
 function toLocation(pos: GeolocationPosition): UserLocation {
-  const { latitude, longitude, accuracy } = pos.coords;
+  const { latitude, longitude, accuracy, heading } = pos.coords;
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) throw new NavigationError('location_unavailable');
   return {
     position: { lat: latitude, lng: longitude },
     accuracyMeters: Number.isFinite(accuracy) ? accuracy : null,
+    headingDegrees: typeof heading === 'number' && Number.isFinite(heading) ? heading : null,   // null when stationary / no compass: never required
     timestamp: pos.timestamp,
   };
 }
@@ -73,7 +74,8 @@ export async function locateForNavigation(): Promise<UserLocation> {
   }
 }
 
-/** Continuous tracking for ACTIVE navigation only (Part 2). Always call the returned function to stop it. */
+/** Continuous tracking for ACTIVE navigation only. Always call the returned function to stop it.
+ *  A timeout or a lost signal is reported through onError but the watcher keeps running, so tracking resumes by itself. */
 export function watchLocation(onUpdate: (l: UserLocation) => void, onError: (e: NavigationError) => void): () => void {
   if (!isGeolocationSupported()) { onError(new NavigationError('browser_unsupported')); return () => undefined; }
   const id = navigator.geolocation.watchPosition(
@@ -83,3 +85,20 @@ export function watchLocation(onUpdate: (l: UserLocation) => void, onError: (e: 
   );
   return () => navigator.geolocation.clearWatch(id);
 }
+
+/** Everything the navigation controller needs from the device, as one object so tests can replace it. */
+export interface LocationPort {
+  isSupported(): boolean;
+  permissionState(): Promise<PermissionResult>;
+  onPermissionGranted(cb: () => void): () => void;
+  locateOnce(): Promise<UserLocation>;
+  watch(onUpdate: (l: UserLocation) => void, onError: (e: NavigationError) => void): () => void;
+}
+
+export const browserLocation: LocationPort = {
+  isSupported: isGeolocationSupported,
+  permissionState: getPermissionState,
+  onPermissionGranted,
+  locateOnce: locateForNavigation,
+  watch: watchLocation,
+};

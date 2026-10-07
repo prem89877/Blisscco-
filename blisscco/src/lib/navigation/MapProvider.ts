@@ -14,10 +14,18 @@ export interface MapCreateOptions {
 
 export interface MapController {
   setDestination(position: LatLng, name: string): void;
-  setUserLocation(position: LatLng | null, accuracyMeters: number | null): void;
+  /** Moves the "you" marker smoothly. `headingDegrees` is optional (no compass needed): when given, the marker shows a small direction arrow. */
+  setUserLocation(position: LatLng | null, accuracyMeters: number | null, headingDegrees?: number | null): void;
   setRoute(path: LatLng[] | null): void;
   /** Shows the whole route (or you + the shop when there is no route yet) inside the visible area above the info card. */
   fitToRoute(insets: { top: number; bottom: number }): void;
+  /** Follow mode: keeps the customer in the visible area above the info card, moving the map gently (not on every GPS tick).
+   *  Turning it on focuses on the customer straight away. */
+  setFollowing(following: boolean, insets: { top: number; bottom: number }): void;
+  /** Tells the map how much of it is covered by the top bar / bottom card (they change size between states). */
+  setInsets(insets: { top: number; bottom: number }): void;
+  /** Called when the customer moves or zooms the map by hand (not for moves the app makes itself). */
+  onManualMove(cb: () => void): void;
   destroy(): void;
 }
 

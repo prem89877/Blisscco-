@@ -1,13 +1,20 @@
 import { useI18n } from '../../i18n';
 import { formatDistance, formatDuration } from '../../lib/navigation/units';
 import type { NavigationSnapshot } from '../../lib/navigation/types';
+import NavArrivedCard from './NavArrivedCard';
 import NavErrorState from './NavErrorState';
+import NavLiveCard from './NavLiveCard';
 
 interface Props {
   snapshot: NavigationSnapshot;
   shopName: string;
   address: string | null;
+  /** Asks for location and calculates the route (idle screen). */
   onStart: () => void;
+  /** Route preview -> live navigation. */
+  onBegin: () => void;
+  onEnd: () => void;
+  onViewShop: () => void;
   onRetry: () => void;
   onBack: () => void;
 }
@@ -25,7 +32,7 @@ function Busy({ title, hint }: { title: string; hint?: string }) {
 }
 
 /** Bottom card of the navigation screen. Shows friendly text only: no coordinates, no technical data. */
-export default function NavInfoCard({ snapshot, shopName, address, onStart, onRetry, onBack }: Props) {
+export default function NavInfoCard({ snapshot, shopName, address, onStart, onBegin, onEnd, onViewShop, onRetry, onBack }: Props) {
   const { t, lang } = useI18n();
   const { navigationStatus: st } = snapshot;
 
@@ -38,7 +45,11 @@ export default function NavInfoCard({ snapshot, shopName, address, onStart, onRe
     body = <Busy title={t('nav.locating')} />;
   } else if (st === 'calculating_route') {
     body = <Busy title={t('nav.calculating')} />;
-  } else if ((st === 'route_ready' || st === 'navigating' || st === 'completed') && snapshot.routeDistance !== null && snapshot.estimatedDuration !== null) {
+  } else if (st === 'navigating') {
+    return <NavLiveCard snapshot={snapshot} shopName={shopName} onEnd={onEnd} />;
+  } else if (st === 'completed') {
+    return <NavArrivedCard shopName={shopName} onViewShop={onViewShop} />;
+  } else if (st === 'route_ready' && snapshot.routeDistance !== null && snapshot.estimatedDuration !== null) {
     body = (
       <div className="space-y-3">
         <div>
@@ -49,7 +60,10 @@ export default function NavInfoCard({ snapshot, shopName, address, onStart, onRe
           </p>
           {address && <p className="mt-1.5 line-clamp-2 text-sm text-ink/60">{address}</p>}
         </div>
-        <button type="button" className="btn-secondary" onClick={onRetry}>{t('nav.refresh')}</button>
+        <div className="flex flex-col gap-2">
+          <button type="button" className="btn-solid min-h-[52px] w-full text-base" onClick={onBegin}>{t('nav.start')}</button>
+          <button type="button" className="btn-secondary w-full" onClick={onRetry}>{t('nav.refresh')}</button>
+        </div>
       </div>
     );
   } else {
