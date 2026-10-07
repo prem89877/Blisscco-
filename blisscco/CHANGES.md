@@ -221,3 +221,27 @@ Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new fro
 ## Known limits
 - Not run against a live database or the Cashfree sandbox here (no network). Test one sandbox payment end to end before going live.
 - The business listing terms stored in the database (migration 0025) still say "Razorpay"; update them with a new terms version if you want that text changed.
+
+---
+
+# Blisscco update: Navigation page UI refresh
+
+## What changes
+- Navigation page background is now blush pink **#FF91A4** (page, loading screen and map background while tiles load).
+- Cleaner UI: rounded bottom card with a small grab handle, white ring around floating buttons, shop name pill with a small round photo, shop photo thumbnail in the info card, pink time chip, dark direction badge and pink progress bar in the live card.
+- Map shows small lanes (galiyan) better: default zoom 15 -> 17, route fit and follow zoom up to 18, retina tiles and a little extra contrast. (Which lanes are drawn finally depends on the tile provider; to get even more detail set `VITE_MAP_TILE_URL` to a more detailed tile server.)
+- The "B" in the shop pin on the map is replaced by the **owner's first business photo** (small, round). If a shop has no photo, or it fails to load, the "B" stays.
+
+## Changed files
+- src/pages/Navigate.tsx
+- src/components/navigation/NavMap.tsx
+- src/components/navigation/NavInfoCard.tsx
+- src/components/navigation/NavLiveCard.tsx
+- src/components/navigation/NavArrivedCard.tsx
+- src/lib/navigation/leafletMapProvider.ts
+- src/lib/navigation/MapProvider.ts
+- src/lib/navigation/navigation.css
+- CHANGES.md
+
+## New files
+- None. No new package, no new environment variable, no database change.
