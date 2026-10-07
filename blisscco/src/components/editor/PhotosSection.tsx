@@ -5,7 +5,8 @@ import { supabase } from '../../lib/supabase';
 import { BUCKET, EXT, MAX_BYTES, signedUrlMap } from '../../lib/storage';
 import type { Loaded } from '../../lib/types';
 
-export default function PhotosSection({ data, editable, reload }: { data: Loaded; editable: boolean; reload: () => Promise<void> }) {
+/** minKeep: a live shop must keep at least this many photos (the owner can still Change a photo, or add first and then remove). */
+export default function PhotosSection({ data, editable, reload, minKeep = 0 }: { data: Loaded; editable: boolean; reload: () => Promise<void>; minKeep?: number }) {
   const { t } = useI18n();
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -38,6 +39,24 @@ export default function PhotosSection({ data, editable, reload }: { data: Loaded
     await reload();
   }
 
+  async function replace(img: { id: string; storage_path: string; sort_order: number }, e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (busy || !file) return;
+    setError('');
+    if (!EXT[file.type] || file.size > MAX_BYTES) return setError(t('ed.fileInvalid'));
+    setBusy(true);
+    const path = `${bid}/${crypto.randomUUID()}.${EXT[file.type]}`;
+    const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+    if (up.error) { console.error(up.error); setError(t('err.generic')); setBusy(false); return; }
+    const ins = await supabase.from('business_images').insert({ business_id: bid, storage_path: path, sort_order: img.sort_order });
+    if (ins.error) { console.error(ins.error); await supabase.storage.from(BUCKET).remove([path]); setError(t('err.generic')); setBusy(false); return; }
+    const del = await supabase.from('business_images').delete().eq('id', img.id);   // old photo goes only after the new one is saved
+    if (del.error) setError(t('err.generic')); else await supabase.storage.from(BUCKET).remove([img.storage_path]);
+    setBusy(false);
+    await reload();
+  }
+
   async function remove(id: string, path: string) {
     if (busy) return;
     setBusy(true); setError('');
@@ -56,7 +75,15 @@ export default function PhotosSection({ data, editable, reload }: { data: Loaded
             {urls[img.storage_path]
               ? <img src={urls[img.storage_path]} alt="" loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
               : <div className="aspect-square w-full animate-pulse rounded-xl bg-ink/10" />}
-            {editable && <button className="btn-secondary w-full" disabled={busy} onClick={() => void remove(img.id, img.storage_path)}>{t('ed.remove')}</button>}
+            {editable && (
+              <div className="grid grid-cols-2 gap-1.5">
+                <label className={`btn-secondary cursor-pointer px-2 ${busy ? 'opacity-60' : ''}`}>
+                  {t('ed.changePhoto')}
+                  <input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(e) => void replace(img, e)} />
+                </label>
+                <button className="btn-secondary px-2" disabled={busy || data.images.length <= minKeep} onClick={() => void remove(img.id, img.storage_path)}>{t('ed.remove')}</button>
+              </div>
+            )}
           </figure>
         ))}
       </div>
@@ -66,6 +93,7 @@ export default function PhotosSection({ data, editable, reload }: { data: Loaded
           <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden disabled={busy} onChange={(e) => void onFiles(e)} />
         </label>
       )}
+      {editable && minKeep > 0 && <p className="text-xs text-ink/60">{t('ed.photosMin', { n: minKeep })}</p>}
       <Msg error={error} />
     </Section>
   );
