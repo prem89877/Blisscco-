@@ -104,7 +104,9 @@ async function sendPush(item: Item, report: (endpoint: string, outcome: 'ok' | '
   const { title, body } = composeNotification(item.notification.type, item.notification.data, item.language ?? 'en');
   const payload = JSON.stringify({ title, body, url: item.notification.link ?? '/', tag: item.notification.id });
   const type = item.notification.type;
-  const urgency = type === 'booking_in_service' || type === 'appointment_reminder' || type === 'appointment_remind_20' ? 'high' : 'normal';
+  // 'normal' urgency lets Android hold the message while the phone is idle (minutes of delay). Everything the person is waiting
+  // for goes 'high' so it arrives right away; only the slow daily reminders stay 'normal'.
+  const urgency = type === 'coupon_expiring' || type === 'subscription_expiring' ? 'normal' : 'high';
   const ttl = type === 'appointment_remind_20' ? 900 : 86400;      // a 20-minute reminder is useless if it arrives late: drop it after 15 min
 
   let ok = 0; let gone = 0; let retryable = 0; let fatal = 0; const codes: number[] = [];
