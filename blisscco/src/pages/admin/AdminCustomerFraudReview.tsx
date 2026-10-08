@@ -79,13 +79,14 @@ export default function AdminCustomerFraudReview() {
   }
 
   function decide(r: CcAdminReferral, action: CcAction) {
-    if (!r.id) return;
+    const id = r.id;
+    if (!id) return;
     if (action === 'reject' && !window.confirm(t('cf.confirm.reject'))) return;
     if (action === 'fraud' && !window.confirm(t('cf.confirm.fraud'))) return;
     if (action === 'restore' && !window.confirm(t('cf.confirm.restore'))) return;
-    void run(r.id, () => supabase.rpc('admin_review_customer_referral', { p_id: r.id, p_action: action, p_note: notes[r.id] ?? '' }));
+    void run(id, () => supabase.rpc('admin_review_customer_referral', { p_id: id, p_action: action, p_note: notes[id] ?? '' }));
   }
-  const recheck = (r: CcAdminReferral) => { if (r.id) void run(r.id, () => supabase.rpc('admin_recheck_customer_referral_risk', { p_id: r.id })); };
+  const recheck = (r: CcAdminReferral) => { const id = r.id; if (id) void run(id, () => supabase.rpc('admin_recheck_customer_referral_risk', { p_id: id })); };
 
   const comp = comps.find((c) => c.id === compId) ?? null;
   const closed = comp?.status === 'ended';
