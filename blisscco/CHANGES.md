@@ -429,3 +429,41 @@ That message appears when the server could not create the order at Cashfree (or 
 - public/badges/rank-1.png
 - public/badges/rank-2.png
 - public/badges/rank-3.png
+
+---
+
+# Blisscco update: Refer-a-Customer Competition - fraud protection (Part 2)
+
+## What it does
+- **Stricter referral rules.** A referral does NOT count when: the referrer refers themselves (same e-mail identity such as `a.b+x@gmail.com`, or same phone); the referred account was created before the competition started, or its phone number already belonged to an older account; the same person is referred again (same e-mail identity or same phone - one genuine customer counts once); the account is suspended / rejected / fraudulent; the genuine activity (booking) was not done; or the booking was later **cancelled / no-show / disputed** or its shop is no longer live. All of this is checked on the server, live, by one single "what counts" function - so a cancelled booking or a rejected referral drops off the leaderboard immediately.
+- **Risk status (never automatic rejection).** Several weak signals are added into a score: same browser as the referrer, same browser behind many accounts, same browser pattern, same network (weak, only 15), accounts created within 30 minutes, booking within 30 minutes of sign-up, many referred customers using only the same shop, unusual number of referrals in 24 hours, similar machine-like e-mail names, repeated cancelled bookings, made-up phone. **Score 50 or more puts the referral ON HOLD ("suspicious")** - it does not count until an admin decides. One signal alone (for example the same IP) can never hold a referral, and the system never marks anybody fraudulent by itself.
+- **Admin > Customer referral fraud review** (new page): for each referral shows referrer, referred customer, referral date, eligibility status, risk status + reasons, related booking. Admin can **Start review, Approve, Reject, Mark fraudulent, Restore** (note required) and re-check risk. Restore never skips eligibility (a valid booking must exist; self-referral and duplicate identities cannot be restored). Per-referral **History** is shown.
+- **Audit log** (append-only table, nobody can edit or delete): every qualify / automatic refusal / risk hold / admin decision / booking change / freeze / validation / reward event. Shown per referral and as a competition feed on the competition page.
+- **Reward protection.** When a competition ends: (1) the **final leaderboard is frozen** (snapshot that can never change; no new referral can enter), (2) the **eligibility / fraud validation runs** again, (3) the **admin confirms the winner** (the server recomputes the winner and refuses if it differs from what the admin saw, or if any suspicious referral is undecided), (4) the **Promotional Balance is issued once** with the amount stored in the competition (normally Rs 1,000), (5) duplicates are impossible: competition row lock + unique index + database triggers (reward rows cannot be inserted around the function, edited or deleted; prize / dates / rules are locked after the end).
+- **Server-side only.** Counts, leaderboard, eligibility, winner and amount come from the database. The browser sends only ids, the admin's decision and which winner the admin saw. Device ids are random / hashed; the IP is stored only as a hash.
+- **Customer screens** see only "Counted / Under review / Not counted" - never the risk signals. The winner is shown publicly only after confirmation and reward.
+
+## Run this
+1. Supabase SQL editor: run `supabase/migrations/0033_customer_referral_fraud_protection.sql` (after 0032). Safe to re-run. It replaces `claim_referral(text)` with `claim_referral(text, text, text)` - deploy the new front end right after.
+2. Optional (test project only): `supabase/tests/phase13_customer_fraud_tests.sql`. NOT RUN by the assistant (no database available) - please run and send me any error text.
+3. Deploy the front end.
+
+## Good to know
+- A referral that already counted stays counted unless it now fails a rule (for example the referred account is older than the competition start). A 0032 hold ("in review") becomes "suspicious".
+- A competition already waiting for its winner gets a frozen snapshot of its current ranking when 0033 runs.
+- Phone checks only work for customers who have a phone number on their account (profiles.phone); e-mail identity, device and booking checks work for everyone. Customer bookings are not paid online in Blisscco, so there is no refund state: cancelled / no-show / disputed bookings are what makes a booking ineligible.
+
+## Changed files
+- src/components/Layout.tsx
+- src/lib/customerCompetition.ts
+- src/pages/admin/AdminCustomerCompetition.tsx
+- src/pages/admin/AdminHome.tsx
+- src/App.tsx
+- src/i18n/messages.ts
+- CHANGES.md
+- supabase/RUN_LOG.md
+
+## New files
+- supabase/migrations/0033_customer_referral_fraud_protection.sql
+- supabase/tests/phase13_customer_fraud_tests.sql
+- src/pages/admin/AdminCustomerFraudReview.tsx
