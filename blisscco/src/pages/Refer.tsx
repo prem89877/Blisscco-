@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Msg, Section } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
@@ -77,6 +78,7 @@ export default function Refer() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <h1 className="font-display text-2xl font-semibold">{t('ref.title')}</h1>
+      <Link to="/refer/competition" className="card block font-medium">🏆 {t('cc.title')}</Link>
       <Msg error={errKey ? t(errKey) : ''} />
       {active === false && <p className="text-ink/70">{t('ref.inactive')}</p>}
 
