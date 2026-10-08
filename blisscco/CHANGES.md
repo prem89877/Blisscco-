@@ -276,6 +276,7 @@ Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new fro
 - src/lib/navigation/MapProvider.ts
 - src/lib/navigation/navigation.css
 - CHANGES.md
+- supabase/RUN_LOG.md
 
 ## New files
 - None. No new package, no new environment variable, no database change.
@@ -298,6 +299,7 @@ Run `supabase/migrations/0023_india_validation.sql` BEFORE deploying the new fro
 - src/lib/navigation/navigation.css
 - .env.example (comments only)
 - CHANGES.md
+- supabase/RUN_LOG.md
 
 ## New files
 - None.
@@ -320,6 +322,7 @@ At some places (small towns / rural areas) the satellite provider has no picture
 - src/lib/navigation/config.ts
 - src/lib/navigation/navigation.css
 - CHANGES.md
+- supabase/RUN_LOG.md
 
 ## New files
 - None.
@@ -343,6 +346,7 @@ At some places (small towns / rural areas) the satellite provider has no picture
 - src/pages/Navigate.tsx
 - src/lib/navigation/navigation.css
 - CHANGES.md
+- supabase/RUN_LOG.md
 
 ## New files
 - None.
@@ -362,6 +366,7 @@ A wide (landscape) shop photo was drawn at its own shape on the map pin and spil
 - src/lib/navigation/leafletMapProvider.ts
 - src/lib/navigation/navigation.css
 - CHANGES.md
+- supabase/RUN_LOG.md
 
 ## New files
 - None.
@@ -383,6 +388,44 @@ That message appears when the server could not create the order at Cashfree (or 
 - src/pages/owner/OwnerPlans.tsx
 - src/components/PhysicalQrOrder.tsx
 - CHANGES.md
+- supabase/RUN_LOG.md
 
 ## New files
 - None.
+
+---
+
+# Blisscco update: Refer-a-Shop Competition - fraud protection
+
+## What it does
+- **Stricter referral rules.** A referral does NOT count when: the referred business is the referrer's own (same phone, e-mail, or same shop name + PIN under a second account); its phone already belonged to another Blisscco business before the referral; the same business / phone is referred again (only the **first valid attribution** is kept); its profile is incomplete, not approved by admin, or later rejected / suspended (it simply drops off the board); or admin marks it rejected / fraudulent.
+- **Risk detection (never automatic rejection).** Several weak signals are added into a risk score: same browser as the referrer, same browser behind many accounts, same browser pattern, same network (weak, worth only 15), several accounts created within 30 minutes, unusual number of referrals from one account, made-up looking phone number, and identical shop name + PIN / e-mail / address / description / map location with another owner's business. A score of **50 or more puts the referral on hold** ("suspicious"): it is not counted on the leaderboard until an admin decides. One signal alone, like the same network, can never hold a referral. Owners only see "Under review", never the signals.
+- **Admin > Referral fraud review** (new page): filter *Needs review / Decided / All*, see the reasons, and **Start review, Approve, Reject, Mark fraudulent, Reopen, Re-check risk** (note required). Rejected / fraudulent referrals never count. Every change is saved in an **append-only audit trail** (who, when, from -> to, note), shown per referral under *History*, and also written to the Audit log.
+- **Winner protection.** Ending a competition now only picks a *provisional* winner (status "Verifying winner"). The admin ticks each qualifying referral of the winner as verified, and only then **Issue Business Growth Credit** works. It is blocked while suspicious referrals are waiting or if the ranking changed. The credit is issued **only once** (competition row lock, unique ledger index, database triggers). Prize, dates and title are frozen after the end. The wallet ledger can no longer be edited or deleted.
+- **Server-side only.** Leaderboard counts, the winner and the reward amount are always computed / read in the database; the browser sends only ids and the admin's decision. Device ids are random / hashed; the IP is stored only as a hash.
+- **Winner badges.** Your three badge images (1st / 2nd / 3rd) are used for the top 3 on the leaderboard (owner + admin) and for the winner.
+
+## Run this
+1. Supabase SQL editor: run `supabase/migrations/0031_shop_referral_fraud_protection.sql` (after 0030; do not re-run 0030 afterwards).
+2. Optional (test project only): `supabase/tests/phase12_shop_fraud_tests.sql`. NOT RUN by the assistant (no database available) - please run and send me any error text.
+3. Deploy the front end. Referrals that already counted stay counted unless they now fail a rule (for example an incomplete profile).
+
+## Changed files
+- src/components/Layout.tsx
+- src/lib/shopReferral.ts
+- src/pages/owner/OwnerCompetition.tsx
+- src/pages/admin/AdminCompetition.tsx
+- src/pages/admin/AdminHome.tsx
+- src/App.tsx
+- src/i18n/messages.ts
+- CHANGES.md
+- supabase/RUN_LOG.md
+
+## New files
+- supabase/migrations/0031_shop_referral_fraud_protection.sql
+- supabase/tests/phase12_shop_fraud_tests.sql
+- src/pages/admin/AdminFraudReview.tsx
+- src/components/RankBadge.tsx
+- public/badges/rank-1.png
+- public/badges/rank-2.png
+- public/badges/rank-3.png
