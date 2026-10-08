@@ -5,7 +5,7 @@ import { useI18n } from '../i18n';
 import { useOnline } from '../lib/offlineCache';
 import { syncPushSubscription } from '../lib/push';
 import { clearRef, getStoredRef } from '../lib/referral';
-import { clearShopRef, getStoredShopRef } from '../lib/shopReferral';
+import { clearShopRef, getDeviceSignals, getStoredShopRef, recordShopDevice } from '../lib/shopReferral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import HeaderMenu from './HeaderMenu';
 import InstallPrompt from './InstallPrompt';
@@ -33,7 +33,16 @@ export default function Layout() {
     if (profile?.role !== 'owner') return;
     const code = getStoredShopRef();
     if (!code) return;
-    void supabase.rpc('claim_shop_referral', { p_code: code }).then(() => clearShopRef());
+    void (async () => {
+      const d = await getDeviceSignals();
+      await supabase.rpc('claim_shop_referral', { p_code: code, p_device_id: d?.id ?? null, p_device_fp: d?.fp ?? null });
+      clearShopRef();
+    })();
+  }, [profile?.id, profile?.role]);
+
+  // Fraud protection: remember which browser a business owner uses (weak signal only; the server decides with several signals + admin review)
+  useEffect(() => {
+    if (profile?.role === 'owner') void recordShopDevice();
   }, [profile?.id, profile?.role]);
 
   // renew this browser's push subscription if this user already turned it on (never turns it on by itself)
