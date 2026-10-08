@@ -5,6 +5,7 @@ import { useI18n } from '../i18n';
 import { useOnline } from '../lib/offlineCache';
 import { syncPushSubscription } from '../lib/push';
 import { clearRef, getStoredRef } from '../lib/referral';
+import { clearShopRef, getStoredShopRef } from '../lib/shopReferral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import HeaderMenu from './HeaderMenu';
 import InstallPrompt from './InstallPrompt';
@@ -25,6 +26,14 @@ export default function Layout() {
     const code = getStoredRef();
     if (!code) return;
     void supabase.rpc('claim_referral', { p_code: code }).then(() => clearRef());
+  }, [profile?.id, profile?.role]);
+
+  // A new business owner who arrived through a shop-referral link (Refer-a-Shop Competition) is attributed once, by the server
+  useEffect(() => {
+    if (profile?.role !== 'owner') return;
+    const code = getStoredShopRef();
+    if (!code) return;
+    void supabase.rpc('claim_shop_referral', { p_code: code }).then(() => clearShopRef());
   }, [profile?.id, profile?.role]);
 
   // renew this browser's push subscription if this user already turned it on (never turns it on by itself)
@@ -64,6 +73,7 @@ export default function Layout() {
 
       <footer className="border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70">
         {profile?.role === 'customer' && <Link to="/refer" className="mr-3 btn-text">{t('ref.title')}</Link>}
+        {profile?.role === 'owner' && <Link to="/owner/competition" className="mr-3 btn-text">{t('sc.title')}</Link>}
         {session && <Link to="/my-bookings" className="mr-3 btn-text">{t('my.title')}</Link>}
         <Link to="/owner/register" className="btn-text">{t('nav.forBusiness')}</Link>
         <p className="mt-2 space-x-3">
