@@ -31,6 +31,7 @@ already-run file; add a new numbered file instead (exception: bug-fixed re-runna
 | 0027 | migrations/0027_qr_price_100_live_edit.sql | Physical QR price Rs 50 -> Rs 100 (plans.physical_qr = 10000 paise); new function owner_update_live_details() so owners can edit description / phone / e-mail of an approved or hidden listing | NOT YET - run this | Run after 0026, BEFORE deploying the new frontend; safe to re-run; no table/column change |
 | 0028 | migrations/0028_live_photos_edit.sql | business_is_editable() now also true for approved / hidden listings, so the owner can add / remove / change photos of a live shop (photos only; name, address, location stay locked) | NOT YET - run this | Run after 0027, BEFORE deploying the new frontend; safe to re-run; no table/column change |
 | 0029 | migrations/0029_admin_custom_notification.sql | admin_send_notification(): admin sends a custom push notification to all owners / all customers / one owner / one customer (push only, no e-mail; audited) | NOT YET - run this | Run after 0028, BEFORE deploying the new frontend; safe to re-run; no table/column change |
+| 0030 | migrations/0030_refer_a_shop_competition.sql | Refer-a-Shop Competition: shop_competitions (title, dates, prize, status, winner), shop_referral_codes, shop_referrals, growth_credit_ledger (promotional wallet), businesses.phone_verified_at, ranking / qualification / winner functions, admin functions, auto-finalise every 5 min (pg_cron) | NOT YET - run this | Run after 0029, BEFORE deploying the new frontend; safe to re-run. pg_cron optional (admin can press End by hand) |
 | - | tests/phase11c_india_tests.sql | India polygon / PIN code / businesses trigger tests (test project only) | Run after 0023 | Rolls back |
 | - | manual/benchmark_search.sql | Search benchmark (time + EXPLAIN) to run before and after the 0020 indexes | Run by hand on a test project | Read-only, changes nothing |
 | - | tests/phase11a_admin_tests.sql | Phase 11 Part 1 admin tests (test project only) | Run after 0014 | Rolls back |
@@ -58,4 +59,5 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 - (0027 done: QR poster Rs 100, live listing contact edit)
 - (0028 done: photos editable on a live listing)
 - (0029 done: admin custom push notification)
+- (0030 done: Refer-a-Shop Competition + Business Growth Credit wallet)
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)
