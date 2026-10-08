@@ -35,7 +35,7 @@ export default function NotificationSettings() {
   async function toggleDevice() {
     setBusy(true); setMsg({ error: '', ok: '' });
     try {
-      if (here) { await disablePush(); setHere(false); }
+      if (here) { await disablePush(true); setHere(false); }
       else {
         const r = await enablePush();
         setPerm('Notification' in window ? Notification.permission : 'none');
