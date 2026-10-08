@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Field from '../../components/Field';
+import RankBadge from '../../components/RankBadge';
 import { Msg, Section } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { fmtDateTime, rupees } from '../../lib/format';
@@ -8,17 +9,24 @@ import { addDaysLocal, isoToLocalInput, localInputToIso, type LeaderRow } from '
 import { supabase } from '../../lib/supabase';
 
 interface Comp {
-  id: string; title: string; description: string | null; status: 'draft' | 'active' | 'paused' | 'ended';
+  id: string; title: string; description: string | null; status: 'draft' | 'active' | 'paused' | 'pending_verification' | 'ended';
   starts_at: string; ends_at: string; reward_amount_inr: number; winner_business_name: string | null; winner_referral_count: number | null;
 }
 interface RefRow {
   id: string; status: 'pending' | 'qualified' | 'rejected' | 'revoked'; created_at: string; competition_id: string | null;
   referrer_business: string | null; referred_owner_name: string | null; business_id: string | null; business_name: string | null; business_phone: string | null;
   profile_complete: boolean; phone_verified: boolean; approved: boolean; reject_reason: string | null; revoked_reason: string | null;
+  risk_status: string;
+}
+interface WinnerRef { id: string; business_name: string; phone: string | null; verified: boolean; risk_status: string }
+interface WinnerCheck {
+  status: string; reward_amount_inr: number; has_winner: boolean; winner_business_name: string | null; winner_referrals: number | null;
+  referrals: WinnerRef[]; unverified: number; unresolved_risk: number; can_award: boolean; already_awarded: boolean;
 }
 interface Form { id: string | null; title: string; desc: string; start: string; end: string; prize: string }
 
-const KNOWN_ERRORS = ['another_live', 'invalid_dates', 'ends_in_past', 'invalid_reward', 'already_ended', 'invalid_state', 'no_phone', 'reason_required'];
+const KNOWN_ERRORS = ['another_live', 'invalid_dates', 'ends_in_past', 'invalid_reward', 'already_ended', 'invalid_state', 'no_phone', 'reason_required',
+  'competition_locked', 'competition_closed', 'not_countable', 'already_awarded', 'winner_exists', 'unresolved_risk'];
 const inputCls = 'input';
 
 function blankForm(): Form {
@@ -37,6 +45,7 @@ export default function AdminCompetition() {
   const [board, setBoard] = useState<LeaderRow[]>([]);
   const [form, setForm] = useState<Form>(blankForm);
   const [reason, setReason] = useState('');
+  const [check, setCheck] = useState<WinnerCheck | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState({ error: '', ok: '' });
 
@@ -45,6 +54,13 @@ export default function AdminCompetition() {
     const list = (c.data ?? []) as Comp[];
     setComps(list);
     setRefs((r.data ?? []) as RefRow[]);
+    // a finished competition waits for the final winner verification: fresh server-side check of risk + winner every time
+    const pendingOne = list.find((x) => x.status === 'pending_verification');
+    if (pendingOne) {
+      await supabase.rpc('admin_refresh_competition_winner', { p_id: pendingOne.id });
+      const ck = await supabase.rpc('admin_competition_winner_check', { p_id: pendingOne.id });
+      setCheck((ck.data ?? null) as WinnerCheck | null);
+    } else setCheck(null);
     const liveOne = list.find((x) => x.status === 'active' || x.status === 'paused');
     if (liveOne) {
       const lb = await supabase.rpc('get_shop_competition_leaderboard', { p_competition_id: liveOne.id, p_limit: 20 });
@@ -82,18 +98,66 @@ export default function AdminCompetition() {
     void run(() => supabase.rpc('admin_set_shop_competition_status', { p_id: c.id, p_action: action }));
   }
 
+  async function award(c: Comp) {
+    if (busy) return;
+    if (!window.confirm(t('sa.confirmAward', { amt: rupees(check?.reward_amount_inr ?? c.reward_amount_inr) }))) return;
+    setBusy(true); setMsg({ error: '', ok: '' });
+    const { data, error } = await supabase.rpc('admin_award_competition_reward', { p_competition_id: c.id, p_note: null });
+    setBusy(false);
+    if (error) {
+      console.error(error);
+      const k = KNOWN_ERRORS.find((e) => error.message.includes(e));
+      setMsg({ error: t(k ? `sa.err.${k}` : 'err.generic'), ok: '' });
+    } else {
+      const res = (data ?? {}) as { awarded?: boolean; reason?: string };
+      setMsg(res.awarded ? { error: '', ok: t('sa.awarded') } : { error: t(`sa.award.${res.reason ?? 'generic'}`), ok: '' });
+    }
+    await load();
+  }
+
   function edit(c: Comp) {
     setForm({ id: c.id, title: c.title, desc: c.description ?? '', start: isoToLocalInput(c.starts_at), end: isoToLocalInput(c.ends_at), prize: String(c.reward_amount_inr) });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const label = (s: Comp['status']) => t(s === 'draft' ? 'sa.draft' : s === 'active' ? 'sc.live' : s === 'paused' ? 'sc.paused' : 'sc.ended');
+  const label = (s: Comp['status']) => t(s === 'draft' ? 'sa.draft' : s === 'active' ? 'sc.live' : s === 'paused' ? 'sc.paused' : s === 'pending_verification' ? 'sa.pending' : 'sc.ended');
+  const pendingComp = comps.find((x) => x.status === 'pending_verification');
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
       <Link to="/admin" className="text-sm btn-text">← {t('dash.admin')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('sa.title')}</h1>
       <Msg error={msg.error} ok={msg.ok} />
+      <Link to="/admin/competition/fraud" className="card block font-medium">🛡️ {t('fr.title')}</Link>
+
+      {pendingComp && check && (
+        <Section title={t('sa.verifyTitle')}>
+          <p className="text-sm text-ink/70">{t('sa.verifyHelp')}</p>
+          {check.has_winner ? (
+            <>
+              <div className="flex items-center gap-3"><RankBadge rank={1} size={56} /><div><p className="font-semibold">{t('sa.verifyWinner', { name: check.winner_business_name ?? '—', n: check.winner_referrals ?? 0 })}</p><p className="text-xs text-ink/70">{t('sa.verifyAmount', { amt: rupees(check.reward_amount_inr) })}</p></div></div>
+              {check.unresolved_risk > 0 && (
+                <p role="alert" className="rounded-xl bg-amber-100 p-3 text-sm text-amber-900">{t('sa.unresolved', { n: check.unresolved_risk })} <Link to="/admin/competition/fraud" className="btn-text underline">{t('sa.openFraud')}</Link></p>
+              )}
+              <ul className="space-y-2">
+                {check.referrals.map((v) => (
+                  <li key={v.id} className="flex items-center justify-between gap-2 rounded-xl border border-ink/10 p-2 text-sm">
+                    <span className="min-w-0 flex-1"><span className="block truncate font-medium">{v.business_name}</span>{v.phone && <span className="text-xs text-ink/70">{v.phone}</span>}</span>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${v.verified ? 'bg-green-100 text-green-900' : 'bg-ink/10 text-ink/70'}`}>{v.verified ? t('sa.verified') : t('sa.notVerified')}</span>
+                    <button className={v.verified ? 'btn-secondary' : 'btn-solid'} disabled={busy} onClick={() => void run(() => supabase.rpc('admin_verify_winner_referral', { p_referral_id: v.id, p_verified: !v.verified }))}>{v.verified ? t('sa.unverify') : t('sa.verify')}</button>
+                  </li>
+                ))}
+              </ul>
+              <button className="btn-primary w-full" disabled={busy || !check.can_award} onClick={() => void award(pendingComp)}>{t('sa.awardBtn')}</button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm">{t('sa.noWinnerYet')}</p>
+              <button className="btn-secondary w-full" disabled={busy || check.unresolved_risk > 0} onClick={() => void run(() => supabase.rpc('admin_close_competition_without_winner', { p_id: pendingComp.id, p_note: null }))}>{t('sa.closeNoWinner')}</button>
+            </>
+          )}
+        </Section>
+      )}
 
       <Section title={form.id ? t('sa.formEdit') : t('sa.formNew')}>
         <Field id="ct" label={t('sa.fTitle')} value={form.title} onChange={(v) => setForm({ ...form, title: v })} disabled={busy} />
@@ -134,7 +198,7 @@ export default function AdminCompetition() {
                 {c.status === 'active' && <button className="btn-secondary" disabled={busy} onClick={() => act(c, 'pause')}>{t('sa.btnPause')}</button>}
                 {c.status === 'paused' && <button className="btn-solid" disabled={busy} onClick={() => act(c, 'resume')}>{t('sa.btnResume')}</button>}
                 {(c.status === 'active' || c.status === 'paused') && <button className="btn-secondary" disabled={busy} onClick={() => act(c, 'end')}>{t('sa.btnEnd')}</button>}
-                {c.status !== 'ended' && <button className="btn-secondary" disabled={busy} onClick={() => edit(c)}>{t('sa.btnEdit')}</button>}
+                {c.status !== 'ended' && c.status !== 'pending_verification' && <button className="btn-secondary" disabled={busy} onClick={() => edit(c)}>{t('sa.btnEdit')}</button>}
                 {c.status === 'draft' && <button className="btn-secondary" disabled={busy} onClick={() => act(c, 'delete')}>{t('sa.btnDelete')}</button>}
               </div>
             </li>
@@ -146,7 +210,7 @@ export default function AdminCompetition() {
         <Section title={t('sa.standings')}>
           <ol className="divide-y divide-ink/10 text-sm">
             {board.map((r) => (
-              <li key={r.rank} className="flex items-center gap-3 py-2"><span className="w-10">#{r.rank}</span><span className="min-w-0 flex-1 truncate">{r.business_name}</span><span className="font-semibold">{r.referrals}</span></li>
+              <li key={r.rank} className="flex items-center gap-3 py-2"><span className="flex w-12 items-center"><RankBadge rank={r.rank} size={34} /></span><span className="min-w-0 flex-1 truncate">{r.business_name}</span><span className="font-semibold">{r.referrals}</span></li>
             ))}
           </ol>
         </Section>
@@ -161,7 +225,7 @@ export default function AdminCompetition() {
             <li key={r.id} className="space-y-2 rounded-xl border border-ink/10 p-3 text-sm">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium">{r.business_name ?? t('sa.noBusiness')}</span>
-                <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{r.status === 'qualified' ? t(r.competition_id ? 'sc.state.counted' : 'sc.state.valid') : t(`sc.state.${r.status}`)}</span>
+                <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{r.status === 'qualified' ? (r.risk_status === 'suspicious' || r.risk_status === 'in_review' ? t(`fr.risk.${r.risk_status}`) : t(r.competition_id ? 'sc.state.counted' : 'sc.state.valid')) : t(`sc.state.${r.status}`)}</span>
               </div>
               <p className="text-xs text-ink/70">{t('sa.owner')}: {r.referred_owner_name ?? '—'} · {t('sa.referredBy', { name: r.referrer_business ?? '—' })} · {fmtDateTime(r.created_at, lang)}</p>
               {r.business_phone && <p className="text-xs">{r.business_phone}</p>}
