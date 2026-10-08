@@ -64,3 +64,5 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 - (0032 Refer-a-Customer competition: run before 0033)
 - (0033 NEW, not run yet: Refer-a-Customer fraud protection, freeze + winner confirmation + audit log)
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)
+
+- (0034 NEW, not run yet: service_images table, up to 3 photos per service)
