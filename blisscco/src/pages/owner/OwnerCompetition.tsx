@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import RankBadge from '../../components/RankBadge';
 import { Msg, Section } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { fmtDateTime, rupees } from '../../lib/format';
@@ -8,7 +9,7 @@ import { supabase } from '../../lib/supabase';
 
 interface MyRef {
   id: string; status: 'pending' | 'qualified' | 'rejected' | 'revoked'; created_at: string; business_name: string | null;
-  profile_complete: boolean; phone_verified: boolean; approved: boolean; counted: boolean; reject_reason: string | null;
+  profile_complete: boolean; phone_verified: boolean; approved: boolean; counted: boolean; under_review: boolean; reject_reason: string | null;
 }
 
 function Step({ ok, label }: { ok: boolean; label: string }) {
@@ -47,7 +48,7 @@ export default function OwnerCompetition() {
     if (cur) {
       const lb = await supabase.rpc('get_shop_competition_leaderboard', { p_competition_id: cur.id, p_limit: 20 });
       setRows((lb.data ?? []) as LeaderRow[]);
-      if (cur.can_participate && cur.status !== 'ended') {
+      if (cur.can_participate && (cur.status === 'active' || cur.status === 'paused')) {
         const c = await supabase.rpc('get_my_shop_referral_code');
         if (!c.error) setCode(c.data as string);
       }
@@ -69,12 +70,13 @@ export default function OwnerCompetition() {
   const startMs = ov ? new Date(ov.starts_at).getTime() : 0;
   const endMs = ov ? new Date(ov.ends_at).getTime() : 0;
   const upcoming = !!ov && ov.status === 'active' && server < startMs;
-  const stateLabel = !ov ? '' : ov.status === 'ended' ? t('sc.ended') : ov.status === 'paused' ? t('sc.paused') : upcoming ? t('sc.upcoming') : t('sc.live');
-  const countdown = !ov || ov.status === 'ended' ? '' : upcoming ? `${t('sc.startsIn')}: ${clock((startMs - server) / 1000)}`
+  const finished = !!ov && (ov.status === 'ended' || ov.status === 'pending_verification');
+  const stateLabel = !ov ? '' : ov.status === 'ended' ? t('sc.ended') : ov.status === 'pending_verification' ? t('sc.verifying') : ov.status === 'paused' ? t('sc.paused') : upcoming ? t('sc.upcoming') : t('sc.live');
+  const countdown = !ov || finished ? '' : upcoming ? `${t('sc.startsIn')}: ${clock((startMs - server) / 1000)}`
     : server >= endMs ? t('sc.timeUp') : `${t('sc.left')}: ${clock((endMs - server) / 1000)}`;
-  const live = !!ov && ov.status !== 'ended';
+  const live = !!ov && !finished;
 
-  const stateText = (r: MyRef) => (r.status === 'qualified' ? t(r.counted ? 'sc.state.counted' : 'sc.state.valid') : t(`sc.state.${r.status}`));
+  const stateText = (r: MyRef) => (r.under_review ? t('sc.state.under_review') : r.status === 'qualified' ? t(r.counted ? 'sc.state.counted' : 'sc.state.valid') : t(`sc.state.${r.status}`));
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
@@ -100,13 +102,15 @@ export default function OwnerCompetition() {
             {ov.status === 'paused' && <p role="status" className="rounded-xl bg-amber-100 p-3 text-sm text-amber-900">{t('sc.pausedNote')}</p>}
           </Section>
 
-          {ov.status === 'ended' && (
+          {finished && (
             <Section title={t('sc.winner')}>
-              {ov.i_won
-                ? <p className="font-medium text-green-800">{t('sc.youWon', { amt: rupees(ov.reward_amount_inr) })}</p>
-                : ov.winner_business_name
-                  ? <p>{t('sc.winnerLine', { name: ov.winner_business_name, n: ov.winner_referral_count ?? 0 })}</p>
-                  : <p>{t('sc.noWinner')}</p>}
+              {ov.status === 'pending_verification'
+                ? <p role="status" className="rounded-xl bg-amber-100 p-3 text-sm text-amber-900">{t('sc.verifyingNote')}</p>
+                : ov.i_won
+                  ? <div className="flex items-center gap-3"><RankBadge rank={1} size={72} /><p className="font-medium text-green-800">{t('sc.youWon', { amt: rupees(ov.reward_amount_inr) })}</p></div>
+                  : ov.winner_business_name
+                    ? <div className="flex items-center gap-3"><RankBadge rank={1} size={56} /><p>{t('sc.winnerLine', { name: ov.winner_business_name, n: ov.winner_referral_count ?? 0 })}</p></div>
+                    : <p>{t('sc.noWinner')}</p>}
             </Section>
           )}
 
@@ -119,10 +123,10 @@ export default function OwnerCompetition() {
             {rows.length === 0 && <p className="text-sm text-ink/70">{t('sc.noEntries')}</p>}
             {rows.length > 0 && (
               <ol className="divide-y divide-ink/10 text-sm">
-                <li className="flex items-center gap-3 py-2 text-xs font-semibold text-ink/60"><span className="w-10">{t('sc.rank')}</span><span className="flex-1">{t('sc.shop')}</span><span>{t('sc.referrals')}</span></li>
+                <li className="flex items-center gap-3 py-2 text-xs font-semibold text-ink/60"><span className="w-12">{t('sc.rank')}</span><span className="flex-1">{t('sc.shop')}</span><span>{t('sc.referrals')}</span></li>
                 {rows.map((r) => (
                   <li key={r.rank} className={`flex items-center gap-3 py-2 ${r.is_me ? 'rounded-xl bg-blush/20 px-2 font-semibold' : ''}`}>
-                    <span className="w-10">{r.rank === 1 ? '🥇' : r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : `#${r.rank}`}</span>
+                    <span className="flex w-12 items-center"><RankBadge rank={r.rank} size={34} /></span>
                     <span className="min-w-0 flex-1 truncate">{r.business_name}{r.is_me ? ` (${t('sc.you')})` : ''}</span>
                     <span>{r.referrals}</span>
                   </li>
@@ -148,7 +152,7 @@ export default function OwnerCompetition() {
               )}
               <p className="text-sm font-semibold">{t('sc.rulesTitle')}:</p>
               <ol className="list-decimal space-y-1 pl-5 text-sm text-ink/80">
-                <li>{t('sc.rule1')}</li><li>{t('sc.rule2')}</li><li>{t('sc.rule3')}</li><li>{t('sc.rule4')}</li>
+                <li>{t('sc.rule1')}</li><li>{t('sc.rule2')}</li><li>{t('sc.rule3')}</li><li>{t('sc.rule4')}</li><li>{t('sc.rule5')}</li>
               </ol>
             </Section>
           )}
