@@ -60,4 +60,5 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 - (0028 done: photos editable on a live listing)
 - (0029 done: admin custom push notification)
 - (0030 done: Refer-a-Shop Competition + Business Growth Credit wallet)
+- (0031 NEW, not run yet: Refer-a-Shop fraud protection + winner verification)
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)
