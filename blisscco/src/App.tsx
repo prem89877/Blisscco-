@@ -46,6 +46,8 @@ import OwnerReviews from './pages/owner/OwnerReviews';
 import Refer from './pages/Refer';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
 import Privacy from './pages/Privacy';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import PostLogin from './pages/PostLogin';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
@@ -111,6 +113,8 @@ export default function App() {
         <Route path="/admin/customer-competition" element={admin(<AdminCustomerCompetition />)} />
         <Route path="/admin/customer-competition/fraud" element={admin(<AdminCustomerFraudReview />)} />
         <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
+        <Route path="/profile" element={anyUser(<Profile />)} />
+        <Route path="/settings" element={anyUser(<Settings />)} />
         <Route path="/notifications" element={anyUser(<Notifications />)} />
         <Route path="/notifications/settings" element={anyUser(<NotificationSettings />)} />
         <Route path="/admin" element={admin(<AdminHome />)} />
