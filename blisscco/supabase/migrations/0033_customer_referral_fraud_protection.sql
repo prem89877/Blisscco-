@@ -34,6 +34,12 @@ language sql immutable set search_path = '' as $$
   select nullif(right(regexp_replace(coalesce(p, ''), '[^0-9]', '', 'g'), 10), '');
 $$;
 
+-- customers have no phone on their profile (dropped in 0021); the only phone is the one on the sign-in account (auth.users.phone), when they use one
+create or replace function public.customer_phone_key(p_user uuid) returns text
+language sql stable security definer set search_path = '' as $$
+  select public.phone_key(u.phone) from auth.users u where u.id = p_user;
+$$;
+
 create or replace function public.shop_hash(p text) returns text
 language sql immutable set search_path = '' as $$
   select case when nullif(trim(coalesce(p, '')), '') is null then null
@@ -408,7 +414,7 @@ begin
   if n >= 2 then sig := sig || jsonb_build_object('code', 'booking_churn', 'weight', 20, 'count', n); score := score + 20; end if;
 
   -- made-up looking phone number
-  v_pkey := public.phone_key(pr.phone);
+  v_pkey := public.customer_phone_key(x.referred_id);
   if v_pkey is not null and (v_pkey ~ '^(\d)\1{7,}$' or v_pkey in ('1234567890', '0123456789', '9876543210', '0987654321')) then
     sig := sig || jsonb_build_object('code', 'sequential_phone', 'weight', 30); score := score + 30;
   end if;
@@ -479,7 +485,7 @@ begin
     select public.normalize_email(u.email) into v_me_mail from auth.users u where u.id = me.id;
     select public.normalize_email(u.email) into v_ref_mail from auth.users u where u.id = v_ref;
     if v_me_mail is not null and v_me_mail = v_ref_mail then v_out := 'self_referral';
-    elsif public.phone_key(me.phone) is not null and public.phone_key(me.phone) = public.phone_key(rp.phone) then v_out := 'self_referral';
+    elsif public.customer_phone_key(me.id) is not null and public.customer_phone_key(me.id) = public.customer_phone_key(v_ref) then v_out := 'self_referral';
     else
       begin
         insert into public.referrals (referrer_id, referred_id, code) values (v_ref, me.id, v_code);
@@ -527,7 +533,7 @@ begin
   if not found or pr.is_suspended or pr.role <> 'customer' or not pr.email_verified then return; end if;   -- may be fixed later: wait
   select public.normalize_email(u.email) into v_email from auth.users u where u.id = p_referred and u.email_confirmed_at is not null;
   if coalesce(v_email, '') = '' then return; end if;
-  v_pkey := public.phone_key(pr.phone);
+  v_pkey := public.customer_phone_key(p_referred);
 
   select * into rr from public.profiles where id = r.referrer_id;
   if not found or rr.is_suspended or rr.role <> 'customer' then
@@ -539,7 +545,7 @@ begin
   select public.normalize_email(u.email) into v_ref_email from auth.users u where u.id = r.referrer_id;
 
   -- 1. the referrer referring their own account (same e-mail identity, or same phone number)
-  if (v_ref_email is not null and v_ref_email = v_email) or (v_pkey is not null and v_pkey = public.phone_key(rr.phone)) then
+  if (v_ref_email is not null and v_ref_email = v_email) or (v_pkey is not null and v_pkey = public.customer_phone_key(r.referrer_id)) then
     perform public.customer_comp_auto_reject(c.id, r.id, r.referrer_id, p_referred, 'self_referral');
     return;
   end if;
@@ -549,7 +555,7 @@ begin
     return;
   end if;
   -- 3. the referred phone number already belonged to another account that was created earlier
-  if v_pkey is not null and exists (select 1 from public.profiles o where o.id <> p_referred and public.phone_key(o.phone) = v_pkey and o.created_at < pr.created_at) then
+  if v_pkey is not null and exists (select 1 from auth.users o join public.profiles op on op.id = o.id where o.id <> p_referred and public.phone_key(o.phone) = v_pkey and op.created_at < pr.created_at) then
     perform public.customer_comp_auto_reject(c.id, r.id, r.referrer_id, p_referred, 'phone_already_registered', null, v_pkey);
     return;
   end if;
@@ -863,7 +869,7 @@ begin
     if not found or v_pr.is_suspended or v_pr.role <> 'customer' or not v_pr.email_verified then raise exception 'account_not_eligible'; end if;
     select public.normalize_email(u.email) into v_email from auth.users u where u.id = x.referred_id and u.email_confirmed_at is not null;
     if coalesce(v_email, '') = '' then raise exception 'account_not_eligible'; end if;
-    v_pkey := public.phone_key(v_pr.phone);
+    v_pkey := public.customer_phone_key(x.referred_id);
     -- the genuine activity must exist (the old booking if still valid, else another valid one) - restoring never skips eligibility
     if x.qualifying_booking_id is not null and public.customer_comp_booking_valid(x.qualifying_booking_id, x.competition_id, x.referrer_id, x.referred_id) then
       v_bk := x.qualifying_booking_id;
@@ -1073,7 +1079,7 @@ revoke execute on function
   public.forbid_row_change(), public.shop_hash(text), public.shop_request_ip_hash(),
   public.log_customer_comp_event(text, uuid, uuid, text, text, text, uuid, text, jsonb),
   public.customer_comp_referrals_guard(), public.customer_competitions_lock_guard(), public.promo_grant_guard(),
-  public.customer_comp_booking_valid(uuid, uuid, uuid, uuid), public.customer_comp_find_booking(uuid, uuid, uuid),
+  public.customer_phone_key(uuid), public.customer_comp_booking_valid(uuid, uuid, uuid, uuid), public.customer_comp_find_booking(uuid, uuid, uuid),
   public.customer_comp_countable(uuid, uuid), public.customer_comp_row_countable(uuid), public.customer_comp_ranking(uuid),
   public.evaluate_customer_referral_risk(uuid), public.reevaluate_referrer_customer_referrals(uuid),
   public.customer_comp_auto_reject(uuid, uuid, uuid, uuid, text, text, text), public.try_qualify_customer_comp_referral(uuid),
