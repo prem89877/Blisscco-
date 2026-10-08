@@ -82,6 +82,7 @@ export default function Layout() {
 
       <footer className="border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70">
         {profile?.role === 'customer' && <Link to="/refer" className="mr-3 btn-text">{t('ref.title')}</Link>}
+        {profile?.role === 'customer' && <Link to="/refer/competition" className="mr-3 btn-text">{t('cc.title')}</Link>}
         {profile?.role === 'owner' && <Link to="/owner/competition" className="mr-3 btn-text">{t('sc.title')}</Link>}
         {session && <Link to="/my-bookings" className="mr-3 btn-text">{t('my.title')}</Link>}
         <Link to="/owner/register" className="btn-text">{t('nav.forBusiness')}</Link>
