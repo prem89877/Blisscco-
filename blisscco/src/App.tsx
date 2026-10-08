@@ -5,6 +5,7 @@ import Seo from './components/Seo';
 import RequireRole from './components/RequireRole';
 import AdminAudit from './pages/admin/AdminAudit';
 import AdminCompetition from './pages/admin/AdminCompetition';
+import AdminFraudReview from './pages/admin/AdminFraudReview';
 import AdminDisputes from './pages/admin/AdminDisputes';
 import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminReports from './pages/admin/AdminReports';
@@ -102,6 +103,7 @@ export default function App() {
         <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
         <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />
         <Route path="/admin/competition" element={admin(<AdminCompetition />)} />
+        <Route path="/admin/competition/fraud" element={admin(<AdminFraudReview />)} />
         <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
         <Route path="/notifications" element={anyUser(<Notifications />)} />
         <Route path="/notifications/settings" element={anyUser(<NotificationSettings />)} />
