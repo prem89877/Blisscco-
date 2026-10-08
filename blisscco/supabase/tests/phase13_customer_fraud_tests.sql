@@ -27,8 +27,11 @@ begin
   update public.profiles set created_at = now() - interval '3 days'  where id = c4;     -- the OLDER account that owns the phone used by c5
   update public.profiles set created_at = now() - interval '8 hours'  where id = c5;
   update public.profiles set created_at = now() - interval '10 hours' where id in (c6, c7);   -- same moment: the duplicate-phone rule (not the older-phone rule) must refuse c7
-  update public.profiles set phone = '9123456780' where id in (c4, c5);
-  update public.profiles set phone = '9988776655' where id in (c6, c7);
+  -- same number written two ways (auth.users.phone must be unique as text; the check compares the last 10 digits)
+  update auth.users set phone = '919123456780' where id = c4;
+  update auth.users set phone = '9123456780' where id = c5;
+  update auth.users set phone = '919988776655' where id = c6;
+  update auth.users set phone = '9988776655' where id = c7;
 
   select id into cat from public.business_categories limit 1;
   insert into public.businesses (owner_id, category_id, name, phone, latitude, longitude, status) values (o1, cat, 'T33 Shop A', '9876500001', 18.5, 73.8, 'approved') returning id into sa;
