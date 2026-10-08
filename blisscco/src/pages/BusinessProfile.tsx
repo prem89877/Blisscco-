@@ -14,7 +14,7 @@ import { getStoredRef } from '../lib/referral';
 import { dowOf, hhmm, hoursRange, istToday, rupees } from '../lib/format';
 import { signedUrlMap } from '../lib/storage';
 import { supabase } from '../lib/supabase';
-import type { BizImage, Hour, Service } from '../lib/types';
+import type { BizImage, Hour, Service, ServiceImage } from '../lib/types';
 
 interface Pub {
   id: string; name: string; category_name_en: string; category_name_hi: string | null; category_name_mr: string | null;
@@ -52,6 +52,7 @@ export default function BusinessProfile() {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [hours, setHours] = useState<Hour[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [svcImgUrls, setSvcImgUrls] = useState<Record<string, string[]>>({});
   const [rvKey, setRvKey] = useState(0);
   const [imgsReady, setImgsReady] = useState(false);
   const [loaded, setLoaded] = useState<Record<string, boolean>>({});
@@ -73,14 +74,24 @@ export default function BusinessProfile() {
         .then(({ data }) => { if (alive && data) setRating(data as { avg_rating: number; review_count: number }); });
       void supabase.from('public_business_flags').select('is_verified').eq('business_id', id).maybeSingle()
         .then(({ data }) => { if (alive && data) setFlags(data as { is_verified: boolean }); });
-      const [i, h, s] = await Promise.all([
+      const [i, h, s, si] = await Promise.all([
         supabase.from('business_images').select('*').eq('business_id', id).order('sort_order'),
         supabase.from('business_hours').select('*').eq('business_id', id).order('day_of_week'),
         supabase.from('services').select('*').eq('business_id', id).eq('is_active', true).order('price_inr'),
+        supabase.from('service_images').select('*').eq('business_id', id).order('sort_order'),
       ]);
       if (!alive) return;
       const imgs = (i.data ?? []) as BizImage[];
       setImages(imgs); setHours((h.data ?? []) as Hour[]); setServices((s.data ?? []) as Service[]);
+      const sImgs = (si.data ?? []) as ServiceImage[];
+      if (sImgs.length > 0) {
+        void signedUrlMap(sImgs.map((x) => x.storage_path)).then((sm) => {
+          if (!alive) return;
+          const g: Record<string, string[]> = {};
+          sImgs.forEach((x) => { if (sm[x.storage_path]) (g[x.service_id] ??= []).push(sm[x.storage_path]); });
+          setSvcImgUrls(g);
+        });
+      }
       if (imgs.length === 0) { setImgsReady(true); return; }
       const m = await signedUrlMap(imgs.map((x) => x.storage_path));
       if (alive) { setUrls(m); setImgsReady(true); }
@@ -205,6 +216,11 @@ export default function BusinessProfile() {
                 <p className="truncate text-sm font-medium">{s.name || s.service_category}</p>
                 <p className="text-base font-semibold" style={{ color: '#2D2A2E' }}>{rupees(s.price_inr)}</p>
                 {s.duration_minutes ? <p className="text-xs text-ink/60">{s.duration_minutes} min</p> : null}
+                {svcImgUrls[s.id]?.length ? (
+                  <div className="mt-2 flex gap-1.5">
+                    {svcImgUrls[s.id].map((u) => <img key={u} src={u} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" />)}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
