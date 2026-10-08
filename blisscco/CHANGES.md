@@ -1,3 +1,37 @@
+# Blisscco update: Refer-a-Shop Competition
+
+## What it does
+- **Admin controls everything** (Admin dashboard > Refer-a-Shop Competition): create a competition with title, description, **start / end date-time (India time)** and **prize amount in Rs**; quick buttons 7 / 15 / 30 days; then **Start, Pause, Resume, End and declare winner**, Edit, Delete draft. Only one competition can be live at a time. Nothing is hard-coded: dates, prize, counts, winner and reward are all stored in Supabase, so any number of future competitions can be created.
+- **Owners** (Business dashboard > Refer-a-Shop Competition, also a footer link): see the prize, start / end date, a live **countdown**, the **leaderboard** (rank, shop name, successful referrals), **their own rank**, their referral code / link (WhatsApp, Share, Copy), each referral with its 3 progress steps, and their **Business Growth Credit** balance.
+- A referral **counts only when all 4 are true**: (1) the business owner signed up through the referrer's link, (2) the business profile is complete, (3) its phone number is verified, (4) Blisscco admin approved the business. Only approved, eligible referrals are on the leaderboard. A business that is later suspended / rejected drops off the board.
+- Extra safety: a phone number can count only once; the referred phone cannot be the referrer's own; only owners with an approved shop get a referral link; the referral is attributed once and cannot be changed (account must be less than 7 days old).
+- **Winner** = most valid referrals (tie: whoever reached that count first). When admin presses End (or the end time passes: automatic check every 5 minutes) the winner is stored and **Rs prize is added as "Business Growth Credit"** (promotional wallet ledger, once only). It is NOT cash: there is no withdraw option.
+- Pause: while paused, referrals that become valid are not counted for the competition.
+- A referral counts for the competition that is active at the moment its 4th step is completed.
+
+## Phone verification (important)
+Phone OTP was removed from the project in migration 0021, so there is no SMS provider. The phone check is therefore done by admin: in **Referral checks** (admin competition page) press **Mark phone verified** after confirming the number (for example by calling it). Changing a business phone number removes the verification automatically. If you add an SMS-OTP provider later, set `businesses.phone_verified_at` from your server after a successful OTP and nothing else needs to change.
+
+## Credit usage
+The wallet balance, ledger and a server-side function `spend_growth_credit(owner, amount, note)` (service role only, never below zero) are in place. Using the credit at the checkout of a banner / plan / campaign is a separate step and is not wired yet.
+
+## Setup
+- Run `supabase/migrations/0030_refer_a_shop_competition.sql` BEFORE deploying (safe to re-run). No new package, no new environment variable. pg_cron is optional (only for automatic ending).
+- Share link format: `https://YOUR-SITE/owner/register?sref=CODE` (separate from the customer `?ref=` link).
+
+## Changed files
+- src/App.tsx, src/main.tsx, src/components/Layout.tsx
+- src/pages/admin/AdminHome.tsx, src/pages/owner/OwnerDashboard.tsx
+- src/i18n/messages.ts (new p23 block, EN / HI / MR)
+- supabase/RUN_LOG.md, CHANGES.md
+
+## New files
+- supabase/migrations/0030_refer_a_shop_competition.sql
+- src/lib/shopReferral.ts
+- src/pages/owner/OwnerCompetition.tsx, src/pages/admin/AdminCompetition.tsx
+
+---
+
 # Blisscco update: QR Rs 100, simple add-business steps, Edit profile, tutorial
 
 ## What changes
