@@ -9,9 +9,11 @@ import { I18nProvider } from './i18n';
 import './lib/installPrompt';
 import { registerServiceWorker } from './lib/push';
 import { captureRefFromUrl } from './lib/referral';
+import { captureShopRefFromUrl } from './lib/shopReferral';
 import './index.css';
 
 captureRefFromUrl();
+captureShopRefFromUrl();
 registerServiceWorker();
 
 createRoot(document.getElementById('root') as HTMLElement).render(
