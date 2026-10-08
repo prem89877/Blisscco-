@@ -1,3 +1,27 @@
+# Blisscco update: 3 photos per service (Add business + Edit business)
+
+## What it does
+- Every service can now have **up to 3 optional photos**.
+- **Add business** (Services step) and **Edit business** (live shop page) use the same Services section: while adding a new service you can pick up to 3 photos, and for any saved service you can **Add photo / Change / Remove** (max 3, enforced in the database too).
+- The public shop page shows the service photos as small thumbnails inside each service card.
+- Photos are optional; the "at least 3 shop photos" rule is unchanged.
+
+## Setup
+- Run `supabase/migrations/0034_service_images.sql` BEFORE deploying (safe to re-run). No new package, no new environment variable. Photos use the existing private `business-images` bucket.
+
+## Changed files
+- src/components/editor/ServicesSection.tsx
+- src/pages/owner/BusinessEditor.tsx
+- src/pages/BusinessProfile.tsx
+- src/lib/types.ts
+- src/i18n/messages.ts (new ed.svcPhoto* keys, EN / HI / MR)
+- supabase/RUN_LOG.md, CHANGES.md
+
+## New files
+- supabase/migrations/0034_service_images.sql
+
+---
+
 # Blisscco update: Refer-a-Shop Competition
 
 ## What it does
