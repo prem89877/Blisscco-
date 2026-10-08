@@ -11,7 +11,7 @@ import { StatusBadge } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { checkIndiaCoords, validateAddress } from '../../lib/india';
 import { supabase } from '../../lib/supabase';
-import type { BizImage, Business, Category, Hour, Loaded, Service } from '../../lib/types';
+import type { BizImage, Business, Category, Hour, Loaded, Service, ServiceImage } from '../../lib/types';
 
 const STEPS = ['basic', 'contact', 'photos', 'hours', 'services', 'submit'] as const;
 type Step = (typeof STEPS)[number];
@@ -40,17 +40,19 @@ export default function BusinessEditor() {
 
   const load = useCallback(async () => {
     if (!id) { setMissing(true); return; }
-    const [b, c, i, h, s] = await Promise.all([
+    const [b, c, i, h, s, si] = await Promise.all([
       supabase.from('businesses').select('*').eq('id', id).maybeSingle(),
       supabase.from('business_categories').select('*').eq('is_active', true).order('sort_order'),
       supabase.from('business_images').select('*').eq('business_id', id).order('sort_order'),
       supabase.from('business_hours').select('*').eq('business_id', id),
       supabase.from('services').select('*').eq('business_id', id).order('created_at'),
+      supabase.from('service_images').select('*').eq('business_id', id).order('sort_order'),
     ]);
     if (b.error || !b.data) { setMissing(true); return; }
     setData({
       business: b.data as Business, categories: (c.data ?? []) as Category[], images: (i.data ?? []) as BizImage[],
       hours: (h.data ?? []) as Hour[], services: (s.data ?? []) as Service[],
+      serviceImages: (si.data ?? []) as ServiceImage[],
     });
   }, [id]);
   useEffect(() => { void load(); }, [load]);
