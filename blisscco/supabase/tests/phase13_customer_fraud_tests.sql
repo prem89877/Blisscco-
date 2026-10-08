@@ -140,12 +140,16 @@ begin
   perform public.admin_review_customer_referral(x6, 'fraud', 'same device and network as the referrer');
   select status, review_status into st, rs from public.customer_comp_referrals where id = x6;
   if st <> 'rejected' or rs <> 'fraudulent' then raise exception 'TEST FAIL: fraud decision (% / %)', st, rs; end if;
+  reset role;
   select referrals into n from public.customer_comp_ranking(comp) where referrer_id = ref;
+  perform set_config('request.jwt.claims', json_build_object('sub', adm, 'role', 'authenticated')::text, true); set local role authenticated;
   if n <> 1 then raise exception 'TEST FAIL: fraudulent referral still counts (%)', n; end if;
   perform public.admin_review_customer_referral(x6, 'restore', 'checked by phone: genuine customer');
   select status, review_status into st, rs from public.customer_comp_referrals where id = x6;
   if st <> 'qualified' or rs <> 'approved' then raise exception 'TEST FAIL: restore (% / %)', st, rs; end if;
+  reset role;
   select referrals into n from public.customer_comp_ranking(comp) where referrer_id = ref;
+  perform set_config('request.jwt.claims', json_build_object('sub', adm, 'role', 'authenticated')::text, true); set local role authenticated;
   if n <> 2 then raise exception 'TEST FAIL: restored referral does not count (%)', n; end if;
   reset role;
   perform public.evaluate_customer_referral_risk(x6);               -- the system never overwrites an admin decision
