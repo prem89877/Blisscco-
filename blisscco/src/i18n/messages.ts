@@ -37,6 +37,8 @@ const en: Record<string, string> = {
   'ed.required': 'Please fill in: {field}', 'ed.needPhotos': 'Add at least 3 photos before you continue.',
   'ed.needHours': 'Keep at least one day open before you continue.', 'ed.needService': 'Add at least one service with its price before you continue.',
   'ed.finishFirst': 'Please complete the current step first.',
+  'bn.bookings': 'My bookings', 'bn.refer': 'Refer & earn', 'bn.settings': 'Settings', 'bn.help': 'Help & support', 'bn.profile': 'Profile',
+  'prof.name': 'Name', 'prof.email': 'Email', 'prof.role': 'Account type', 'prof.role.customer': 'Customer', 'prof.role.owner': 'Business owner', 'prof.role.admin': 'Admin', 'set.notifications': 'Notification settings',
 };
 
 const hi: Record<string, string> = {
@@ -71,6 +73,8 @@ const hi: Record<string, string> = {
   'ed.required': 'कृपया भरें: {field}', 'ed.needPhotos': 'आगे बढ़ने से पहले कम से कम 3 फ़ोटो जोड़ें।',
   'ed.needHours': 'आगे बढ़ने से पहले कम से कम एक दिन खुला रखें।', 'ed.needService': 'आगे बढ़ने से पहले कीमत के साथ कम से कम एक सेवा जोड़ें।',
   'ed.finishFirst': 'कृपया पहले मौजूदा स्टेप पूरा करें।',
+  'bn.bookings': 'मेरी बुकिंग', 'bn.refer': 'रेफ़र करें', 'bn.settings': 'सेटिंग्स', 'bn.help': 'मदद', 'bn.profile': 'प्रोफ़ाइल',
+  'prof.name': 'नाम', 'prof.email': 'ईमेल', 'prof.role': 'खाते का प्रकार', 'prof.role.customer': 'ग्राहक', 'prof.role.owner': 'व्यवसाय मालिक', 'prof.role.admin': 'एडमिन', 'set.notifications': 'नोटिफ़िकेशन सेटिंग्स',
 };
 
 const mr: Record<string, string> = {
@@ -105,6 +109,8 @@ const mr: Record<string, string> = {
   'ed.required': 'कृपया भरा: {field}', 'ed.needPhotos': 'पुढे जाण्यापूर्वी किमान 3 फोटो जोडा.',
   'ed.needHours': 'पुढे जाण्यापूर्वी किमान एक दिवस उघडा ठेवा.', 'ed.needService': 'पुढे जाण्यापूर्वी किंमतीसह किमान एक सेवा जोडा.',
   'ed.finishFirst': 'कृपया आधी सध्याचा टप्पा पूर्ण करा.',
+  'bn.bookings': 'माझी बुकिंग', 'bn.refer': 'रेफर करा', 'bn.settings': 'सेटिंग्ज', 'bn.help': 'मदत', 'bn.profile': 'प्रोफाइल',
+  'prof.name': 'नाव', 'prof.email': 'ईमेल', 'prof.role': 'खात्याचा प्रकार', 'prof.role.customer': 'ग्राहक', 'prof.role.owner': 'व्यवसाय मालक', 'prof.role.admin': 'अ‍ॅडमिन', 'set.notifications': 'नोटिफिकेशन सेटिंग्ज',
 };
 
 type M = Record<string, string>;
