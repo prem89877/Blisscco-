@@ -12,6 +12,18 @@ export const isStandalone = (): boolean =>
 export const isIos = (): boolean =>
   /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+// Per-device, per-account memory (only this phone/browser): "user switched push off here" and "we already asked once".
+const optOutKey = (uid: string) => `bc_push_optout_${uid}`;
+const askedKey = (uid: string) => `bc_push_asked_${uid}`;
+const lsGet = (k: string): string | null => { try { return window.localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k: string, v: string) => { try { window.localStorage.setItem(k, v); } catch { /* storage blocked: ignore */ } };
+const lsDel = (k: string) => { try { window.localStorage.removeItem(k); } catch { /* ignore */ } };
+async function currentUid(): Promise<string | null> {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user.id ?? null;
+}
+let askListenerSet = false;
+
 export function pushSupport(): PushSupport {
   if (isIos() && !isStandalone()) return 'needs_install';     // iPhone/iPad only allow web push for an installed app
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'unsupported';
@@ -88,6 +100,8 @@ export async function enablePush(): Promise<EnableResult> {
   try {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') return 'denied';
+    const uid = await currentUid();
+    if (uid) lsDel(optOutKey(uid));                                   // switching on again (or auto-on) clears any earlier opt-out
     const reg = await getRegistration(true);
     if (!reg) return 'error';
     let sub = await reg.pushManager.getSubscription();
@@ -100,21 +114,49 @@ export async function enablePush(): Promise<EnableResult> {
   }
 }
 
-export async function disablePush(): Promise<void> {
+/** userChoice=true: the person pressed "turn off" on this device, so auto-enable must leave it off. Log-out passes nothing. */
+export async function disablePush(userChoice = false): Promise<void> {
+  if (userChoice) {
+    const uid = await currentUid();
+    if (uid) lsSet(optOutKey(uid), '1');
+  }
   const sub = await currentSubscription();
   if (!sub) return;
   await supabase.rpc('remove_push_subscription', { p_endpoint: sub.endpoint });
   await sub.unsubscribe().catch(() => false);
 }
 
-/** Called when the app opens for a logged-in user: renews a subscription this user already turned on (never turns one on). */
+/**
+ * Called when the app opens for a logged-in user. Push is ON BY DEFAULT:
+ * - notification permission already granted -> subscribes this device and saves it (no extra step in Settings);
+ * - permission not asked yet -> asks ONCE, on the person's first tap (phones require a tap for the permission pop-up);
+ * - the person switched push off on this device in Settings -> left alone;
+ * - permission blocked -> nothing to do.
+ */
 export async function syncPushSubscription(): Promise<void> {
-  const sub = await currentSubscription();
-  if (!sub || Notification.permission !== 'granted') return;
-  const { data } = await supabase.from('push_subscriptions').select('id').eq('endpoint', sub.endpoint).maybeSingle();
-  if (!data) return;                                          // another account's / never opted in here: leave it alone
-  if (sameKey(sub)) return;
-  await enablePush();                                         // VAPID key was rotated: re-subscribe quietly
+  if (pushSupport() !== 'ok') return;
+  const uid = await currentUid();
+  if (!uid) return;
+  if (lsGet(optOutKey(uid))) return;
+
+  if (Notification.permission === 'granted') {
+    const sub = await currentSubscription();
+    if (sub && sameKey(sub)) {
+      const { data } = await supabase.from('push_subscriptions').select('id').eq('endpoint', sub.endpoint).maybeSingle();
+      if (data) return;                                         // already subscribed and known to the server
+    }
+    await enablePush();                                         // new install / new account on this phone / rotated VAPID key
+    return;
+  }
+
+  if (Notification.permission === 'default' && !lsGet(askedKey(uid)) && !askListenerSet) {
+    askListenerSet = true;
+    window.addEventListener('pointerdown', () => {
+      askListenerSet = false;
+      lsSet(askedKey(uid), '1');
+      void enablePush().catch(() => undefined);
+    }, { once: true });
+  }
 }
 
 /** On log-out the device stops receiving this account's notifications (matters on shared phones). */
