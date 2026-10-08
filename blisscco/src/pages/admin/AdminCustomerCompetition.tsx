@@ -15,20 +15,20 @@ interface Comp {
   winner_name: string | null; winner_referral_count: number | null; reward_issued_at: string | null;
 }
 interface Standing { rank: number; full_name: string; referrals: number }
-interface RefRow {
-  id: string; status: 'qualified' | 'rejected'; review_status: 'clear' | 'in_review' | 'approved' | 'rejected'; qualified_at: string;
-  referrer_name: string; referred_name: string; business_name: string | null; booking_price: number | null; risk_flags: string[]; reject_reason: string | null; review_note: string | null;
-}
 interface WinnerCheck {
-  status: string; reward_amount_inr: number; has_winner: boolean; winner_name: string | null; winner_referrals: number | null;
-  unresolved_review: number; top: { rank: number; name: string; referrals: number }[]; already_issued: boolean; can_issue: boolean;
+  status: string; reward_amount_inr: number; already_issued: boolean; frozen_at: string | null; validated_at: string | null;
+  frozen_ranking: { pos: number; name: string; referrals: number }[];
+  has_winner: boolean; winner_id: string | null; winner_name: string | null; winner_referrals: number | null; winner_changed_since_freeze: boolean;
+  winner_referral_list: { id: string; referred_name: string; business_name: string | null; price: number | null; qualified_at: string; risk_status: string }[];
+  top: { rank: number; name: string; referrals: number }[]; unresolved_review: number; rejected_count: number; fraud_count: number; can_issue: boolean;
 }
+interface AuditRow { id: string; entity_type: string; action: string; from_state: string | null; to_state: string | null; note: string | null; actor_name: string | null; created_at: string }
 interface Shop { id: string; name: string; city: string | null }
 interface AdminBalance extends Omit<PromoBalance, 'id' | 'created_at'> { id: string; customer_name: string }
 interface Form { id: string | null; title: string; desc: string; start: string; end: string; prize: string; sponsor: string; rule: CcRule; min: string; days: string }
 
 const KNOWN_ERRORS = ['another_live', 'invalid_dates', 'ends_in_past', 'invalid_reward', 'already_ended', 'invalid_state', 'reason_required', 'invalid_sponsor', 'invalid_rule',
-  'competition_closed', 'already_awarded', 'unresolved_review', 'no_winner'];
+  'competition_closed', 'already_awarded', 'unresolved_review', 'no_winner', 'not_frozen', 'winner_required', 'competition_locked', 'winner_exists', 'winner_changed', 'winner_not_eligible'];
 
 function blankForm(): Form {
   const start = isoToLocalInput(new Date().toISOString());
@@ -42,8 +42,7 @@ export default function AdminCustomerCompetition() {
   const [form, setForm] = useState<Form>(blankForm);
   const [focus, setFocus] = useState<string | null>(null);     // competition whose standings / referrals are shown
   const [board, setBoard] = useState<Standing[]>([]);
-  const [refs, setRefs] = useState<RefRow[]>([]);
-  const [filter, setFilter] = useState<'all' | 'review' | 'counted' | 'rejected'>('review');
+  const [audit, setAudit] = useState<AuditRow[]>([]);
   const [note, setNote] = useState('');
   const [check, setCheck] = useState<WinnerCheck | null>(null);
   const [balances, setBalances] = useState<AdminBalance[]>([]);
@@ -66,19 +65,21 @@ export default function AdminCustomerCompetition() {
   useEffect(() => { void load(); }, [load]);
 
   const loadFocus = useCallback(async () => {
-    if (!focus) { setBoard([]); setRefs([]); setCheck(null); return; }
+    if (!focus) { setBoard([]); setAudit([]); setCheck(null); return; }
     const comp = comps.find((x) => x.id === focus);
-    const [lb, rf] = await Promise.all([
+    // when the competition waits for its winner, the eligibility / fraud validation runs first (server side), then the check is read
+    if (comp?.status === 'pending_verification') await supabase.rpc('admin_refresh_customer_winner', { p_id: focus });
+    const [lb, au] = await Promise.all([
       supabase.rpc('admin_customer_standings', { p_competition_id: focus }),
-      supabase.rpc('admin_customer_referral_overview', { p_competition_id: focus, p_filter: filter }),
+      supabase.rpc('admin_customer_comp_audit', { p_competition_id: focus, p_limit: 30 }),
     ]);
     setBoard((lb.data ?? []) as Standing[]);
-    setRefs((rf.data ?? []) as RefRow[]);
+    setAudit((au.data ?? []) as AuditRow[]);
     if (comp && (comp.status === 'pending_verification' || comp.status === 'ended')) {
       const ck = await supabase.rpc('admin_customer_winner_check', { p_id: focus });
       setCheck((ck.data ?? null) as WinnerCheck | null);
     } else setCheck(null);
-  }, [focus, filter, comps]);
+  }, [focus, comps]);
   useEffect(() => { void loadFocus(); }, [loadFocus]);
 
   async function run(fn: () => PromiseLike<{ error: { message: string } | null }>, after?: () => void) {
@@ -121,15 +122,28 @@ export default function AdminCustomerCompetition() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function confirmWinner(c: Comp) {
-    if (!window.confirm(t('cc.confirmAward', { amt: rupees(check?.reward_amount_inr ?? c.reward_amount_inr), name: check?.winner_name ?? '—' }))) return;
-    void run(() => supabase.rpc('admin_confirm_customer_winner', { p_id: c.id, p_note: note || null }));
+  async function confirmWinner(c: Comp) {
+    if (!check?.winner_id || busy) return;
+    if (!window.confirm(t('cc.confirmAward', { amt: rupees(check.reward_amount_inr), name: check.winner_name ?? '—' }))) return;
+    setBusy(true); setMsg({ error: '', ok: '' });
+    // the server recomputes the winner and the amount; the browser only says WHICH winner the admin saw
+    const { data, error } = await supabase.rpc('admin_confirm_customer_winner', { p_id: c.id, p_winner_id: check.winner_id, p_note: note || null });
+    setBusy(false);
+    if (error) {
+      console.error(error);
+      const k = KNOWN_ERRORS.find((e) => error.message.includes(e));
+      setMsg({ error: t(k ? `cc.err.${k}` : 'err.generic'), ok: '' });
+    } else if (!(data as { awarded?: boolean } | null)?.awarded) {
+      const reason = (data as { reason?: string } | null)?.reason ?? '';
+      setMsg({ error: t(KNOWN_ERRORS.includes(reason) ? `cc.err.${reason}` : 'err.generic'), ok: '' });
+    } else { setMsg({ error: '', ok: t('cf.awarded') }); setNote(''); }
+    await load();
+    await loadFocus();
   }
 
   const label = (s: CcStatus) => t(s === 'draft' ? 'sa.draft' : s === 'active' ? 'cc.on' : s === 'paused' ? 'cc.off' : s === 'pending_verification' ? 'cc.verifying' : 'sc.ended');
   const focusComp = comps.find((x) => x.id === focus) ?? null;
   const pendingComp = comps.find((x) => x.status === 'pending_verification') ?? null;
-  const stateOf = (r: RefRow) => (r.review_status === 'in_review' ? t('cc.state.under_review') : r.status === 'rejected' || r.review_status === 'rejected' ? t('cc.state.rejected') : t('cc.state.counted'));
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
@@ -140,15 +154,35 @@ export default function AdminCustomerCompetition() {
       {pendingComp && check && (
         <Section title={t('cc.verifyTitle')}>
           <p className="text-sm text-ink/70">{t('cc.verifyHelp')}</p>
+          <ol className="list-decimal space-y-0.5 pl-5 text-xs text-ink/70">
+            <li>{t('cf.step1', { d: check.frozen_at ? fmtDateTime(check.frozen_at, lang) : '—' })}</li>
+            <li>{t('cf.step2', { d: check.validated_at ? fmtDateTime(check.validated_at, lang) : '—' })}</li>
+            <li>{t('cf.step3')}</li>
+            <li>{t('cf.step4')}</li>
+          </ol>
+          {check.frozen_ranking.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-semibold">{t('cf.frozenBoard')}</p>
+              <ol className="text-xs text-ink/80">{check.frozen_ranking.slice(0, 3).map((r) => <li key={r.pos}>#{r.pos} {r.name} — {r.referrals}</li>)}</ol>
+            </div>
+          )}
+          <p className="text-xs text-ink/70">{t('cf.counts', { rej: check.rejected_count, fraud: check.fraud_count })}</p>
+          <Link to="/admin/customer-competition/fraud" className="btn-secondary inline-flex">{t('cf.openReview')}</Link>
           {check.has_winner ? (
             <>
+              {check.winner_changed_since_freeze && <p role="alert" className="rounded-xl bg-amber-100 p-3 text-sm text-amber-900">{t('cf.winnerChanged')}</p>}
               <div className="flex items-center gap-3"><RankBadge rank={1} size={56} /><div><p className="font-semibold">{t('cc.verifyWinner', { name: check.winner_name ?? '—', n: check.winner_referrals ?? 0 })}</p><p className="text-xs text-ink/70">{t('cc.verifyAmount', { amt: rupees(check.reward_amount_inr) })}</p></div></div>
               <ol className="divide-y divide-ink/10 text-sm">
                 {check.top.map((r) => <li key={r.rank} className="flex items-center gap-3 py-2"><span className="flex w-12 items-center"><RankBadge rank={r.rank} size={30} /></span><span className="min-w-0 flex-1 truncate">{r.name}</span><span className="font-semibold">{r.referrals}</span></li>)}
               </ol>
               {check.unresolved_review > 0 && <p role="alert" className="rounded-xl bg-amber-100 p-3 text-sm text-amber-900">{t('cc.unresolved', { n: check.unresolved_review })}</p>}
+              {check.winner_referral_list.length > 0 && (
+                <ul className="space-y-1 text-xs">
+                  {check.winner_referral_list.map((w) => <li key={w.id} className="rounded-lg bg-ink/5 px-2 py-1">{w.referred_name} · {w.business_name ?? '—'}{w.price != null ? ` · ${rupees(w.price)}` : ''} · {fmtDateTime(w.qualified_at, lang)}</li>)}
+                </ul>
+              )}
               <Field id="wn" label={t('cc.noteOpt')} value={note} onChange={setNote} disabled={busy} />
-              <button className="btn-primary w-full" disabled={busy || !check.can_issue} onClick={() => confirmWinner(pendingComp)}>{t('cc.confirmWinnerBtn')}</button>
+              <button className="btn-primary w-full" disabled={busy || !check.can_issue} onClick={() => void confirmWinner(pendingComp)}>{t('cc.confirmWinnerBtn')}</button>
             </>
           ) : (
             <>
@@ -222,32 +256,20 @@ export default function AdminCustomerCompetition() {
           </Section>
 
           <Section title={t('cc.refChecks')}>
-            <p className="text-sm text-ink/70">{t('cc.refHelp')}</p>
-            <div className="flex flex-wrap gap-2">
-              {(['review', 'counted', 'rejected', 'all'] as const).map((f) => <button key={f} className={filter === f ? 'btn-solid' : 'btn-secondary'} onClick={() => setFilter(f)}>{t(`cc.filter.${f}`)}</button>)}
-            </div>
-            <Field id="ccrr" label={t('sa.reason')} value={note} onChange={setNote} disabled={busy} />
-            {refs.length === 0 && <p className="text-sm text-ink/70">{t('cc.noRefs')}</p>}
-            <ul className="space-y-3">
-              {refs.map((r) => (
-                <li key={r.id} className="space-y-2 rounded-xl border border-ink/10 p-3 text-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">{r.referred_name}</span>
-                    <span className="rounded-full bg-ink/10 px-3 py-1 text-xs font-semibold">{stateOf(r)}</span>
-                  </div>
-                  <p className="text-xs text-ink/70">{t('sa.referredBy', { name: r.referrer_name })} · {fmtDateTime(r.qualified_at, lang)}</p>
-                  {r.business_name && <p className="text-xs">{r.business_name}{r.booking_price != null ? ` · ${rupees(r.booking_price)}` : ''}</p>}
-                  {r.risk_flags.length > 0 && <div className="flex flex-wrap gap-1.5">{r.risk_flags.map((f) => <span key={f} className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-900">⚠ {t(`cc.flag.${f}`)}</span>)}</div>}
-                  {(r.reject_reason || r.review_note) && <p className="text-xs text-red-700">{r.reject_reason ? t(`cc.reason.${r.reject_reason}`) : ''} {r.review_note ?? ''}</p>}
-                  {focusComp.status !== 'ended' && r.status === 'qualified' && (
-                    <div className="flex flex-wrap gap-2">
-                      {r.review_status === 'in_review' && <button className="btn-solid" disabled={busy} onClick={() => void run(() => supabase.rpc('admin_review_customer_referral', { p_id: r.id, p_action: 'approve', p_note: note || null }))}>{t('cc.approve')}</button>}
-                      <button className="btn-secondary" disabled={busy || note.trim().length < 3} onClick={() => void run(() => supabase.rpc('admin_review_customer_referral', { p_id: r.id, p_action: 'reject', p_note: note }))}>{t('cc.reject')}</button>
-                    </div>
-                  )}
+            <p className="text-sm text-ink/70">{t('cf.help')}</p>
+            <Link to="/admin/customer-competition/fraud" className="btn-solid inline-flex">{t('cf.openReview')}</Link>
+          </Section>
+
+          <Section title={t('cf.auditTitle')}>
+            {audit.length === 0 && <p className="text-sm text-ink/70">{t('cf.noHistory')}</p>}
+            <ol className="space-y-1.5 text-xs">
+              {audit.map((e) => (
+                <li key={e.id}>
+                  <span className="font-semibold">{t(`cf.audit.${e.action}`)}</span> · {e.actor_name ?? t('cf.system')} · {fmtDateTime(e.created_at, lang)}
+                  {e.note ? <span className="block text-ink/70">{e.note}</span> : null}
                 </li>
               ))}
-            </ul>
+            </ol>
           </Section>
         </>
       )}

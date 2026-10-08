@@ -13,6 +13,7 @@ export default function AdminHome() {
       <Link to="/admin/competition" className="card block font-medium">{t('sa.title')}</Link>
       <Link to="/admin/competition/fraud" className="card block font-medium">🛡️ {t('fr.title')}</Link>
       <Link to="/admin/customer-competition" className="card block font-medium">{t('cc.adminTitle')}</Link>
+      <Link to="/admin/customer-competition/fraud" className="card block font-medium">🛡️ {t('cf.title')}</Link>
       <Link to="/admin/banners" className="card block font-medium">{t('p8.adBanners')}</Link>
       <Link to="/admin/verifications" className="card block font-medium">{t('p8.adVerify')}</Link>
       <Link to="/admin/payments" className="card block font-medium">{t('p8.adPayments')}</Link>
