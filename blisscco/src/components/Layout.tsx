@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { useOnline } from '../lib/offlineCache';
 import { syncPushSubscription } from '../lib/push';
+import { recordCustomerDevice } from '../lib/customerCompetition';
 import { clearRef, getStoredRef } from '../lib/referral';
 import { clearShopRef, getDeviceSignals, getStoredShopRef, recordShopDevice } from '../lib/shopReferral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
@@ -25,7 +26,16 @@ export default function Layout() {
     if (profile?.role !== 'customer') return;
     const code = getStoredRef();
     if (!code) return;
-    void supabase.rpc('claim_referral', { p_code: code }).then(() => clearRef());
+    void (async () => {
+      const d = await getDeviceSignals();      // weak fraud signals only (random browser id + hash); the server decides with several signals + admin review
+      await supabase.rpc('claim_referral', { p_code: code, p_device_id: d?.id ?? null, p_device_fp: d?.fp ?? null });
+      clearRef();
+    })();
+  }, [profile?.id, profile?.role]);
+
+  // Fraud protection: remember which browser a customer uses (weak signal only)
+  useEffect(() => {
+    if (profile?.role === 'customer') void recordCustomerDevice();
   }, [profile?.id, profile?.role]);
 
   // A new business owner who arrived through a shop-referral link (Refer-a-Shop Competition) is attributed once, by the server
