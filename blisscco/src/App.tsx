@@ -5,6 +5,7 @@ import Seo from './components/Seo';
 import RequireRole from './components/RequireRole';
 import AdminAudit from './pages/admin/AdminAudit';
 import AdminCompetition from './pages/admin/AdminCompetition';
+import AdminCustomerCompetition from './pages/admin/AdminCustomerCompetition';
 import AdminFraudReview from './pages/admin/AdminFraudReview';
 import AdminDisputes from './pages/admin/AdminDisputes';
 import AdminPromotions from './pages/admin/AdminPromotions';
@@ -35,6 +36,7 @@ import OwnerAnalytics from './pages/owner/OwnerAnalytics';
 import OwnerBanners from './pages/owner/OwnerBanners';
 import OwnerQR from './pages/owner/OwnerQR';
 import OwnerCompetition from './pages/owner/OwnerCompetition';
+import CustomerCompetition from './pages/CustomerCompetition';
 import OwnerCoupons from './pages/owner/OwnerCoupons';
 import OwnerPlans from './pages/owner/OwnerPlans';
 import OwnerVerify from './pages/owner/OwnerVerify';
@@ -100,10 +102,12 @@ export default function App() {
         <Route path="/admin/payments" element={admin(<AdminPayments />)} />
         <Route path="/admin/notify" element={admin(<AdminNotify />)} />
         <Route path="/refer" element={customer(<Refer />)} />
+        <Route path="/refer/competition" element={customer(<CustomerCompetition />)} />
         <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
         <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />
         <Route path="/admin/competition" element={admin(<AdminCompetition />)} />
         <Route path="/admin/competition/fraud" element={admin(<AdminFraudReview />)} />
+        <Route path="/admin/customer-competition" element={admin(<AdminCustomerCompetition />)} />
         <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
         <Route path="/notifications" element={anyUser(<Notifications />)} />
         <Route path="/notifications/settings" element={anyUser(<NotificationSettings />)} />
