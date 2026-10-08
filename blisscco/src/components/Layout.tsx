@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { useOnline } from '../lib/offlineCache';
@@ -8,6 +8,7 @@ import { recordCustomerDevice } from '../lib/customerCompetition';
 import { clearRef, getStoredRef } from '../lib/referral';
 import { clearShopRef, getDeviceSignals, getStoredShopRef, recordShopDevice } from '../lib/shopReferral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import BottomNav from './BottomNav';
 import HeaderMenu from './HeaderMenu';
 import InstallPrompt from './InstallPrompt';
 import Logo from './Logo';
@@ -17,6 +18,9 @@ export default function Layout() {
   const { session, profile } = useAuth();
   const { t, setLang } = useI18n();
   const online = useOnline();
+  const { pathname } = useLocation();
+  // Terms / Privacy links are shown only on the log-in and sign-up pages
+  const isAuthPage = ['/login', '/register', '/owner/login', '/owner/register', '/admin/login'].includes(pathname);
 
   // Apply the saved language preference once the profile loads
   useEffect(() => { if (profile?.language) setLang(profile.language); }, [profile?.language, setLang]);
@@ -90,18 +94,22 @@ export default function Layout() {
 
       <main className="flex-1"><Outlet /></main>
 
-      <footer className="border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70">
+      <footer className={`border-t border-ink/10 px-4 py-6 text-center text-sm text-ink/70 ${session ? 'pb-24' : ''}`}>
         {profile?.role === 'customer' && <Link to="/refer" className="mr-3 btn-text">{t('ref.title')}</Link>}
         {profile?.role === 'customer' && <Link to="/refer/competition" className="mr-3 btn-text">{t('cc.title')}</Link>}
         {profile?.role === 'owner' && <Link to="/owner/competition" className="mr-3 btn-text">{t('sc.title')}</Link>}
         {session && <Link to="/my-bookings" className="mr-3 btn-text">{t('my.title')}</Link>}
         <Link to="/owner/register" className="btn-text">{t('nav.forBusiness')}</Link>
-        <p className="mt-2 space-x-3">
-          <Link to="/privacy" className="btn-text">{t('footer.privacy')}</Link>
-          <Link to="/terms" className="btn-text">{t('footer.terms')}</Link>
-        </p>
+        {isAuthPage && (
+          <p className="mt-2 space-x-3">
+            <Link to="/privacy" className="btn-text">{t('footer.privacy')}</Link>
+            <Link to="/terms" className="btn-text">{t('footer.terms')}</Link>
+          </p>
+        )}
         <p className="mt-2">© Blisscco</p>
       </footer>
+
+      <BottomNav />
     </div>
   );
 }
