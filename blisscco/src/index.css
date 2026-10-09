@@ -66,7 +66,18 @@
 /* Shop profile: services in a horizontal scroll row. Each pill looks like a transparent button with a #ff91a4 border, but is NOT clickable. */
 .svc-row { @apply -mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .svc-row::-webkit-scrollbar { display: none; }
-.svc-pill { @apply flex-none cursor-default select-none snap-start rounded-2xl border bg-transparent px-4 py-2.5 text-left; border-color: #ff91a4; pointer-events: none; min-width: 120px; max-width: 220px; }
+.svc-pill { @apply block h-full cursor-pointer select-none rounded-2xl border bg-transparent px-4 py-2.5 text-left transition active:bg-blush/20; border-color: #ff91a4; min-width: 120px; max-width: 220px; }
+
+/* Service photo bottom sheet (slides up from the bottom) */
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sheet-down { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes sheet-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sheet-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.sheet-up { animation: sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.sheet-down { animation: sheet-down 0.2s ease-in forwards; }
+.sheet-fade-in { animation: sheet-fade-in 0.25s ease-out; }
+.sheet-fade-out { animation: sheet-fade-out 0.2s ease-in forwards; }
+@media (prefers-reduced-motion: reduce) { .sheet-up, .sheet-down, .sheet-fade-in, .sheet-fade-out { animation-duration: 0.01s; } }
 
 /* Browse shops: shop cards */
 .shop-card { @apply block overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-ink/5 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]; }
