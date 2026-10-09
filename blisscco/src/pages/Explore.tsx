@@ -10,6 +10,7 @@ import { useGeo } from '../context/LocationContext';
 import { useI18n } from '../i18n';
 import { trackImpressions } from '../lib/analytics';
 import { distanceLabel, localName, rupees } from '../lib/format';
+import { offerBadge, offerEndsText, type PublicOffer } from '../lib/offers';
 import { signedUrlMap } from '../lib/storage';
 import { supabase } from '../lib/supabase';
 import { SEARCH_HINTS } from '../lib/searchHints';
@@ -45,6 +46,7 @@ export default function Explore() {
   const [rows, setRows] = useState<Row[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [ratings, setRatings] = useState<Record<string, { avg_rating: number; review_count: number }>>({});
+  const [offers, setOffers] = useState<Record<string, PublicOffer[]>>({});   // live shop offers, by shop id
   const [loading, setLoading] = useState(false);
   const [errKey, setErrKey] = useState('');
   const [hasMore, setHasMore] = useState(false);
@@ -98,6 +100,12 @@ export default function Explore() {
       const rt = await supabase.from('public_business_ratings').select('business_id,avg_rating,review_count').in('business_id', ids);
       const got = (rt.data ?? []) as { business_id: string; avg_rating: number; review_count: number }[];
       if (id === reqId.current) setRatings((prev) => ({ ...prev, ...Object.fromEntries(got.map((x) => [x.business_id, x])) }));
+      // Live offers (percent / rupees) of these shops. A failure here only hides the badges.
+      const of = await supabase.rpc('get_shop_offers', { p_business_ids: ids });
+      if (!of.error && id === reqId.current) {
+        const all = (of.data ?? []) as PublicOffer[];
+        setOffers((prev) => ({ ...prev, ...Object.fromEntries(ids.map((b) => [b, all.filter((o) => o.business_id === b)])) }));
+      }
     }
   }, [coords, dq, openNow]);
 
@@ -179,6 +187,7 @@ export default function Explore() {
       <ul className="grid gap-4 sm:grid-cols-2">
         {rows.map((r) => {
           const rt = ratings[r.bid];
+          const shopOffers = offers[r.bid] ?? [];
           const name = r.business ?? r.title;
           return (
             <li key={r.key}>
@@ -219,6 +228,21 @@ export default function Explore() {
                     <span className="rounded-full bg-blush/25 px-2.5 py-1 font-semibold">{localName(r.catEn, r.catHi, r.catMr, lang)}</span>
                     {r.city && <span className="truncate text-ink/70">{r.city}</span>}
                   </p>
+
+                  {shopOffers.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                      {shopOffers.slice(0, 2).map((o) => (
+                        <span key={o.offer_id} className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 font-semibold text-green-900">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01" /></svg>
+                          {offerBadge(o, t)}
+                          {o.discount_type === 'percent' && o.max_discount_inr ? ` · ${t('of.upTo', { n: rupees(o.max_discount_inr) })}` : ''}
+                          {' · '}{t('of.code', { c: o.code })}
+                          {o.ends_at ? ` · ${offerEndsText(o.ends_at, lang, t)}` : ''}
+                        </span>
+                      ))}
+                      {shopOffers.length > 2 && <span className="font-semibold text-ink/70">{t('of.more', { n: shopOffers.length - 2 })}</span>}
+                    </div>
+                  )}
 
                   <p className="flex items-center gap-1.5 text-xs text-ink/70">
                     {rt ? <><Stars value={rt.avg_rating} /> <span className="font-semibold text-ink">{rt.avg_rating}</span> ({rt.review_count})</> : t('biz.noReviews')}
