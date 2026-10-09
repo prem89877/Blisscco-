@@ -236,7 +236,7 @@ export default function Explore() {
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01" /></svg>
                           {offerBadge(o, t)}
                           {o.discount_type === 'percent' && o.max_discount_inr ? ` · ${t('of.upTo', { n: rupees(o.max_discount_inr) })}` : ''}
-                          {' · '}{t('of.code', { c: o.code })}
+                          {' · '}{t('of.codeBadge', { c: o.code })}
                           {o.ends_at ? ` · ${offerEndsText(o.ends_at, lang, t)}` : ''}
                         </span>
                       ))}
