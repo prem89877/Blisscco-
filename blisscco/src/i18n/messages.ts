@@ -2178,9 +2178,84 @@ const mr26: M = {
 };
 const p26 = { en: en26, hi: hi26, mr: mr26 };
 
+// ============ PHASE 27: bottom-nav Home + shop owner UPI ID ============
+const en27: M = {
+  "bn.home": "Home",
+  "upi.title": "Your UPI ID",
+  "upi.note": "Add your UPI ID. When your promotional balance (Business Growth Credit) is fully used, Blisscco can pay you on this UPI ID.",
+  "upi.label": "UPI ID",
+  "upi.save": "Save UPI ID",
+  "upi.update": "Update UPI ID",
+  "upi.remove": "Remove",
+  "upi.removeConfirm": "Remove your UPI ID?",
+  "upi.saved": "UPI ID saved.",
+  "upi.removed": "UPI ID removed.",
+  "upi.invalid": "Enter a valid UPI ID, for example name@okhdfcbank.",
+  "upi.privacy": "Only you and Blisscco admins can see your UPI ID.",
+  "upi.adminTitle": "Owner UPI IDs",
+  "upi.adminNote": "Pay an owner on their UPI ID after their promotional balance is fully used. Copy the UPI ID and pay from your UPI app.",
+  "upi.adminSearch": "Search name, email, phone or UPI ID",
+  "upi.adminGo": "Search",
+  "upi.adminList": "Shop owners",
+  "upi.adminEmpty": "No shop owners found.",
+  "upi.adminBalance": "Promotional balance",
+  "upi.adminEarned": "total earned",
+  "upi.adminUsed": "Balance used up",
+  "upi.adminNoUpi": "No UPI ID added yet."
+};
+const hi27: M = {
+  "bn.home": "होम",
+  "upi.title": "आपकी UPI ID",
+  "upi.note": "अपनी UPI ID जोड़ें। जब आपका प्रमोशनल बैलेंस (बिज़नेस ग्रोथ क्रेडिट) पूरा खत्म हो जाएगा, तब Blisscco आपको इसी UPI ID पर भुगतान कर सकता है।",
+  "upi.label": "UPI ID",
+  "upi.save": "UPI ID सेव करें",
+  "upi.update": "UPI ID अपडेट करें",
+  "upi.remove": "हटाएं",
+  "upi.removeConfirm": "अपनी UPI ID हटाएं?",
+  "upi.saved": "UPI ID सेव हो गई।",
+  "upi.removed": "UPI ID हटा दी गई।",
+  "upi.invalid": "सही UPI ID डालें, जैसे name@okhdfcbank।",
+  "upi.privacy": "आपकी UPI ID सिर्फ आप और Blisscco एडमिन देख सकते हैं।",
+  "upi.adminTitle": "ओनर UPI ID",
+  "upi.adminNote": "ओनर का प्रमोशनल बैलेंस पूरा खत्म होने पर उसकी UPI ID पर भुगतान करें। UPI ID कॉपी करके अपने UPI ऐप से भेजें।",
+  "upi.adminSearch": "नाम, ईमेल, फ़ोन या UPI ID खोजें",
+  "upi.adminGo": "खोजें",
+  "upi.adminList": "शॉप ओनर",
+  "upi.adminEmpty": "कोई शॉप ओनर नहीं मिला।",
+  "upi.adminBalance": "प्रमोशनल बैलेंस",
+  "upi.adminEarned": "कुल मिला",
+  "upi.adminUsed": "बैलेंस खत्म",
+  "upi.adminNoUpi": "अभी तक UPI ID नहीं जोड़ी।"
+};
+const mr27: M = {
+  "bn.home": "होम",
+  "upi.title": "तुमचा UPI ID",
+  "upi.note": "तुमचा UPI ID जोडा. तुमचा प्रमोशनल बॅलन्स (बिझनेस ग्रोथ क्रेडिट) पूर्ण संपल्यावर Blisscco तुम्हाला याच UPI ID वर पैसे देऊ शकते.",
+  "upi.label": "UPI ID",
+  "upi.save": "UPI ID सेव्ह करा",
+  "upi.update": "UPI ID अपडेट करा",
+  "upi.remove": "काढा",
+  "upi.removeConfirm": "तुमचा UPI ID काढायचा?",
+  "upi.saved": "UPI ID सेव्ह झाला.",
+  "upi.removed": "UPI ID काढला.",
+  "upi.invalid": "योग्य UPI ID टाका, उदा. name@okhdfcbank.",
+  "upi.privacy": "तुमचा UPI ID फक्त तुम्ही आणि Blisscco अॅडमिन पाहू शकतात.",
+  "upi.adminTitle": "ओनर UPI ID",
+  "upi.adminNote": "ओनरचा प्रमोशनल बॅलन्स पूर्ण संपल्यावर त्याच्या UPI ID वर पैसे द्या. UPI ID कॉपी करून तुमच्या UPI अॅपमधून पाठवा.",
+  "upi.adminSearch": "नाव, ईमेल, फोन किंवा UPI ID शोधा",
+  "upi.adminGo": "शोधा",
+  "upi.adminList": "शॉप ओनर",
+  "upi.adminEmpty": "कोणताही शॉप ओनर सापडला नाही.",
+  "upi.adminBalance": "प्रमोशनल बॅलन्स",
+  "upi.adminEarned": "एकूण मिळाले",
+  "upi.adminUsed": "बॅलन्स संपला",
+  "upi.adminNoUpi": "अजून UPI ID जोडलेला नाही."
+};
+const p27 = { en: en27, hi: hi27, mr: mr27 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr },
 };
