@@ -6,6 +6,7 @@
 - Safety: login required, per-user (40/hour) and per-IP limits, only the typed chat text (last 10 messages) is sent to the AI provider, no name / email / bookings are attached, it never asks for passwords / OTP / UPI PIN.
 - Uses the SAME AI settings as the other AI features (`AI_API_KEY`, optional `AI_PROVIDER`, `AI_MODEL`, `AI_BASE_URL`). If `AI_API_KEY` is not set, the page shows "AI support is not switched on yet" with the email address.
 - No database change, no new package.
+- Fix: `api/support-chat.ts` now imports `./_lib/rateLimit.js` (with `.js`, like the other API files); without it the function crashed on Vercel. On an error the chat now shows a short code, e.g. (provider 401), to find the cause in Vercel > Logs.
 
 ## Changed files
 - src/components/BottomNav.tsx
