@@ -7,6 +7,7 @@ export interface Business {
   address_line: string | null;city: string | null;state: string | null;pincode: string | null;
   latitude: number | null;longitude: number | null;status: Status;rejection_reason: string | null;submitted_at: string | null;
 }
+export interface ChangeRequest { id: string;business_id: string;name: string;category_id: string;description: string;status: 'pending' | 'approved' | 'rejected';rejection_reason: string | null;created_at: string }
 export interface BizImage { id: string;business_id: string;storage_path: string;sort_order: number }
 export interface ServiceImage { id: string;service_id: string;business_id: string;storage_path: string;sort_order: number }
 export interface Hour { day_of_week: number;opens_at: string | null;closes_at: string | null;is_closed: boolean }
