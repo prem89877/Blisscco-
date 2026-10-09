@@ -50,6 +50,7 @@ import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
+import OwnerAdvisor from './pages/owner/OwnerAdvisor';
 import PostLogin from './pages/PostLogin';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
@@ -87,6 +88,7 @@ export default function App() {
         <Route path="/post-login" element={hidden('Signing in', <PostLogin />)} />
         <Route path="/owner" element={owner(<OwnerDashboard />)} />
         <Route path="/owner/competition" element={owner(<OwnerCompetition />)} />
+        <Route path="/owner/advisor" element={owner(<OwnerAdvisor />)} />
         <Route path="/owner/business/new" element={owner(<NewBusiness />)} />
         <Route path="/owner/business/:id" element={owner(<BusinessEditor />)} />
         <Route path="/owner/business/:id/queue" element={owner(<OwnerQueue />)} />
