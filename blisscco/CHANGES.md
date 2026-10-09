@@ -1,3 +1,25 @@
+# Blisscco update: Help & Support AI chat
+
+## What it does
+- The **Help & support** icon in the bottom bar now opens a new page (`/support`) instead of an email app. The customer chats with an **AI assistant** about using Blisscco (bookings, tokens, cancelling, reviews, Refer & earn, language, notifications). 4 quick-question buttons, typing indicator, answers in the app language (EN / HI / MR).
+- The assistant only answers from facts about Blisscco written into `api/support-chat.ts` (taken from your Terms). When unsure, or for account / refund / dispute problems, it asks the customer to email support.blisscco@gmail.com. An "Email us" button is always on the page.
+- Safety: login required, per-user (40/hour) and per-IP limits, only the typed chat text (last 10 messages) is sent to the AI provider, no name / email / bookings are attached, it never asks for passwords / OTP / UPI PIN.
+- Uses the SAME AI settings as the other AI features (`AI_API_KEY`, optional `AI_PROVIDER`, `AI_MODEL`, `AI_BASE_URL`). If `AI_API_KEY` is not set, the page shows "AI support is not switched on yet" with the email address.
+- No database change, no new package.
+
+## Changed files
+- src/components/BottomNav.tsx
+- src/App.tsx
+- vercel.json
+- src/i18n/messages.ts (new phase 29 block, EN / HI / MR)
+- CHANGES.md
+
+## New files
+- api/support-chat.ts
+- src/pages/Support.tsx
+
+---
+
 # Blisscco update: Service photo bottom sheet (shop profile)
 
 ## What it does

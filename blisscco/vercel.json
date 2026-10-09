@@ -7,6 +7,7 @@
   "functions": {
     "api/ai-insights.ts": { "maxDuration": 30 },
     "api/ai-price-suggest.ts": { "maxDuration": 30 },
+    "api/support-chat.ts": { "maxDuration": 30 },
     "api/dispatch-notifications.ts": { "maxDuration": 30 }
   },
   "headers": [
