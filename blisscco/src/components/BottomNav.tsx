@@ -2,8 +2,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 
-const SUPPORT_EMAIL = 'support.blisscco@gmail.com';
-
 interface Item { key: string; label: string; icon: string; to?: string; href?: string; active: boolean }
 
 /** Fixed bottom bar (signed-in users). Selected tab = filled icon, others = transparent outline icon. */
@@ -20,7 +18,7 @@ export default function BottomNav() {
     { key: 'bookings', label: t('bn.bookings'), icon: 'bookings', to: '/my-bookings', active: is('/my-bookings') },
     { key: 'refer', label: t('bn.refer'), icon: 'refer', to: referTo, active: is('/refer') || is('/owner/competition') || is('/admin/competition') },
     { key: 'home', label: t('bn.home'), icon: 'home', to: '/explore', active: pathname === '/' || is('/explore') },
-    { key: 'help', label: t('bn.help'), icon: 'help', href: `mailto:${SUPPORT_EMAIL}`, active: false },
+    { key: 'help', label: t('bn.help'), icon: 'help', to: '/support', active: is('/support') },
     { key: 'profile', label: t('bn.profile'), icon: 'profile', to: '/profile', active: is('/profile') },
   ];
 
