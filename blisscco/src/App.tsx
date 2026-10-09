@@ -49,6 +49,7 @@ import OwnerDashboard from './pages/owner/OwnerDashboard';
 import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import Support from './pages/Support';
 import PostLogin from './pages/PostLogin';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
@@ -117,6 +118,7 @@ export default function App() {
         <Route path="/my-bookings" element={anyUser(<MyBookings />)} />
         <Route path="/profile" element={anyUser(<Profile />)} />
         <Route path="/settings" element={anyUser(<Settings />)} />
+        <Route path="/support" element={anyUser(<Support />)} />
         <Route path="/notifications" element={anyUser(<Notifications />)} />
         <Route path="/notifications/settings" element={anyUser(<NotificationSettings />)} />
         <Route path="/admin" element={admin(<AdminHome />)} />
