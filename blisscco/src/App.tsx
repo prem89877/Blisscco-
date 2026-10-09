@@ -9,6 +9,7 @@ import AdminCustomerCompetition from './pages/admin/AdminCustomerCompetition';
 import AdminCustomerFraudReview from './pages/admin/AdminCustomerFraudReview';
 import AdminFraudReview from './pages/admin/AdminFraudReview';
 import AdminDisputes from './pages/admin/AdminDisputes';
+import AdminOwnerUpi from './pages/admin/AdminOwnerUpi';
 import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminReports from './pages/admin/AdminReports';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -103,6 +104,7 @@ export default function App() {
         <Route path="/admin/banners" element={admin(<AdminBanners />)} />
         <Route path="/admin/verifications" element={admin(<AdminVerifications />)} />
         <Route path="/admin/payments" element={admin(<AdminPayments />)} />
+        <Route path="/admin/owner-upi" element={admin(<AdminOwnerUpi />)} />
         <Route path="/admin/notify" element={admin(<AdminNotify />)} />
         <Route path="/refer" element={customer(<Refer />)} />
         <Route path="/refer/competition" element={customer(<CustomerCompetition />)} />
