@@ -51,10 +51,11 @@ function clean(input: unknown): Msg[] | null {
     const role = (m as { role?: unknown })?.role;
     const content = String((m as { content?: unknown })?.content ?? '').replace(/\s+/g, ' ').trim().slice(0, MAX_CHARS);
     if ((role !== 'user' && role !== 'assistant') || !content) return null;
-    out.push({ role, content });
+    // after a failed answer the chat has two user messages in a row: join them instead of rejecting (that caused the 400)
+    if (out.length && out[out.length - 1].role === role) out[out.length - 1].content = `${out[out.length - 1].content} ${content}`.slice(0, MAX_CHARS * 2);
+    else out.push({ role, content });
   }
   while (out.length && out[0].role !== 'user') out.shift();
-  for (let i = 1; i < out.length; i++) if (out[i].role === out[i - 1].role) return null;
   return out.length && out[out.length - 1].role === 'user' ? out : null;
 }
 
@@ -62,7 +63,7 @@ async function askAI(system: string, messages: Msg[]): Promise<string> {
   const provider = (process.env.AI_PROVIDER ?? 'anthropic').toLowerCase();
   const key = process.env.AI_API_KEY as string;
   const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), 25000);
+  const timer = setTimeout(() => ctl.abort(), 18000);
   try {
     if (provider === 'anthropic') {
       const base = (process.env.AI_BASE_URL ?? 'https://api.anthropic.com').replace(/\/+$/, '');
@@ -89,7 +90,7 @@ async function askAI(system: string, messages: Msg[]): Promise<string> {
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const iso = (d: Date) => d.toISOString().slice(0, 10);
-const cut = (s: unknown, n: number) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
+const cut = (s: unknown, n: number) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, n).replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
 
 interface ReviewRow { rating: number; comment: string | null; owner_response: string | null; created_at: string }
 interface BookingRow { status: string; type: string; service_label: string; price_inr: number | string; created_at: string; cancelled_by: string | null }
@@ -194,7 +195,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const lang = String(body.lang ?? 'en');
   const businessId = String(body.business_id ?? '');
   const messages = clean(body.messages);
-  if (!messages || !(lang in LANG_NAME) || !UUID.test(businessId)) return res.status(400).json({ error: 'bad_request' });
+  if (!messages) return res.status(400).json({ error: 'bad_request', detail: 'messages' });
+  if (!(lang in LANG_NAME)) return res.status(400).json({ error: 'bad_request', detail: 'lang' });
+  if (!UUID.test(businessId)) return res.status(400).json({ error: 'bad_request', detail: 'shop id' });
 
   const opts = { auth: { persistSession: false, autoRefreshToken: false } };
   const { data: u, error: ue } = await createClient(url, anonKey, opts).auth.getUser(token);
@@ -213,7 +216,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const summary = await shopSummary(db, businessId, u.user.id);
     if (!summary) return res.status(403).json({ error: 'not_owner' });
     const system = `${SYSTEM}\n\nSHOP DATA (JSON, today is ${iso(new Date())}):\n${JSON.stringify(summary)}\n\nReply in ${LANG_NAME[lang]}.`;
-    const reply = await askAI(system, messages);
+    let reply: string;
+    try { reply = await askAI(system, messages); }
+    catch (first) {
+      if (!/^provider (500|503|529)/.test(first instanceof Error ? first.message : '')) throw first;
+      await new Promise((r) => setTimeout(r, 1200));   // provider busy: try once more
+      reply = await askAI(system, messages);
+    }
     if (!reply) throw new Error('empty answer');
     return res.status(200).json({ reply: reply.slice(0, 2500) });
   } catch (e) {
