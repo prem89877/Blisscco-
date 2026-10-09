@@ -2328,9 +2328,50 @@ const mr29: M = {
 };
 const p29 = { en: en29, hi: hi29, mr: mr29 };
 
+const en30: M = {
+  'pc.title': 'Change name, category or description',
+  'pc.note': 'Changes to business name, category and description go live only after admin approval. Until then your current details stay visible.',
+  'pc.pending': 'Your change request is under admin review.',
+  'pc.rejected': 'Your last change request was rejected',
+  'pc.submit': 'Send for admin review',
+  'pc.sent': 'Sent for admin review.',
+  'pc.noChange': 'Nothing was changed.',
+  'pc.adminTitle': 'Profile change requests',
+  'pc.current': 'Current',
+  'pc.requested': 'Requested',
+  'ed.liveNote': 'Your shop is live. You can edit phone and e-mail here. Name, category and description need admin approval (see above). Address and location are locked.',
+};
+const hi30: M = {
+  'pc.title': 'नाम, श्रेणी या विवरण बदलें',
+  'pc.note': 'व्यवसाय का नाम, श्रेणी और विवरण एडमिन की मंज़ूरी के बाद ही लाइव होंगे। तब तक आपकी मौजूदा जानकारी दिखती रहेगी।',
+  'pc.pending': 'आपका बदलाव अनुरोध एडमिन की समीक्षा में है।',
+  'pc.rejected': 'आपका पिछला बदलाव अनुरोध अस्वीकार हुआ',
+  'pc.submit': 'एडमिन समीक्षा के लिए भेजें',
+  'pc.sent': 'एडमिन समीक्षा के लिए भेज दिया गया।',
+  'pc.noChange': 'कुछ भी नहीं बदला।',
+  'pc.adminTitle': 'प्रोफ़ाइल बदलाव अनुरोध',
+  'pc.current': 'मौजूदा',
+  'pc.requested': 'अनुरोधित',
+  'ed.liveNote': 'आपकी दुकान लाइव है। यहाँ आप फ़ोन और ईमेल बदल सकते हैं। नाम, श्रेणी और विवरण के लिए एडमिन की मंज़ूरी चाहिए (ऊपर देखें)। पता और लोकेशन लॉक हैं।',
+};
+const mr30: M = {
+  'pc.title': 'नाव, श्रेणी किंवा वर्णन बदला',
+  'pc.note': 'व्यवसायाचे नाव, श्रेणी आणि वर्णन अॅडमिनच्या मंजुरीनंतरच लाइव्ह होतील. तोपर्यंत तुमची सध्याची माहिती दिसत राहील.',
+  'pc.pending': 'तुमची बदल विनंती अॅडमिनच्या पुनरावलोकनात आहे.',
+  'pc.rejected': 'तुमची मागील बदल विनंती नाकारली गेली',
+  'pc.submit': 'अॅडमिन पुनरावलोकनासाठी पाठवा',
+  'pc.sent': 'अॅडमिन पुनरावलोकनासाठी पाठवले.',
+  'pc.noChange': 'काहीही बदलले नाही.',
+  'pc.adminTitle': 'प्रोफाइल बदल विनंत्या',
+  'pc.current': 'सध्याचे',
+  'pc.requested': 'विनंती केलेले',
+  'ed.liveNote': 'तुमचे दुकान लाइव्ह आहे. येथे तुम्ही फोन आणि ईमेल बदलू शकता. नाव, श्रेणी आणि वर्णनासाठी अॅडमिनची मंजुरी लागते (वर पहा). पत्ता आणि लोकेशन लॉक आहेत.',
+};
+const p30 = { en: en30, hi: hi30, mr: mr30 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr },
 };
