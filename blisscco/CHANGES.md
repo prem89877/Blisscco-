@@ -1,3 +1,22 @@
+# Blisscco update: Service photo bottom sheet (shop profile)
+
+## What it does
+- On a shop profile page, tapping a service now slides a **half-screen sheet up from the bottom** showing that service's photos (swipe sideways if there are several), name, price, duration and description.
+- Close with the X button, by tapping the dark area, by swiping the sheet down, or with Esc. Services without photos still open the sheet with a short "no photos yet" note.
+- Service boxes were not tappable before; they are now buttons.
+- No database change, no new package, no new environment variable.
+
+## Changed files
+- src/pages/BusinessProfile.tsx
+- src/index.css
+- src/i18n/messages.ts (new phase 28 block, EN / HI / MR)
+- CHANGES.md
+
+## New files
+- src/components/ServiceSheet.tsx
+
+---
+
 # Blisscco update: Home icon in bottom bar + shop owner UPI ID
 
 ## What it does
