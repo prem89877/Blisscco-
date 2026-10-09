@@ -10,7 +10,7 @@
 // Uses the SAME server-only env vars as /api/ai-insights (AI_API_KEY, AI_PROVIDER, AI_MODEL, AI_BASE_URL).
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { clientIp, limited } from './_lib/rateLimit';
+import { clientIp, limited } from './_lib/rateLimit.js';
 
 const LANG_NAME: Record<string, string> = { en: 'English', hi: 'Hindi (Devanagari script)', mr: 'Marathi (Devanagari script)' };
 const DEFAULT_ANTHROPIC_MODEL = 'claude-haiku-4-5-20251001';
@@ -120,6 +120,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'unknown';
     console.error('support chat failed', msg);   // full reason is in Vercel > Logs
-    return res.status(502).json({ error: 'ai_unavailable' });
+    const code = /^provider (\d+)/.exec(msg)?.[1];
+    const detail = code ? `provider ${code}` : /abort/i.test(msg) ? 'timeout' : msg.startsWith('empty') ? 'empty answer' : 'network';
+    return res.status(502).json({ error: 'ai_unavailable', detail });
   }
 }
