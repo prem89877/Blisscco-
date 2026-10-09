@@ -19,7 +19,7 @@ export default function BottomNav() {
   const items: Item[] = [
     { key: 'bookings', label: t('bn.bookings'), icon: 'bookings', to: '/my-bookings', active: is('/my-bookings') },
     { key: 'refer', label: t('bn.refer'), icon: 'refer', to: referTo, active: is('/refer') || is('/owner/competition') || is('/admin/competition') },
-    { key: 'settings', label: t('bn.settings'), icon: 'settings', to: '/settings', active: is('/settings') || is('/notifications/settings') },
+    { key: 'home', label: t('bn.home'), icon: 'home', to: '/explore', active: pathname === '/' || is('/explore') },
     { key: 'help', label: t('bn.help'), icon: 'help', href: `mailto:${SUPPORT_EMAIL}`, active: false },
     { key: 'profile', label: t('bn.profile'), icon: 'profile', to: '/profile', active: is('/profile') },
   ];
