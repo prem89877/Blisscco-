@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import RankBadge from '../../components/RankBadge';
 import { Msg, Section } from '../../components/ui';
+import UpiIdCard from '../../components/UpiIdCard';
 import { useI18n } from '../../i18n';
 import { fmtDateTime, rupees } from '../../lib/format';
 import { splitSeconds, type CompetitionOverview, type LeaderRow } from '../../lib/shopReferral';
@@ -183,6 +184,8 @@ export default function OwnerCompetition() {
         <p className="font-display text-3xl font-semibold">{rupees(wallet)}</p>
         <p className="text-xs text-ink/60">{t('sc.walletNote')}</p>
       </Section>
+
+      <UpiIdCard />
     </div>
   );
 }

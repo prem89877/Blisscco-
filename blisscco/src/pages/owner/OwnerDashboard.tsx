@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Msg, StatusBadge } from '../../components/ui';
+import UpiIdCard from '../../components/UpiIdCard';
 import { useI18n } from '../../i18n';
 import { supabase } from '../../lib/supabase';
 import type { Status } from '../../lib/types';
@@ -68,6 +69,7 @@ export default function OwnerDashboard() {
       </div>
       <Msg error={error} />
       <Link to="/owner/competition" className="card block font-medium">🏆 {t('sc.title')}</Link>
+      <UpiIdCard />
       {rows === null && !error && <div className="h-24 animate-pulse rounded-2xl bg-ink/10" />}
       {rows?.length === 0 && <p className="text-ink/70">{t('owner.empty')}</p>}
       {rows?.map((r) => (
