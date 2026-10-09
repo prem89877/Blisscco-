@@ -17,6 +17,7 @@ export default function AdminHome() {
       <Link to="/admin/banners" className="card block font-medium">{t('p8.adBanners')}</Link>
       <Link to="/admin/verifications" className="card block font-medium">{t('p8.adVerify')}</Link>
       <Link to="/admin/payments" className="card block font-medium">{t('p8.adPayments')}</Link>
+      <Link to="/admin/owner-upi" className="card block font-medium">{t('upi.adminTitle')}</Link>
       <Link to="/admin/users" className="card block font-medium">Users</Link>
       <Link to="/admin/disputes" className="card block font-medium">Booking disputes</Link>
       <Link to="/admin/promotions" className="card block font-medium">Promotions</Link>
