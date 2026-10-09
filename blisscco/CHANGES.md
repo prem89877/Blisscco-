@@ -1,3 +1,31 @@
+# Blisscco update: Home icon in bottom bar + shop owner UPI ID
+
+## What it does
+- **Bottom bar:** the Settings icon (3rd, middle) is replaced by a **Home** icon (pink outline, filled when selected). Tapping it opens the **Browse shops** page (`/explore`). Language is still in the 3-line menu; notification settings are still reachable from Notifications > Settings. The `/settings` page itself is unchanged and still works if opened by link.
+- **Shop owners can add a UPI ID** (Owner dashboard, and also under the Business Growth Credit balance on the Refer-a-Shop page). Used so Blisscco can pay the owner after the promotional balance is fully used. Owner can add, update and remove it. Format is checked in the app and in the database (for example `name@okhdfcbank`).
+- **Admin > Owner UPI IDs** (new page): every shop owner with UPI ID, current promotional balance, total earned, a "Balance used up" tag, search and a Copy button.
+- Only the owner and admins can read a UPI ID (own table + RLS, writes only through `set_my_upi_id`). Privacy page has one new sentence about it.
+
+## Setup
+- Run `supabase/migrations/0035_owner_upi_id.sql` BEFORE deploying (needs 0030; safe to re-run). No new package, no new environment variable.
+
+## Changed files
+- src/components/BottomNav.tsx
+- src/App.tsx
+- src/pages/owner/OwnerDashboard.tsx, src/pages/owner/OwnerCompetition.tsx
+- src/pages/admin/AdminHome.tsx
+- src/pages/Privacy.tsx
+- src/i18n/messages.ts (new phase 27 block, EN / HI / MR)
+- supabase/RUN_LOG.md, CHANGES.md
+
+## New files
+- public/icons/nav/home.png, public/icons/nav/home-filled.png
+- src/components/UpiIdCard.tsx, src/lib/upi.ts
+- src/pages/admin/AdminOwnerUpi.tsx
+- supabase/migrations/0035_owner_upi_id.sql
+
+---
+
 # Blisscco update: 3 photos per service (Add business + Edit business)
 
 ## What it does
