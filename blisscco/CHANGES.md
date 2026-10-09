@@ -1,3 +1,24 @@
+# Blisscco update: beauty jokes, slogans and tips for customers
+
+## What it does
+- A slim strip under the header shows a **beauty joke 😄, slogan ✨ or tip 💡** on every page for customers and visitors.
+- **100 different lines** (34 jokes, 33 slogans, 33 tips) in English, Hindi and Marathi, shown in a **cycle**: a new line on every page change and every 20 seconds while the customer stays on a page. It starts at a random place and then goes one by one through all 100 before repeating; the position is remembered on the device.
+- Not shown to shop owners or admins, on log-in / sign-up pages, or on the Help & support chat.
+- Tips are general and safe (patch test, sunscreen, water, hygiene, booking tips). No medical claims.
+- To change the lines, edit `src/lib/beautyTips.ts` (add or remove lines freely).
+- No database change, no new package.
+
+## Changed files
+- src/components/Layout.tsx
+- src/index.css
+- CHANGES.md
+
+## New files
+- src/lib/beautyTips.ts
+- src/components/BeautyTip.tsx
+
+---
+
 # Blisscco update: Help & Support AI chat
 
 ## What it does
