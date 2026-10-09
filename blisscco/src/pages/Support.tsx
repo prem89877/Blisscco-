@@ -31,9 +31,9 @@ export default function Support() {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ messages: next.slice(-10), lang }),
       });
-      const j = (await r.json().catch(() => ({}))) as { reply?: string; error?: string };
+      const j = (await r.json().catch(() => ({}))) as { reply?: string; error?: string; detail?: string };
       if (r.ok && j.reply) setMsgs([...next, { role: 'assistant', content: j.reply }]);
-      else setErr(t(j.error && KNOWN_ERR.includes(j.error) ? `sup.err.${j.error}` : 'sup.err.generic'));
+      else setErr(t(j.error && KNOWN_ERR.includes(j.error) ? `sup.err.${j.error}` : 'sup.err.generic') + (j.detail ? ` (${j.detail})` : r.ok ? '' : ` (${r.status})`));
     } catch { setErr(t('sup.err.generic')); }
     finally { setBusy(false); }
   }
