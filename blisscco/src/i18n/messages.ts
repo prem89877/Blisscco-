@@ -2253,9 +2253,27 @@ const mr27: M = {
 };
 const p27 = { en: en27, hi: hi27, mr: mr27 };
 
+// ============ PHASE 28: service photo bottom sheet ============
+const en28: M = {
+  "svc.close": "Close",
+  "svc.photoAlt": "{name} photo {n} of {total}",
+  "svc.noPhotos": "No photos added for this service yet."
+};
+const hi28: M = {
+  "svc.close": "बंद करें",
+  "svc.photoAlt": "{name} फ़ोटो {n}/{total}",
+  "svc.noPhotos": "इस सेवा की अभी कोई फ़ोटो नहीं जोड़ी गई।"
+};
+const mr28: M = {
+  "svc.close": "बंद करा",
+  "svc.photoAlt": "{name} फोटो {n}/{total}",
+  "svc.noPhotos": "या सेवेचा अजून कोणताही फोटो जोडलेला नाही."
+};
+const p28 = { en: en28, hi: hi28, mr: mr28 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr },
 };
