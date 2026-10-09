@@ -2271,9 +2271,66 @@ const mr28: M = {
 };
 const p28 = { en: en28, hi: hi28, mr: mr28 };
 
+// ============ PHASE 29: Help & Support AI chat ============
+const en29: M = {
+  "sup.title": "Help & Support",
+  "sup.sub": "Ask our AI assistant about bookings, shops, reviews and more.",
+  "sup.email": "Email us",
+  "sup.hello": "Hi! I am the Blisscco assistant. Ask me anything about using Blisscco, or tap a question below.",
+  "sup.q1": "How do I book an appointment?",
+  "sup.q2": "How do I cancel my booking?",
+  "sup.q3": "Do I pay Blisscco for bookings?",
+  "sup.q4": "How does Refer & earn work?",
+  "sup.placeholder": "Type your question…",
+  "sup.send": "Send",
+  "sup.typing": "Typing…",
+  "sup.disclaimer": "AI answers can be wrong. For account or booking problems, email us.",
+  "sup.err.generic": "Sorry, I could not answer right now. Please try again, or email us at",
+  "sup.err.configuration_required": "AI support is not switched on yet. Please email us at",
+  "sup.err.rate_limited": "You have asked a lot of questions. Please try again a little later, or email us at",
+  "sup.err.unauthorized": "Please log in again to use support. Or email us at"
+};
+const hi29: M = {
+  "sup.title": "मदद और सहायता",
+  "sup.sub": "बुकिंग, दुकानों, रिव्यू और बाकी बातों के बारे में हमारे AI असिस्टेंट से पूछें।",
+  "sup.email": "ईमेल करें",
+  "sup.hello": "नमस्ते! मैं Blisscco असिस्टेंट हूँ। Blisscco इस्तेमाल करने के बारे में कुछ भी पूछें, या नीचे कोई सवाल चुनें।",
+  "sup.q1": "अपॉइंटमेंट कैसे बुक करूँ?",
+  "sup.q2": "अपनी बुकिंग कैसे रद्द करूँ?",
+  "sup.q3": "क्या बुकिंग के लिए Blisscco को पैसे देने होते हैं?",
+  "sup.q4": "रेफ़र करके कमाना कैसे काम करता है?",
+  "sup.placeholder": "अपना सवाल लिखें…",
+  "sup.send": "भेजें",
+  "sup.typing": "लिख रहा है…",
+  "sup.disclaimer": "AI के जवाब गलत हो सकते हैं। अकाउंट या बुकिंग की समस्या के लिए हमें ईमेल करें।",
+  "sup.err.generic": "माफ़ कीजिए, अभी जवाब नहीं दे सका। कृपया दोबारा कोशिश करें, या हमें ईमेल करें:",
+  "sup.err.configuration_required": "AI सहायता अभी चालू नहीं है। कृपया हमें ईमेल करें:",
+  "sup.err.rate_limited": "आपने बहुत सवाल पूछ लिए हैं। थोड़ी देर बाद कोशिश करें, या हमें ईमेल करें:",
+  "sup.err.unauthorized": "सहायता के लिए कृपया दोबारा लॉग इन करें। या हमें ईमेल करें:"
+};
+const mr29: M = {
+  "sup.title": "मदत आणि सपोर्ट",
+  "sup.sub": "बुकिंग, दुकाने, रिव्ह्यू आणि इतर गोष्टींबद्दल आमच्या AI असिस्टंटला विचारा.",
+  "sup.email": "ईमेल करा",
+  "sup.hello": "नमस्कार! मी Blisscco असिस्टंट आहे. Blisscco वापरण्याबद्दल काहीही विचारा, किंवा खाली एखादा प्रश्न निवडा.",
+  "sup.q1": "अपॉइंटमेंट कशी बुक करू?",
+  "sup.q2": "माझी बुकिंग कशी रद्द करू?",
+  "sup.q3": "बुकिंगसाठी Blisscco ला पैसे द्यावे लागतात का?",
+  "sup.q4": "रेफर करून कमाई कशी चालते?",
+  "sup.placeholder": "तुमचा प्रश्न लिहा…",
+  "sup.send": "पाठवा",
+  "sup.typing": "लिहित आहे…",
+  "sup.disclaimer": "AI चे उत्तर चुकीचे असू शकते. अकाउंट किंवा बुकिंगच्या समस्येसाठी आम्हाला ईमेल करा.",
+  "sup.err.generic": "माफ करा, आत्ता उत्तर देता आले नाही. कृपया पुन्हा प्रयत्न करा, किंवा आम्हाला ईमेल करा:",
+  "sup.err.configuration_required": "AI सपोर्ट अजून सुरू नाही. कृपया आम्हाला ईमेल करा:",
+  "sup.err.rate_limited": "तुम्ही खूप प्रश्न विचारले आहेत. थोड्या वेळाने प्रयत्न करा, किंवा आम्हाला ईमेल करा:",
+  "sup.err.unauthorized": "सपोर्टसाठी कृपया पुन्हा लॉग इन करा. किंवा आम्हाला ईमेल करा:"
+};
+const p29 = { en: en29, hi: hi29, mr: mr29 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr },
 };
