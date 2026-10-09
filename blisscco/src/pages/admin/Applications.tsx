@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Msg, Section, Select, StatusBadge, TextArea } from '../../components/ui';
 import { useI18n } from '../../i18n';
+import ProfileChangeReview from './ProfileChangeReview';
 import { hoursRange, mapsPointUrl, rupees } from '../../lib/format';
 import { signedUrlMap } from '../../lib/storage';
 import { supabase } from '../../lib/supabase';
@@ -109,6 +110,7 @@ export default function Applications() {
     <div className="mx-auto max-w-3xl space-y-4 px-4 py-6">
       <Link to="/admin" className="text-sm btn-text">← {t('dash.admin')}</Link>
       <h1 className="font-display text-2xl font-semibold">{t('admin.applications')}</h1>
+      <ProfileChangeReview />
       <Select id="flt" label={t('admin.filter')} value={filter} onChange={(v) => { setOpen(null); setFilter(v as Status | 'all'); }}
         options={FILTERS.map((f) => ({ value: f, label: f === 'all' ? t('admin.all') : t(`status.${f}`) }))} />
       <Msg error={error} />
