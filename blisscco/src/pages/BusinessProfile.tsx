@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import BookingPanel from '../components/BookingPanel';
+import ServiceSheet from '../components/ServiceSheet';
 import ReviewForm from '../components/ReviewForm';
 import Seo, { siteOrigin } from '../components/Seo';
 import { RatingLine, ReviewsSection } from '../components/ReviewsSection';
@@ -53,6 +54,7 @@ export default function BusinessProfile() {
   const [hours, setHours] = useState<Hour[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [svcImgUrls, setSvcImgUrls] = useState<Record<string, string[]>>({});
+  const [openSvc, setOpenSvc] = useState<Service | null>(null);
   const [rvKey, setRvKey] = useState(0);
   const [imgsReady, setImgsReady] = useState(false);
   const [loaded, setLoaded] = useState<Record<string, boolean>>({});
@@ -212,20 +214,24 @@ export default function BusinessProfile() {
         {services.length > 0 && (
           <ul className="svc-row" aria-label={t('biz.services')}>
             {services.map((s) => (
-              <li key={s.id} className="svc-pill">
-                <p className="truncate text-sm font-medium">{s.name || s.service_category}</p>
-                <p className="text-base font-semibold" style={{ color: '#2D2A2E' }}>{rupees(s.price_inr)}</p>
-                {s.duration_minutes ? <p className="text-xs text-ink/60">{s.duration_minutes} min</p> : null}
-                {svcImgUrls[s.id]?.length ? (
-                  <div className="mt-2 flex gap-1.5">
-                    {svcImgUrls[s.id].map((u) => <img key={u} src={u} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" />)}
-                  </div>
-                ) : null}
+              <li key={s.id} className="flex-none snap-start">
+                <button type="button" className="svc-pill" aria-haspopup="dialog" onClick={() => setOpenSvc(s)}>
+                  <p className="truncate text-sm font-medium">{s.name || s.service_category}</p>
+                  <p className="text-base font-semibold" style={{ color: '#2D2A2E' }}>{rupees(s.price_inr)}</p>
+                  {s.duration_minutes ? <p className="text-xs text-ink/60">{s.duration_minutes} min</p> : null}
+                  {svcImgUrls[s.id]?.length ? (
+                    <div className="mt-2 flex gap-1.5">
+                      {svcImgUrls[s.id].map((u) => <img key={u} src={u} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" />)}
+                    </div>
+                  ) : null}
+                </button>
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      {openSvc && <ServiceSheet service={openSvc} images={svcImgUrls[openSvc.id] ?? []} onClose={() => setOpenSvc(null)} />}
 
       <BookingPanel businessId={biz.id} services={services} hours={hours} />
 
