@@ -95,15 +95,6 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
     await reload();
   }
 
-  async function onRemoveImage(img: ServiceImage) {
-    if (busy) return;
-    setBusy(true); setError('');
-    const del = await supabase.from('service_images').delete().eq('id', img.id);
-    if (del.error) setError(t('err.generic')); else await supabase.storage.from(BUCKET).remove([img.storage_path]);
-    setBusy(false);
-    await reload();
-  }
-
   const TIP_ERR = ['unauthorized', 'bad_request', 'not_owner', 'rate_limited', 'configuration_required', 'ai_unavailable', 'server_config', 'server_error'];
 
   async function suggestPrice() {
@@ -195,13 +186,10 @@ export default function ServicesSection({ data, reload }: { data: Loaded; reload
                         ? <img src={urls[img.storage_path]} alt="" loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
                         : <div className="aspect-square w-full animate-pulse rounded-xl bg-ink/10" />}
                       {!blocked && (
-                        <div className="grid grid-cols-2 gap-1">
-                          <label className={`btn-secondary cursor-pointer px-1 text-xs ${busy ? 'opacity-60' : ''}`}>
-                            {t('ed.changePhoto')}
-                            <input type="file" accept={ACCEPT} hidden disabled={busy} onChange={(e) => void onReplaceImage(img, e)} />
-                          </label>
-                          <button type="button" className="btn-secondary px-1 text-xs" disabled={busy} onClick={() => void onRemoveImage(img)}>{t('ed.remove')}</button>
-                        </div>
+                        <label className={`btn-secondary block w-full cursor-pointer px-1 text-center text-xs ${busy ? 'opacity-60' : ''}`}>
+                          {t('ed.changePhoto')}
+                          <input type="file" accept={ACCEPT} hidden disabled={busy} onChange={(e) => void onReplaceImage(img, e)} />
+                        </label>
                       )}
                     </figure>
                   ))}

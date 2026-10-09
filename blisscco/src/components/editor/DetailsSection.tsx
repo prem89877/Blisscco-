@@ -13,7 +13,7 @@ const r6 = (n: number) => Math.round(n * 1e6) / 1e6;
 type Part = 'all' | 'basic' | 'contact';
 
 /** part: which fields to show (the wizard shows 'basic' then 'contact'; all values stay in one form state).
- *  live: the shop is approved/hidden, so only description / phone / e-mail can be changed (name, category, address, location are locked). */
+ *  live: the shop is approved/hidden, so only phone / e-mail can be changed here (name, category, description: change request with admin review; address, location are locked). */
 export default function DetailsSection({ data, editable, reload, part = 'all', live = false, onSaved }: {
   data: Loaded; editable: boolean; reload: () => Promise<void>; part?: Part; live?: boolean; onSaved?: () => void;
 }) {
@@ -120,11 +120,11 @@ export default function DetailsSection({ data, editable, reload, part = 'all', l
 
   const d = !editable || busy;
   const lockedD = d || live;                 // name / category / address / location are locked on a live shop
-  const showBasic = part === 'all' || part === 'basic';
+  const showBasic = (part === 'all' || part === 'basic') && !live;   // live shop: name / category / description go through ProfileChangeSection (admin review)
   const showContact = part === 'all' || part === 'contact';
   const canSave = editable || live;
   return (
-    <Section title={part === 'basic' ? t('step.basic') : part === 'contact' ? t('step.contact') : t('ed.details')}>
+    <Section title={part === 'basic' ? t('step.basic') : part === 'contact' ? t('step.contact') : live ? t('step.contact') : t('ed.details')}>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         {live && <p className="rounded-xl bg-cream p-3 text-sm">{t('ed.liveNote')}</p>}
         {showBasic && <>
