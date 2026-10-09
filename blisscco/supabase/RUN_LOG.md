@@ -67,3 +67,4 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 
 - (0034 NEW, not run yet: service_images table, up to 3 photos per service)
 - (0035 NEW, not run yet: owner_upi_ids table + set/get/remove_my_upi_id + admin_list_owner_upi; run after 0030; drops and recreates the admin function, so re-running it fixes the earlier "p.phone does not exist" error)
+- (0036 NEW, not run yet: business_change_requests + owner_request_profile_change() + admin_review_profile_change(); live shops request name / category / description change, goes live after admin approval; run after 0035, before deploying the frontend)
