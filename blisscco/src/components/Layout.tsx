@@ -76,7 +76,9 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             {session ? (
               <>
-                <Link to="/my-bookings" className="btn-secondary hidden sm:inline-flex">{t('my.title')}</Link>
+                {profile?.role === 'owner'
+                  ? <Link to="/owner/advisor" className="btn-secondary hidden sm:inline-flex">{t('bn.advisor')}</Link>
+                  : <Link to="/my-bookings" className="btn-secondary hidden sm:inline-flex">{t('my.title')}</Link>}
                 {home && <Link to={home} className="btn-secondary hidden sm:inline-flex">{t(profile?.role === 'admin' ? 'dash.admin' : 'dash.owner')}</Link>}
               </>
             ) : (

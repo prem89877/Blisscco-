@@ -11,11 +11,14 @@ export default function BottomNav() {
   const { pathname } = useLocation();
   if (!session) return null;
 
+  const isOwner = profile?.role === 'owner';
   const referTo = profile?.role === 'owner' ? '/owner/competition' : profile?.role === 'admin' ? '/admin/competition' : '/refer';
   const is = (p: string) => pathname === p || pathname.startsWith(p + '/');
 
   const items: Item[] = [
-    { key: 'bookings', label: t('bn.bookings'), icon: 'bookings', to: '/my-bookings', active: is('/my-bookings') },
+    isOwner
+      ? { key: 'advisor', label: t('bn.advisor'), icon: 'ai-advisor', to: '/owner/advisor', active: is('/owner/advisor') }
+      : { key: 'bookings', label: t('bn.bookings'), icon: 'bookings', to: '/my-bookings', active: is('/my-bookings') },
     { key: 'refer', label: t('bn.refer'), icon: 'refer', to: referTo, active: is('/refer') || is('/owner/competition') || is('/admin/competition') },
     { key: 'home', label: t('bn.home'), icon: 'home', to: '/explore', active: pathname === '/' || is('/explore') },
     { key: 'help', label: t('bn.help'), icon: 'help', to: '/support', active: is('/support') },
