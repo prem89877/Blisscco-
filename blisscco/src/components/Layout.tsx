@@ -8,6 +8,7 @@ import { recordCustomerDevice } from '../lib/customerCompetition';
 import { clearRef, getStoredRef } from '../lib/referral';
 import { clearShopRef, getDeviceSignals, getStoredShopRef, recordShopDevice } from '../lib/shopReferral';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import BeautyTip from './BeautyTip';
 import BottomNav from './BottomNav';
 import HeaderMenu from './HeaderMenu';
 import InstallPrompt from './InstallPrompt';
@@ -62,6 +63,9 @@ export default function Layout() {
   // renew this browser's push subscription if this user already turned it on (never turns it on by itself)
   useEffect(() => { if (profile?.id) void syncPushSubscription().catch(() => undefined); }, [profile?.id]);
 
+  // Beauty jokes / slogans / tips: for customers and visitors only (not owners, admins, log-in pages or the support chat)
+  const showTip = !isAuthPage && pathname !== '/support' && profile?.role !== 'owner' && profile?.role !== 'admin';
+
   const home = profile?.role === 'admin' ? '/admin' : profile?.role === 'owner' ? '/owner' : null;
 
   return (
@@ -85,6 +89,8 @@ export default function Layout() {
       </header>
 
       {!online && <p role="status" className="bg-amber-100 px-4 py-1.5 text-center text-xs font-medium text-amber-900">{t('off.banner')}</p>}
+
+      {showTip && <BeautyTip />}
 
       <InstallPrompt />
 
