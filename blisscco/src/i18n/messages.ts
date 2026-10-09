@@ -2431,9 +2431,69 @@ const mr31: M = {
 };
 const p31 = { en: en31, hi: hi31, mr: mr31 };
 
+// ============ Shop offers / own coupon codes (owner creates, shown on browse page) ============
+const en32: M = {
+  'of.title': 'Offers & coupon codes', 'oc.title': 'Offers & coupons',
+  'of.fundNote': 'You fund these offers. Blisscco does not pay them. Customers see active offers on the browse page.',
+  'of.create': 'Create an offer', 'of.code': 'Offer code', 'of.codeHint': '3 to 20 letters or numbers, for example SAVE20. Customers show this code at your shop.',
+  'of.type': 'Discount type', 'of.typePercent': 'Percentage (%)', 'of.typeFlat': 'Flat amount (₹)',
+  'of.valuePercent': 'Discount (%)', 'of.valueFlat': 'Discount (₹)',
+  'of.maxDisc': 'Maximum discount in ₹ (optional)', 'of.minSpend': 'Minimum spend in ₹ (optional)',
+  'of.startDate': 'Starts on (optional)', 'of.endDate': 'Valid till (optional)',
+  'of.tenureHint': 'Leave the dates empty if the offer has no time limit.',
+  'of.createBtn': 'Create offer', 'of.created': 'Offer created. It is now visible to customers.',
+  'of.yours': 'Your offers', 'of.none': 'No offers yet.',
+  'of.state.live': 'Live', 'of.state.paused': 'Paused', 'of.state.scheduled': 'Scheduled', 'of.state.expired': 'Expired',
+  'of.pause': 'Pause', 'of.resume': 'Resume', 'of.delete': 'Delete', 'of.confirmDelete': 'Delete offer {c}? It cannot be undone.',
+  'of.noEnd': 'No end date', 'of.upTo': 'up to {n}',
+  'of.pctOff': '{v}% OFF', 'of.flatOff': '₹{v} OFF', 'of.code': 'Code {c}', 'of.till': 'till {d}', 'of.more': '+{n} more',
+  'of.err.not_owner': 'This shop is not in your account.', 'of.err.invalid_code': 'The code must be 3 to 20 letters or numbers.',
+  'of.err.invalid_value': 'Please enter a valid discount (percentage up to 100).', 'of.err.invalid_dates': 'Please check the dates. The end date cannot be in the past or before the start date.',
+  'of.err.code_taken': 'You already have an offer with this code.', 'of.err.too_many_offers': 'You can keep up to 25 offers. Please delete an old one first.',
+};
+const hi32: M = {
+  'of.title': 'ऑफ़र और कूपन कोड', 'oc.title': 'ऑफ़र और कूपन',
+  'of.fundNote': 'ये ऑफ़र आप खुद देते हैं। Blisscco इन्हें नहीं चुकाता। ग्राहक चालू ऑफ़र ब्राउज़ पेज पर देखते हैं।',
+  'of.create': 'नया ऑफ़र बनाएँ', 'of.code': 'ऑफ़र कोड', 'of.codeHint': '3 से 20 अक्षर या अंक, जैसे SAVE20। ग्राहक यह कोड आपकी दुकान पर दिखाएँगे।',
+  'of.type': 'छूट का प्रकार', 'of.typePercent': 'प्रतिशत (%)', 'of.typeFlat': 'तय रकम (₹)',
+  'of.valuePercent': 'छूट (%)', 'of.valueFlat': 'छूट (₹)',
+  'of.maxDisc': 'अधिकतम छूट ₹ में (ऐच्छिक)', 'of.minSpend': 'न्यूनतम खर्च ₹ में (ऐच्छिक)',
+  'of.startDate': 'शुरू होने की तारीख (ऐच्छिक)', 'of.endDate': 'इस तारीख तक मान्य (ऐच्छिक)',
+  'of.tenureHint': 'अगर ऑफ़र की कोई समय सीमा नहीं है तो तारीखें खाली छोड़ें।',
+  'of.createBtn': 'ऑफ़र बनाएँ', 'of.created': 'ऑफ़र बन गया। अब यह ग्राहकों को दिखेगा।',
+  'of.yours': 'आपके ऑफ़र', 'of.none': 'अभी कोई ऑफ़र नहीं।',
+  'of.state.live': 'चालू', 'of.state.paused': 'रुका हुआ', 'of.state.scheduled': 'निर्धारित', 'of.state.expired': 'समाप्त',
+  'of.pause': 'रोकें', 'of.resume': 'फिर चालू करें', 'of.delete': 'हटाएँ', 'of.confirmDelete': 'ऑफ़र {c} हटाएँ? यह वापस नहीं होगा।',
+  'of.noEnd': 'कोई अंतिम तारीख नहीं', 'of.upTo': 'अधिकतम {n}',
+  'of.pctOff': '{v}% छूट', 'of.flatOff': '₹{v} की छूट', 'of.code': 'कोड {c}', 'of.till': '{d} तक', 'of.more': '+{n} और',
+  'of.err.not_owner': 'यह दुकान आपके खाते में नहीं है।', 'of.err.invalid_code': 'कोड 3 से 20 अक्षर या अंक का होना चाहिए।',
+  'of.err.invalid_value': 'कृपया सही छूट डालें (प्रतिशत 100 तक)।', 'of.err.invalid_dates': 'कृपया तारीखें जाँचें। अंतिम तारीख बीती हुई या शुरू होने की तारीख से पहले नहीं हो सकती।',
+  'of.err.code_taken': 'इस कोड का ऑफ़र आपके पास पहले से है।', 'of.err.too_many_offers': 'आप अधिकतम 25 ऑफ़र रख सकते हैं। पहले कोई पुराना हटाएँ।',
+};
+const mr32: M = {
+  'of.title': 'ऑफर आणि कूपन कोड', 'oc.title': 'ऑफर आणि कूपन',
+  'of.fundNote': 'हे ऑफर तुम्ही स्वतः देता. Blisscco ते भरत नाही. ग्राहक सुरू असलेले ऑफर ब्राउझ पेजवर पाहतात.',
+  'of.create': 'नवीन ऑफर तयार करा', 'of.code': 'ऑफर कोड', 'of.codeHint': '3 ते 20 अक्षरे किंवा अंक, उदा. SAVE20. ग्राहक हा कोड तुमच्या दुकानात दाखवतील.',
+  'of.type': 'सवलतीचा प्रकार', 'of.typePercent': 'टक्केवारी (%)', 'of.typeFlat': 'ठराविक रक्कम (₹)',
+  'of.valuePercent': 'सवलत (%)', 'of.valueFlat': 'सवलत (₹)',
+  'of.maxDisc': 'कमाल सवलत ₹ मध्ये (ऐच्छिक)', 'of.minSpend': 'किमान खर्च ₹ मध्ये (ऐच्छिक)',
+  'of.startDate': 'सुरू होण्याची तारीख (ऐच्छिक)', 'of.endDate': 'या तारखेपर्यंत वैध (ऐच्छिक)',
+  'of.tenureHint': 'ऑफरला वेळेची मर्यादा नसेल तर तारखा रिकाम्या ठेवा.',
+  'of.createBtn': 'ऑफर तयार करा', 'of.created': 'ऑफर तयार झाली. आता ती ग्राहकांना दिसेल.',
+  'of.yours': 'तुमचे ऑफर', 'of.none': 'अजून कोणतेही ऑफर नाही.',
+  'of.state.live': 'सुरू', 'of.state.paused': 'थांबवलेले', 'of.state.scheduled': 'नियोजित', 'of.state.expired': 'संपले',
+  'of.pause': 'थांबवा', 'of.resume': 'पुन्हा सुरू करा', 'of.delete': 'हटवा', 'of.confirmDelete': 'ऑफर {c} हटवायचे? हे परत येणार नाही.',
+  'of.noEnd': 'शेवटची तारीख नाही', 'of.upTo': 'कमाल {n}',
+  'of.pctOff': '{v}% सवलत', 'of.flatOff': '₹{v} सवलत', 'of.code': 'कोड {c}', 'of.till': '{d} पर्यंत', 'of.more': '+{n} आणखी',
+  'of.err.not_owner': 'हे दुकान तुमच्या खात्यात नाही.', 'of.err.invalid_code': 'कोड 3 ते 20 अक्षरे किंवा अंकांचा असावा.',
+  'of.err.invalid_value': 'कृपया योग्य सवलत टाका (टक्केवारी 100 पर्यंत).', 'of.err.invalid_dates': 'कृपया तारखा तपासा. शेवटची तारीख भूतकाळातील किंवा सुरुवातीच्या तारखेआधीची असू शकत नाही.',
+  'of.err.code_taken': 'या कोडचे ऑफर तुमच्याकडे आधीच आहे.', 'of.err.too_many_offers': 'तुम्ही जास्तीत जास्त 25 ऑफर ठेवू शकता. आधी एखादे जुने हटवा.',
+};
+const p32 = { en: en32, hi: hi32, mr: mr32 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en, ...p31.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi, ...p31.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr, ...p31.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en, ...p31.en, ...p32.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi, ...p31.hi, ...p32.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr, ...p31.mr, ...p32.mr },
 };
