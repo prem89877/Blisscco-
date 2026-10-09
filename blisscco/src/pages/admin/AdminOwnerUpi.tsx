@@ -6,7 +6,7 @@ import { fmtDateTime, rupees } from '../../lib/format';
 import { supabase } from '../../lib/supabase';
 
 interface R {
-  owner_id: string; full_name: string | null; email: string; phone: string | null; shops: string | null;
+  owner_id: string; full_name: string | null; email: string; shops: string | null;
   upi_id: string | null; balance: number | string; total_earned: number | string; upi_updated_at: string | null;
 }
 
@@ -53,7 +53,7 @@ export default function AdminOwnerUpi() {
                   <span className="font-medium">{r.full_name ?? r.email}</span>
                   {used && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">{t('upi.adminUsed')}</span>}
                 </div>
-                <p className="break-all text-xs text-ink/70">{r.email}{r.phone ? ` · ${r.phone}` : ''}{r.shops ? ` · ${r.shops}` : ''}</p>
+                <p className="break-all text-xs text-ink/70">{r.email}{r.shops ? ` · ${r.shops}` : ''}</p>
                 <p>{t('upi.adminBalance')}: <b>{rupees(bal)}</b> <span className="text-xs text-ink/60">({t('upi.adminEarned')}: {rupees(earned)})</span></p>
                 {r.upi_id ? (
                   <div className="flex flex-wrap items-center gap-2">
