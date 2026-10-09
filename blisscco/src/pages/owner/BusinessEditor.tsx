@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import DetailsSection from '../../components/editor/DetailsSection';
 import HoursSection from '../../components/editor/HoursSection';
 import PhotosSection from '../../components/editor/PhotosSection';
+import ProfileChangeSection from '../../components/editor/ProfileChangeSection';
 import ServicesSection from '../../components/editor/ServicesSection';
 import SubmitSection from '../../components/editor/SubmitSection';
 import Skeleton from '../../components/Skeleton';
@@ -130,7 +131,10 @@ export default function BusinessEditor() {
       <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
         <Tutorial open={tut.open} onClose={tut.close} titleKey="owner.editProfile" steps={TUT_LIVE} />
         {header}
-        <div id="details-form"><DetailsSection data={data} editable={false} live={live} reload={load} /></div>
+        <div id="details-form" className="space-y-4">
+          {live && <ProfileChangeSection data={data} reload={load} />}
+          <DetailsSection data={data} editable={false} live={live} reload={load} />
+        </div>
         <PhotosSection data={data} editable={live} minKeep={live ? 3 : 0} reload={load} />
         <HoursSection data={data} editable={b.status !== 'suspended'} reload={load} />
         <ServicesSection data={data} reload={load} />
