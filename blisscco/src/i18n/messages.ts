@@ -2369,9 +2369,71 @@ const mr30: M = {
 };
 const p30 = { en: en30, hi: hi30, mr: mr30 };
 
+const en31: M = {
+  'bn.advisor': 'AI Advisor',
+  'ad.title': 'AI Advisor',
+  'ad.sub': 'Ask how to get more customers and better ratings. The advisor reads your shop\'s ratings, reviews, services and bookings.',
+  'ad.shop': 'Shop',
+  'ad.hello': 'Hello! I am your AI Advisor. I can read your customer ratings, reviews, services and bookings and tell you what to improve. Ask me anything about growing your shop, or tap a question below.',
+  'ad.q1': 'How are my customer ratings?',
+  'ad.q2': 'How can I get more customers?',
+  'ad.q3': 'What do customers complain about?',
+  'ad.q4': 'Which services should I promote?',
+  'ad.placeholder': 'Ask about your shop…',
+  'ad.typing': 'Reading your shop data…',
+  'ad.disclaimer': 'Uses a summary of your shop (ratings, review text without names, services, booking counts). AI can make mistakes; use your own judgement.',
+  'ad.noShop': 'Add your business first. The AI Advisor can then read your ratings and bookings and suggest what to improve.',
+  'ad.err.generic': 'Sorry, could not answer right now. Please try again, or e-mail us:',
+  'ad.err.configuration_required': 'AI Advisor is not switched on yet. Please e-mail us:',
+  'ad.err.rate_limited': 'You have asked many questions. Please try again after a while, or e-mail us:',
+  'ad.err.unauthorized': 'Please log in again to use the AI Advisor. Or e-mail us:',
+  'ad.err.not_owner': 'This shop could not be found in your account. Or e-mail us:',
+};
+const hi31: M = {
+  'bn.advisor': 'AI सलाहकार',
+  'ad.title': 'AI सलाहकार',
+  'ad.sub': 'ज़्यादा ग्राहक और बेहतर रेटिंग कैसे पाएँ, पूछें। सलाहकार आपकी दुकान की रेटिंग, रिव्यू, सेवाएँ और बुकिंग पढ़ता है।',
+  'ad.shop': 'दुकान',
+  'ad.hello': 'नमस्ते! मैं आपका AI सलाहकार हूँ। मैं आपकी ग्राहक रेटिंग, रिव्यू, सेवाएँ और बुकिंग पढ़कर बता सकता हूँ कि क्या सुधारें। दुकान बढ़ाने के बारे में कुछ भी पूछें, या नीचे का कोई सवाल चुनें।',
+  'ad.q1': 'मेरी ग्राहक रेटिंग कैसी है?',
+  'ad.q2': 'ज़्यादा ग्राहक कैसे पाऊँ?',
+  'ad.q3': 'ग्राहक किस बात की शिकायत करते हैं?',
+  'ad.q4': 'किन सेवाओं का प्रचार करूँ?',
+  'ad.placeholder': 'अपनी दुकान के बारे में पूछें…',
+  'ad.typing': 'आपकी दुकान का डेटा पढ़ रहा है…',
+  'ad.disclaimer': 'यह आपकी दुकान का सारांश इस्तेमाल करता है (रेटिंग, बिना नाम के रिव्यू टेक्स्ट, सेवाएँ, बुकिंग की गिनती)। AI गलती कर सकता है; अपना विवेक भी लगाएँ।',
+  'ad.noShop': 'पहले अपना व्यवसाय जोड़ें। फिर AI सलाहकार आपकी रेटिंग और बुकिंग पढ़कर सुधार सुझा सकेगा।',
+  'ad.err.generic': 'माफ़ करें, अभी जवाब नहीं दे सका। कृपया दोबारा कोशिश करें, या हमें ईमेल करें:',
+  'ad.err.configuration_required': 'AI सलाहकार अभी चालू नहीं है। कृपया हमें ईमेल करें:',
+  'ad.err.rate_limited': 'आपने बहुत सवाल पूछ लिए हैं। थोड़ी देर बाद कोशिश करें, या हमें ईमेल करें:',
+  'ad.err.unauthorized': 'AI सलाहकार के लिए कृपया दोबारा लॉग इन करें। या हमें ईमेल करें:',
+  'ad.err.not_owner': 'यह दुकान आपके खाते में नहीं मिली। या हमें ईमेल करें:',
+};
+const mr31: M = {
+  'bn.advisor': 'AI सल्लागार',
+  'ad.title': 'AI सल्लागार',
+  'ad.sub': 'जास्त ग्राहक आणि चांगले रेटिंग कसे मिळवायचे ते विचारा. सल्लागार तुमच्या दुकानाचे रेटिंग, रिव्ह्यू, सेवा आणि बुकिंग वाचतो.',
+  'ad.shop': 'दुकान',
+  'ad.hello': 'नमस्कार! मी तुमचा AI सल्लागार आहे. मी तुमचे ग्राहक रेटिंग, रिव्ह्यू, सेवा आणि बुकिंग वाचून काय सुधारावे ते सांगू शकतो. दुकान वाढवण्याबद्दल काहीही विचारा, किंवा खालील प्रश्न निवडा.',
+  'ad.q1': 'माझे ग्राहक रेटिंग कसे आहे?',
+  'ad.q2': 'जास्त ग्राहक कसे मिळवू?',
+  'ad.q3': 'ग्राहक कशाबद्दल तक्रार करतात?',
+  'ad.q4': 'कोणत्या सेवांचा प्रचार करू?',
+  'ad.placeholder': 'तुमच्या दुकानाबद्दल विचारा…',
+  'ad.typing': 'तुमच्या दुकानाचा डेटा वाचत आहे…',
+  'ad.disclaimer': 'हे तुमच्या दुकानाचा सारांश वापरते (रेटिंग, नावाशिवाय रिव्ह्यू मजकूर, सेवा, बुकिंग संख्या). AI चुकू शकतो; स्वतःचा विचारही वापरा.',
+  'ad.noShop': 'आधी तुमचा व्यवसाय जोडा. मग AI सल्लागार तुमचे रेटिंग आणि बुकिंग वाचून सुधारणा सुचवू शकेल.',
+  'ad.err.generic': 'माफ करा, आत्ता उत्तर देता आले नाही. कृपया पुन्हा प्रयत्न करा, किंवा आम्हाला ईमेल करा:',
+  'ad.err.configuration_required': 'AI सल्लागार अजून सुरू नाही. कृपया आम्हाला ईमेल करा:',
+  'ad.err.rate_limited': 'तुम्ही खूप प्रश्न विचारले आहेत. थोड्या वेळाने प्रयत्न करा, किंवा आम्हाला ईमेल करा:',
+  'ad.err.unauthorized': 'AI सल्लागारासाठी कृपया पुन्हा लॉग इन करा. किंवा आम्हाला ईमेल करा:',
+  'ad.err.not_owner': 'हे दुकान तुमच्या खात्यात सापडले नाही. किंवा आम्हाला ईमेल करा:',
+};
+const p31 = { en: en31, hi: hi31, mr: mr31 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en, ...p31.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi, ...p31.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr, ...p31.mr },
 };
