@@ -66,4 +66,4 @@ No new SQL was needed for Phase 4 (the Phase 2 tables, functions and policies co
 - Phase 11 Part 2: rating sort, review photos, listing edit review (0015)
 
 - (0034 NEW, not run yet: service_images table, up to 3 photos per service)
-- (0035 NEW, not run yet: owner_upi_ids table + set/get/remove_my_upi_id + admin_list_owner_upi; run after 0030)
+- (0035 NEW, not run yet: owner_upi_ids table + set/get/remove_my_upi_id + admin_list_owner_upi; run after 0030; drops and recreates the admin function, so re-running it fixes the earlier "p.phone does not exist" error)
