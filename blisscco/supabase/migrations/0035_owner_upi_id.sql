@@ -49,8 +49,9 @@ end $$;
 
 -- Admin: every shop owner with UPI ID, current promotional balance and total credit ever earned.
 -- "Credit used up" = earned > 0 and balance = 0 (that is when you pay the owner).
-create or replace function public.admin_list_owner_upi(p_search text default null, p_limit int default 50, p_offset int default 0)
-returns table (owner_id uuid, full_name text, email text, phone text, shops text, upi_id text, balance numeric, total_earned numeric, upi_updated_at timestamptz)
+drop function if exists public.admin_list_owner_upi(text, int, int);
+create function public.admin_list_owner_upi(p_search text default null, p_limit int default 50, p_offset int default 0)
+returns table (owner_id uuid, full_name text, email text, shops text, upi_id text, balance numeric, total_earned numeric, upi_updated_at timestamptz)
 language plpgsql stable security definer set search_path = '' as $$
 #variable_conflict use_column
 declare v_pat text;
@@ -58,7 +59,7 @@ begin
   if not public.is_admin() then raise exception 'admin only' using errcode = '42501'; end if;
   v_pat := '%' || replace(replace(replace(left(trim(coalesce(p_search, '')), 60), '\', '\\'), '%', '\%'), '_', '\_') || '%';
   return query
-  select p.id, p.full_name, u.email::text, p.phone,
+  select p.id, p.full_name, u.email::text,
          (select string_agg(b.name, ', ' order by b.name) from public.businesses b where b.owner_id = p.id),
          q.upi_id,
          coalesce((select sum(l.delta_inr) from public.growth_credit_ledger l where l.owner_id = p.id), 0)::numeric,
@@ -68,7 +69,7 @@ begin
     join auth.users u on u.id = p.id
     left join public.owner_upi_ids q on q.owner_id = p.id
    where p.role = 'owner'
-     and (coalesce(trim(p_search), '') = '' or u.email ilike v_pat or p.full_name ilike v_pat or p.phone ilike v_pat or q.upi_id ilike v_pat)
+     and (coalesce(trim(p_search), '') = '' or u.email ilike v_pat or p.full_name ilike v_pat or q.upi_id ilike v_pat)
    order by (q.upi_id is not null) desc, q.updated_at desc nulls last, p.created_at desc
    limit least(greatest(coalesce(p_limit, 50), 1), 100) offset greatest(coalesce(p_offset, 0), 0);
 end $$;
