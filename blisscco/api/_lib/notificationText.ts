@@ -213,6 +213,47 @@ const T: Record<string, Tpl> = {
     hi: ['टेस्ट नोटिफ़िकेशन', 'इस डिवाइस पर नोटिफ़िकेशन काम कर रहे हैं।'],
     mr: ['टेस्ट सूचना', 'या डिव्हाइसवर सूचना काम करत आहेत.'],
   },
+  // ---- Mega Store Customer Reward Cycle (migration 0038) ----
+  mega_reward_issued: {
+    en: ['Shopping reward unlocked', 'You earned {disc} at {shop}. Valid till {expires}. Show your reward QR at the store.'],
+    hi: ['शॉपिंग रिवॉर्ड मिल गया', '{shop} में आपको {disc} मिला है। {expires} तक वैध। स्टोर में अपना रिवॉर्ड QR दिखाएँ।'],
+    mr: ['शॉपिंग रिवॉर्ड मिळाला', '{shop} मध्ये तुम्हाला {disc} मिळाले आहे. {expires} पर्यंत वैध. स्टोअरमध्ये तुमचा रिवॉर्ड QR दाखवा.'],
+  },
+  mega_reward_review: {
+    en: ['Reward needs your approval', '{who} earned a reward that needs your check before it can be used.'],
+    hi: ['रिवॉर्ड को आपकी मंज़ूरी चाहिए', '{who} को एक रिवॉर्ड मिला है जिसे इस्तेमाल से पहले आपकी जाँच चाहिए।'],
+    mr: ['रिवॉर्डला तुमची मंजुरी हवी', '{who} यांना एक रिवॉर्ड मिळाला आहे, जो वापरण्यापूर्वी तुमची तपासणी आवश्यक आहे.'],
+  },
+  mega_reward_redeemed: {
+    en: ['Reward used', 'Your {shop} shopping reward was applied. Enjoy your shopping!'],
+    hi: ['रिवॉर्ड इस्तेमाल हुआ', 'आपका {shop} का शॉपिंग रिवॉर्ड लागू हो गया। शॉपिंग का मज़ा लें!'],
+    mr: ['रिवॉर्ड वापरला', 'तुमचा {shop} चा शॉपिंग रिवॉर्ड लागू झाला. शॉपिंगचा आनंद घ्या!'],
+  },
+  mega_store_new: {
+    en: ['New Mega Store', '{shop} registered as a Mega Store and is waiting for approval.'],
+    hi: ['नया मेगा स्टोर', '{shop} ने मेगा स्टोर के रूप में रजिस्टर किया है और मंज़ूरी का इंतज़ार कर रहा है।'],
+    mr: ['नवीन मेगा स्टोअर', '{shop} ने मेगा स्टोअर म्हणून नोंदणी केली आहे आणि मंजुरीची वाट पाहत आहे.'],
+  },
+  mega_store_approved: {
+    en: ['Mega Store approved', '{shop} is approved. You can now create a reward campaign.'],
+    hi: ['मेगा स्टोर मंज़ूर', '{shop} मंज़ूर हो गया। अब आप रिवॉर्ड कैंपेन बना सकते हैं।'],
+    mr: ['मेगा स्टोअर मंजूर', '{shop} मंजूर झाले. आता तुम्ही रिवॉर्ड मोहीम तयार करू शकता.'],
+  },
+  mega_store_rejected: {
+    en: ['Mega Store not approved', '{shop} was not approved. {reasonLine}'],
+    hi: ['मेगा स्टोर मंज़ूर नहीं', '{shop} मंज़ूर नहीं हुआ। {reasonLine}'],
+    mr: ['मेगा स्टोअर मंजूर नाही', '{shop} मंजूर झाले नाही. {reasonLine}'],
+  },
+  mega_store_suspended: {
+    en: ['Mega Store suspended', '{shop} was suspended and its rewards are paused. {reasonLine}'],
+    hi: ['मेगा स्टोर निलंबित', '{shop} निलंबित हो गया और इसके रिवॉर्ड रुक गए हैं। {reasonLine}'],
+    mr: ['मेगा स्टोअर निलंबित', '{shop} निलंबित झाले आणि त्याचे रिवॉर्ड थांबले आहेत. {reasonLine}'],
+  },
+  mega_shop_added: {
+    en: ['Your shop joined a reward campaign', '{title} added {shop} to its customer reward campaign. Customers who complete a service at your shop can earn a shopping reward. It costs you nothing.'],
+    hi: ['आपकी दुकान रिवॉर्ड कैंपेन में जुड़ी', '{title} ने {shop} को अपने ग्राहक रिवॉर्ड कैंपेन में जोड़ा है। आपकी दुकान में सर्विस पूरी करने वाले ग्राहक शॉपिंग रिवॉर्ड पा सकते हैं। आपका कोई खर्च नहीं है।'],
+    mr: ['तुमचे दुकान रिवॉर्ड मोहिमेत सामील झाले', '{title} ने {shop} ला आपल्या ग्राहक रिवॉर्ड मोहिमेत जोडले आहे. तुमच्या दुकानात सेवा पूर्ण करणारे ग्राहक शॉपिंग रिवॉर्ड मिळवू शकतात. तुम्हाला कोणताही खर्च नाही.'],
+  },
 };
 
 const LOCALE: Record<NotifLang, string> = { en: 'en-IN', hi: 'hi-IN', mr: 'mr-IN' };
