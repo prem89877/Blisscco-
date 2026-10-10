@@ -57,6 +57,8 @@ export default function MegaCampaign() {
 
   const reward = rewardLabel(c.reward_type, c.reward_value, c.max_discount_inr, t);
   const ended = istDayOf(c.ends_at) < istToday();
+  // Paused campaigns refuse new registrations unless the Mega Store configured otherwise (the server decides; this only hides the button).
+  const canJoin = (c.registrations_open ?? c.status === 'active') && !ended;
 
   return (
     <section className="mx-auto max-w-lg space-y-4 px-4 py-6">
@@ -79,7 +81,7 @@ export default function MegaCampaign() {
         </div>
       )}
       {session && me && me.role !== 'customer' && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm">{t('mg.cp.notCustomer')}</p>}
-      {session && me?.role === 'customer' && !me.enrolled && c.status === 'active' && !ended && (
+      {session && me?.role === 'customer' && !me.enrolled && canJoin && (
         <div className="card space-y-3">
           <Check id="mega-female" label={t('mg.cp.declare')} checked={female} onChange={setFemale} disabled={busy} />
           <button type="button" className="btn-confirm" disabled={busy || !female} onClick={() => void join()}>{t('mg.cp.join')}</button>
