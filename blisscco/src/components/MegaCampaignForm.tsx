@@ -3,7 +3,7 @@ import { Check, Msg, Select } from './ui';
 import Field from './Field';
 import { useI18n } from '../i18n';
 import { addDays, istToday } from '../lib/format';
-import { istDayOf, istEndIso, istStartIso, megaErrKey, type MegaCampaign, type MegaRewardType } from '../lib/megaStore';
+import { inr, istDayOf, istEndIso, istStartIso, megaErrKey, type MegaCampaign, type MegaLimits, type MegaRewardType } from '../lib/megaStore';
 import { supabase } from '../lib/supabase';
 
 function Num({ id, label, value, onChange, disabled }: { id: string; label: string; value: string; onChange: (v: string) => void; disabled?: boolean }) {
@@ -17,7 +17,7 @@ function Num({ id, label, value, onChange, disabled }: { id: string; label: stri
 }
 
 /** Create / edit the draft campaign of the Mega Store. Fixed rules (women only, max 5 rewards, 1-month expiry) are enforced by the database. */
-export default function MegaCampaignForm({ draft, onSaved }: { draft: MegaCampaign | null; onSaved: () => void }) {
+export default function MegaCampaignForm({ draft, limits, onSaved }: { draft: MegaCampaign | null; limits: MegaLimits | null | undefined; onSaved: () => void }) {
   const { t } = useI18n();
   const today = istToday();
   const [title, setTitle] = useState(draft?.title ?? '');
@@ -30,6 +30,8 @@ export default function MegaCampaignForm({ draft, onSaved }: { draft: MegaCampai
   const [minPurchase, setMinPurchase] = useState(draft && draft.min_purchase_inr > 0 ? String(draft.min_purchase_inr) : '');
   const [minService, setMinService] = useState(draft && draft.min_service_price_inr > 0 ? String(draft.min_service_price_inr) : '');
   const [onePerShop, setOnePerShop] = useState(draft?.one_reward_per_shop ?? true);
+  const [budget, setBudget] = useState(draft?.budget_inr ? String(draft.budget_inr) : '');
+  const [pauseBlocks, setPauseBlocks] = useState(draft?.config?.pause_blocks_registrations !== false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [ok, setOk] = useState('');
@@ -41,6 +43,13 @@ export default function MegaCampaignForm({ draft, onSaved }: { draft: MegaCampai
     const v = Number(value);
     if (!(v > 0)) return setError(t('mg.err.invalid_value'));
     if (!startDay || !endDay || endDay < startDay) return setError(t('mg.err.invalid_dates'));
+    // Same limits as the database (which is the real check); these just give an instant answer on the phone.
+    if (limits) {
+      if (type === 'percent' && (v < limits.min_discount_pct || v > limits.max_discount_pct)) return setError(t('mg.err.discount_out_of_range'));
+      if (type === 'flat' && (v < limits.min_flat_inr || v > limits.max_flat_inr)) return setError(t('mg.err.discount_out_of_range'));
+    }
+    const b = budget ? Number(budget) : null;
+    if (b !== null && (!(b > 0) || (limits && (b < limits.min_budget_inr || b > limits.max_budget_inr)))) return setError(t('mg.err.budget_out_of_range'));
     setBusy(true);
     const { error: err } = await supabase.rpc('megastore_save_campaign', {
       p_title: title.trim(), p_description: description.trim() || null,
@@ -50,6 +59,7 @@ export default function MegaCampaignForm({ draft, onSaved }: { draft: MegaCampai
       p_min_purchase: minPurchase ? Number(minPurchase) : null,
       p_min_service: minService ? Number(minService) : null,
       p_one_per_shop: onePerShop,
+      p_budget: b, p_pause_blocks_registrations: pauseBlocks,
     });
     setBusy(false);
     if (err) { setError(t(megaErrKey(err.message))); return; }
@@ -77,10 +87,20 @@ export default function MegaCampaignForm({ draft, onSaved }: { draft: MegaCampai
       <Select id="mg-type" label={t('mg.f.type')} value={type} onChange={(v) => setType(v as MegaRewardType)} disabled={busy}
         options={[{ value: 'percent', label: t('mg.type.percent') }, { value: 'flat', label: t('mg.type.flat') }]} />
       <Num id="mg-value" label={type === 'percent' ? t('mg.f.valuePct') : t('mg.f.valueFlat')} value={value} onChange={setValue} disabled={busy} />
+      {limits && (
+        <p className="-mt-2 px-1 text-xs text-ink/70">
+          {type === 'percent'
+            ? t('mg.limits.pct', { a: limits.min_discount_pct, b: limits.max_discount_pct })
+            : t('mg.limits.flat', { a: inr(limits.min_flat_inr), b: inr(limits.max_flat_inr) })}
+        </p>
+      )}
       {type === 'percent' && <Num id="mg-max" label={t('mg.f.maxDisc')} value={maxDisc} onChange={setMaxDisc} disabled={busy} />}
       <Num id="mg-minbill" label={t('mg.f.minPurchase')} value={minPurchase} onChange={setMinPurchase} disabled={busy} />
       <Num id="mg-minsvc" label={t('mg.f.minService')} value={minService} onChange={setMinService} disabled={busy} />
       <Check id="mg-oneshop" label={t('mg.f.onePerShop')} checked={onePerShop} onChange={setOnePerShop} disabled={busy} />
+      <Num id="mg-budget" label={t('mg.f.budget')} value={budget} onChange={setBudget} disabled={busy} />
+      <p className="-mt-2 px-1 text-xs text-ink/70">{t('mg.f.budgetHint')}{limits ? ` ${t('mg.limits.budget', { a: inr(limits.min_budget_inr), b: inr(limits.max_budget_inr) })}` : ''}</p>
+      <Check id="mg-pauseblocks" label={t('mg.f.pauseBlocks')} checked={pauseBlocks} onChange={setPauseBlocks} disabled={busy} />
       <p className="rounded-xl bg-ink/5 p-3 text-xs">{t('mg.fixedRules')}</p>
       <p className="rounded-xl bg-ink/5 p-3 text-xs">{t('mg.fundNote')}</p>
       <Msg error={error} ok={ok} />
