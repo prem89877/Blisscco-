@@ -42,3 +42,9 @@ Builds on 0038 / 0039 / 0040. The login, sign-up, Google sign-in and e-mail veri
 - src/i18n/messages.ts  (new block p35, English / Hindi / Marathi)
 - supabase/RUN_LOG.md
 - CHANGES.md
+
+## Test fix (after running phase14 / phase15)
+- `supabase/tests/phase14_mega_foundation_tests.sql`: the "budget cannot go below what was spent" check now runs as admin. Since 0040 an owner is stopped earlier by the platform limits (`budget_out_of_range`), so the old expectation `budget_below_spent` could never be reached as owner.
+- `supabase/tests/phase15_mega_dashboard_tests.sql`: the "no sign-up while paused" check now uses a customer who has NOT joined (new `c3`). With 0041 a customer who already joined gets `already_joined`, not an error.
+- Only the tests changed. No migration or app code was touched.
+- If phase14 / phase15 still show an error, please send the exact error text and the line it names.

@@ -1,5 +1,5 @@
 -- Mega Store database foundation tests (0038 + 0039). TEST project only; everything rolls back at the end.
--- Run after 0039. NOT RUN by the assistant (no database available) - please run and send me any error text.
+-- Run after 0039 (still valid after 0040 and 0041). NOT RUN by the assistant (no database available) - please run and send me any error text.
 -- Any failed check raises 'TEST FAIL: ...'. If it ends with "ROLLBACK" and no error, every check passed.
 begin;
 do $$
@@ -299,6 +299,9 @@ begin
   perform public.megastore_redeem_reward(code2, 500);                         -- 50 more: exactly the budget
   j := public.get_mega_campaign_budget(camp);
   if (j->>'spent_inr')::numeric <> 100 or (j->>'remaining_inr')::numeric <> 0 then raise exception 'TEST FAIL: budget numbers wrong (%)', j; end if;
+  -- since 0040 an owner is stopped earlier by the platform limits (budget_out_of_range) or budget_decrease_blocked, so the
+  -- "never below what was already spent" rule is checked as admin (admins skip those owner-only limits, the trigger still applies)
+  reset role; perform set_config('request.jwt.claims', json_build_object('sub', adm, 'role', 'authenticated')::text, true); set local role authenticated;
   begin
     perform public.megastore_set_campaign_budget(camp, 80);
     raise exception 'TEST FAIL: budget lowered below the amount already spent';

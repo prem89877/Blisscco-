@@ -1,11 +1,11 @@
 -- Mega Store dashboard tests (0040). TEST project only; everything rolls back at the end.
--- Run after 0040. NOT RUN by the assistant (no database available) - please run and send me any error text.
+-- Run after 0040 (still valid after 0041). NOT RUN by the assistant (no database available) - please run and send me any error text.
 -- Any failed check raises 'TEST FAIL: ...'. If it ends with "ROLLBACK" and no error, every check passed.
 begin;
 do $$
 declare
   adm uuid := gen_random_uuid(); ost uuid := gen_random_uuid(); mgr uuid := gen_random_uuid(); stranger uuid := gen_random_uuid();
-  osa uuid := gen_random_uuid(); c1 uuid := gen_random_uuid(); c2 uuid := gen_random_uuid();
+  osa uuid := gen_random_uuid(); c1 uuid := gen_random_uuid(); c2 uuid := gen_random_uuid(); c3 uuid := gen_random_uuid();
   cat uuid; ms uuid; camp uuid; sa uuid; shop_ids uuid[] := '{}'; v_id uuid; n int; j jsonb; st text; i int;
 begin
   -- ---------- SETUP (as the table owner) ----------
@@ -13,9 +13,10 @@ begin
     (adm, 'adm@t15.dev', now(), '{}'),
     (ost, 'ost@t15.dev', now(), '{"signup_role":"owner"}'), (mgr, 'mgr@t15.dev', now(), '{"signup_role":"owner"}'),
     (stranger, 'str@t15.dev', now(), '{"signup_role":"owner"}'), (osa, 'osa@t15.dev', now(), '{"signup_role":"owner"}'),
-    (c1, 'c1@t15.dev', now(), '{"signup_role":"customer"}'), (c2, 'c2@t15.dev', now(), '{"signup_role":"customer"}');
+    (c1, 'c1@t15.dev', now(), '{"signup_role":"customer"}'), (c2, 'c2@t15.dev', now(), '{"signup_role":"customer"}'),
+    (c3, 'c3@t15.dev', now(), '{"signup_role":"customer"}');                          -- c3: has NOT joined (used for the paused sign-up check)
   update public.profiles set role = 'admin' where id = adm;
-  update public.profiles set email_verified = true where id in (c1, c2);
+  update public.profiles set email_verified = true where id in (c1, c2, c3);
   select id into cat from public.business_categories limit 1;
 
   -- 12 approved shops owned by osa, so the 10-shop cap can be tested
@@ -176,7 +177,8 @@ begin
     if sqlerrm like 'TEST FAIL%' then raise; end if;
     if sqlerrm not like '%campaign_not_active%' then raise exception 'TEST FAIL: wrong error for paused insert: %', sqlerrm; end if;
   end;
-  perform set_config('request.jwt.claims', json_build_object('sub', c1, 'role', 'authenticated')::text, true); set local role authenticated;
+  -- a NEW customer (c3) cannot register while paused. (c1 / c2 already joined: since 0041 they just get 'already_joined'.)
+  perform set_config('request.jwt.claims', json_build_object('sub', c3, 'role', 'authenticated')::text, true); set local role authenticated;
   begin
     perform public.join_mega_campaign((select code from public.mega_stores where id = ms), true);
     raise exception 'TEST FAIL: a customer could register while the campaign is paused';
