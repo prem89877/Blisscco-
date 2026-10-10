@@ -14,16 +14,38 @@ export interface MegaCampaign {
   id: string; title: string; description: string | null; status: MegaCampaignStatus; starts_at: string; ends_at: string;
   reward_type: MegaRewardType; reward_value: number; max_discount_inr: number | null; min_purchase_inr: number;
   min_service_price_inr: number; max_rewards_per_customer: number; one_reward_per_shop: boolean;
+  budget_inr: number | null; config: { pause_blocks_registrations?: boolean } | null;
 }
-export interface MegaShop { id: string; name: string; city: string | null; status?: string }
+export type MegaPartnerStatus = 'invited' | 'accepted' | 'declined' | 'withdrawn' | 'removed';
+export interface MegaShop {
+  id: string; name: string; city: string | null; status?: string;
+  /** Only the owner dashboard fills these (per partner shop, this campaign). */
+  partner_status?: MegaPartnerStatus; verified_services?: number; rewards_issued?: number; rewards_redeemed?: number;
+}
+export interface MegaLimits {
+  min_discount_pct: number; max_discount_pct: number; min_flat_inr: number; max_flat_inr: number;
+  max_partner_shops: number; min_budget_inr: number; max_budget_inr: number; updated_at?: string;
+}
+export interface MegaBudget {
+  budget_inr: number | null; spent_inr: number; remaining_inr: number | null;
+  outstanding_exposure_inr: number; uncapped_outstanding: number; shortfall_inr: number;
+}
+export interface MegaFlag {
+  id: string; flag_type: string; severity: 'low' | 'medium' | 'high'; status: 'open' | 'confirmed'; source: 'system' | 'admin';
+  created_at: string; business_name: string | null; customer_name: string; reward_code: string | null; reward_status: string | null;
+}
+/** Five numbers that must never be mixed up: enrolled (registrations), verified_services, issued, redeemed, discount_cost_inr. */
 export interface MegaStats {
-  enrolled: number; issued: number; on_hold: number; redeemed: number; expired: number; active: number;
-  discount_given_inr: number; bills_inr: number;
+  enrolled: number; verified_services: number; issued: number; on_hold: number; redeemed: number; expired: number; active: number;
+  revoked: number; discount_cost_inr: number; discount_given_inr: number; bills_inr: number;
 }
 export interface MegaHeld { id: string; code: string; business_name: string; customer_name: string; risk_flags: string[]; created_at: string }
 export interface MegaRecent { code: string; customer_name: string; business_name: string; bill_inr: number; discount_inr: number; redeemed_at: string }
 export interface MegaDashboard {
   store: MegaStore | null; campaign: MegaCampaign | null; shops: MegaShop[]; stats: Partial<MegaStats>; held: MegaHeld[]; recent: MegaRecent[];
+  my_role?: 'owner' | 'manager'; can_manage?: boolean;       // managers can read and redeem; only the primary owner can change the campaign
+  issuance_open?: boolean; registrations_open?: boolean;
+  budget?: MegaBudget | null; flags?: MegaFlag[]; limits?: MegaLimits | null;
 }
 
 export interface MegaPublic {
@@ -32,7 +54,7 @@ export interface MegaPublic {
   campaign?: {
     id: string; title: string; description: string | null; status: 'active' | 'paused'; starts_at: string; ends_at: string;
     reward_type: MegaRewardType; reward_value: number; max_discount_inr: number | null; min_purchase_inr: number;
-    min_service_price_inr: number; max_rewards: number; one_reward_per_shop: boolean;
+    min_service_price_inr: number; max_rewards: number; one_reward_per_shop: boolean; registrations_open?: boolean;
   } | null;
   shops?: MegaShop[];
   me?: { role: 'customer' | 'owner' | 'admin'; enrolled: boolean; earned: number } | null;
@@ -63,6 +85,8 @@ const KNOWN = [
   'invalid_value', 'campaign_locked', 'invalid_transition', 'no_campaign', 'no_shops', 'shop_not_found', 'own_shop', 'too_many_shops',
   'last_shop', 'customer_only', 'email_not_verified', 'declare_required', 'not_active', 'own_store', 'not_available', 'already_redeemed',
   'not_usable', 'expired', 'invalid_bill', 'below_min_purchase', 'invalid_status',
+  'budget_required', 'budget_out_of_range', 'invalid_budget', 'budget_decrease_blocked', 'budget_below_spent', 'budget_exhausted',
+  'discount_out_of_range', 'campaign_not_active', 'registrations_paused', 'invalid_limits',
 ];
 /** Database functions raise stable codes; map them to translated text (mg.err.<code>). */
 export const megaErrKey = (message: string | undefined) => (message && KNOWN.includes(message) ? `mg.err.${message}` : 'err.generic');
@@ -86,3 +110,8 @@ export const redeemLink = (code: string) => `${window.location.origin}/mega/rede
 
 /** Whole days left until an ISO date (0 when passed). */
 export const daysLeft = (iso: string | null) => (iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000)) : 0);
+
+/** Whole-rupee display with Indian grouping; null = not set. */
+export const inr = (n: number | null | undefined) => (n === null || n === undefined ? '—' : `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`);
+/** Share (0-100) of the budget already spent. */
+export const spentPct = (b: MegaBudget | null | undefined) => (b && b.budget_inr ? Math.min(100, Math.round((b.spent_inr / b.budget_inr) * 100)) : 0);
