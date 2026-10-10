@@ -52,14 +52,23 @@ export interface MegaPublic {
   found: boolean;
   store?: { name: string; description: string | null; city: string | null };
   campaign?: {
-    id: string; title: string; description: string | null; status: 'active' | 'paused'; starts_at: string; ends_at: string;
+    id: string; title: string; description: string | null; status: 'active' | 'paused';
+    /** Server-made: 'expired' = the end date has passed although the owner never pressed "end". */
+    state?: 'active' | 'paused' | 'expired';
+    starts_at: string; ends_at: string;
     reward_type: MegaRewardType; reward_value: number; max_discount_inr: number | null; min_purchase_inr: number;
     min_service_price_inr: number; max_rewards: number; one_reward_per_shop: boolean; registrations_open?: boolean;
   } | null;
+  /** True when the store has no running campaign but an earlier one has ended (0041). */
+  closed?: boolean;
   shops?: MegaShop[];
-  me?: { role: 'customer' | 'owner' | 'admin'; enrolled: boolean; earned: number } | null;
+  me?: { role: 'customer' | 'owner' | 'admin'; enrolled: boolean; enrolled_at?: string | null; earned: number; email_verified?: boolean } | null;
   server_now?: string;
 }
+/** get_mega_terms(): the customer terms of a campaign (null when none are published) and whether this user accepted them. */
+export interface MegaTermsPayload { terms: { id: string; version: number; title: string; body_md: string } | null; accepted: boolean }
+/** join_mega_campaign() answer: a new entry, or this account was already in. */
+export type MegaJoinResult = 'joined' | 'already_joined';
 
 export interface MyMegaReward {
   id: string; code: string; store_name: string; store_city: string | null; campaign_title: string; business_name: string;
@@ -87,6 +96,7 @@ const KNOWN = [
   'not_usable', 'expired', 'invalid_bill', 'below_min_purchase', 'invalid_status',
   'budget_required', 'budget_out_of_range', 'invalid_budget', 'budget_decrease_blocked', 'budget_below_spent', 'budget_exhausted',
   'discount_out_of_range', 'campaign_not_active', 'registrations_paused', 'invalid_limits',
+  'terms_required', 'terms_not_accepted',
 ];
 /** Database functions raise stable codes; map them to translated text (mg.err.<code>). */
 export const megaErrKey = (message: string | undefined) => (message && KNOWN.includes(message) ? `mg.err.${message}` : 'err.generic');
