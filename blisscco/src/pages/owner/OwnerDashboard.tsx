@@ -68,6 +68,7 @@ export default function OwnerDashboard() {
       </div>
       <Msg error={error} />
       <Link to="/owner/competition" className="card block font-medium">🏆 {t('sc.title')}</Link>
+      <Link to="/owner/megastore" className="card block font-medium">🛍️ {t('mg.ownerCard')}</Link>
       <UpiIdCard />
       {rows === null && !error && <div className="h-24 animate-pulse rounded-2xl bg-ink/10" />}
       {rows?.length === 0 && <p className="text-ink/70">{t('owner.empty')}</p>}
