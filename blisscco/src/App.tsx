@@ -15,6 +15,7 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminHome from './pages/admin/AdminHome';
+import AdminMegaStores from './pages/admin/AdminMegaStores';
 import AdminNotify from './pages/admin/AdminNotify';
 import AdminPayments from './pages/admin/AdminPayments';
 import AdminVerifications from './pages/admin/AdminVerifications';
@@ -26,6 +27,8 @@ import AuthCallback from './pages/AuthCallback';
 import BusinessProfile from './pages/BusinessProfile';
 import ForgotPassword from './pages/ForgotPassword';
 import Explore from './pages/Explore';
+import MegaCampaign from './pages/MegaCampaign';
+import MyRewards from './pages/MyRewards';
 import HomeGate from './pages/HomeGate';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -37,6 +40,8 @@ import NewBusiness from './pages/owner/NewBusiness';
 import OwnerAnalytics from './pages/owner/OwnerAnalytics';
 import OwnerBanners from './pages/owner/OwnerBanners';
 import OwnerQR from './pages/owner/OwnerQR';
+import MegaStoreDashboard from './pages/owner/MegaStoreDashboard';
+import MegaStoreRedeem from './pages/owner/MegaStoreRedeem';
 import OwnerCompetition from './pages/owner/OwnerCompetition';
 import CustomerCompetition from './pages/CustomerCompetition';
 import OwnerCoupons from './pages/owner/OwnerCoupons';
@@ -77,6 +82,9 @@ export default function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/b/:id" element={<BusinessProfile />} />
+        {/* Mega Store Customer Reward Cycle (migration 0038) */}
+        <Route path="/mega/:code" element={hidden('Reward campaign', <MegaCampaign />)} />
+        <Route path="/mega/redeem/:code" element={hidden('Redeem reward', <MegaStoreRedeem />)} />
         <Route path="/login" element={hidden('Log in', <Login role="customer" />)} />
         <Route path="/register" element={hidden('Sign up', <Register role="customer" />)} />
         <Route path="/owner/login" element={hidden('Business log in', <Login role="owner" />)} />
@@ -89,6 +97,7 @@ export default function App() {
         <Route path="/owner" element={owner(<OwnerDashboard />)} />
         <Route path="/owner/competition" element={owner(<OwnerCompetition />)} />
         <Route path="/owner/advisor" element={owner(<OwnerAdvisor />)} />
+        <Route path="/owner/megastore" element={owner(<MegaStoreDashboard />)} />
         <Route path="/owner/business/new" element={owner(<NewBusiness />)} />
         <Route path="/owner/business/:id" element={owner(<BusinessEditor />)} />
         <Route path="/owner/business/:id/queue" element={owner(<OwnerQueue />)} />
@@ -110,6 +119,8 @@ export default function App() {
         <Route path="/admin/owner-upi" element={admin(<AdminOwnerUpi />)} />
         <Route path="/admin/notify" element={admin(<AdminNotify />)} />
         <Route path="/refer" element={customer(<Refer />)} />
+        <Route path="/my-rewards" element={customer(<MyRewards />)} />
+        <Route path="/admin/mega-stores" element={admin(<AdminMegaStores />)} />
         <Route path="/refer/competition" element={customer(<CustomerCompetition />)} />
         <Route path="/admin/reviews" element={admin(<AdminReviews />)} />
         <Route path="/admin/referrals" element={admin(<AdminReferrals />)} />
