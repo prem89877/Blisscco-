@@ -1,3 +1,58 @@
+# Blisscco update: Mega Store Customer Reward Cycle
+
+## What it does
+- New business type **Mega Store**. It is owned by a normal **owner** login (no role / enum change), registered from **Owner dashboard > Mega Store reward campaign**, and goes live only after **admin approval** (Admin > Mega Stores).
+- The Mega Store runs **one campaign at a time**: title, dates, reward (percent with optional cap, or flat rupees), optional minimum bill at the store, optional minimum partner-shop service price, and a list of **selected partner shops** (up to 50, e.g. 10 of your 30 shops). Partner shop owners are notified; it costs them nothing.
+- **Campaign entry QR** (`/mega/<store code>`): women customers scan it, log in / sign up, tick the "I am a woman customer" confirmation and join. The page shows the reward, rules and partner shops.
+- When a **partner shop marks the customer's booking Completed** (booking made by the customer after joining, inside the campaign dates, price >= minimum), the server issues ONE shopping reward automatically (database trigger on bookings, errors swallowed so a booking can never fail because of it).
+- **Maximum 5 rewards per customer account** per campaign (counted under a row lock, so two bookings completing together cannot exceed 5). Default: one reward per partner shop, so 5 rewards = 5 different shops.
+- **Every reward expires exactly 1 month after it is issued** (`expires_at = issued_at + 1 month`).
+- Customer sees rewards (code + QR + days left) at **Profile > My shopping rewards** (`/my-rewards`) and gets a notification (English / Hindi / Marathi).
+- Mega Store owner scans the reward QR (or types the code) -> enters the bill -> the server calculates the discount and marks the reward used (`/mega/redeem/<code>`).
+- **Fraud protection:** self-dealing is blocked (customer, shop owner and Mega Store owner must be 3 different accounts); one reward per booking; owner-issued tokens never count; risk signals (service under 10 minutes, booked and completed within 15 minutes, 2 rewards within 6 hours) put the reward **On hold** until the Mega Store owner approves it (the 1-month clock starts at approval). Admin can cancel an unused reward by code.
+
+## FINANCIAL RULE (enforced in the database)
+The Mega Store funds 100% of the shopping discount. `mega_rewards.funded_by` is locked to `'mega_store'` by a CHECK constraint, and nothing in this feature writes to Blisscco credit / balance / payment / coupon tables. The discount is only recorded on the reward row for the Mega Store's own results.
+
+## Schema conflicts checked
+- No change to existing enums, roles, tables, RLS or functions. Only NEW tables (mega_stores, mega_campaigns, mega_campaign_shops, mega_enrollments, mega_rewards), NEW functions and ONE new trigger on `bookings` (`after update of status`).
+- `profiles` has no gender column. The "women only" rule is a **self-declaration** saved at join time (`mega_enrollments.declared_female`); the app cannot verify gender.
+- Existing referral / competition triggers on `bookings` are untouched; the new trigger is independent.
+
+## How to deploy
+1. Supabase SQL editor: run `supabase/migrations/0038_mega_store_reward_cycle.sql` (after 0037, safe to re-run).
+2. Deploy the frontend (Vercel). No new package, no new environment variable.
+
+## Quick test
+1. Owner account > Mega Store reward campaign > create store. Admin > Mega Stores > Approve.
+2. Owner > Create campaign (dates today..), add a partner shop, Start. Open the campaign QR link in a customer browser.
+3. Customer (verified e-mail) > join > book a service at the partner shop AFTER joining > shop completes it (service should run 10+ minutes, otherwise the reward is put On hold).
+4. Customer > My shopping rewards shows the QR. Mega Store owner opens it > enter bill > Apply reward.
+
+## Changed files
+- src/App.tsx
+- src/i18n/messages.ts
+- src/pages/Profile.tsx
+- src/pages/owner/OwnerDashboard.tsx
+- src/pages/admin/AdminHome.tsx
+- api/_lib/notificationText.ts
+- api/robots.ts
+- supabase/RUN_LOG.md
+- CHANGES.md
+
+## New files
+- supabase/migrations/0038_mega_store_reward_cycle.sql
+- src/lib/megaStore.ts
+- src/pages/MegaCampaign.tsx
+- src/pages/MyRewards.tsx
+- src/pages/owner/MegaStoreDashboard.tsx
+- src/pages/owner/MegaStoreRedeem.tsx
+- src/pages/admin/AdminMegaStores.tsx
+- src/components/MegaCampaignForm.tsx
+- src/components/MegaPartnerShops.tsx
+
+---
+
 # Blisscco update: beauty jokes, slogans and tips for customers
 
 ## What it does
