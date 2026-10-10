@@ -75,7 +75,7 @@ export default function AdminMegaStores() {
       <Section title={t('mg.ad.revokeTitle')}>
         <p className="text-sm text-ink/80">{t('mg.ad.revokeHint')}</p>
         <div className="flex gap-2">
-          <input aria-label={t('mg.redeem.code')} placeholder="MS-XXXXXXXX" className="input flex-1 font-mono uppercase" value={code} maxLength={16} onChange={(e) => setCode(e.target.value)} />
+          <input aria-label={t('mg.redeem.code')} placeholder="MS-XXXX-XXXX-XXXX-XXXX" className="input flex-1 font-mono uppercase" value={code} maxLength={24} onChange={(e) => setCode(e.target.value)} />
           <button type="button" className="btn-secondary" disabled={!code.trim()} onClick={() => void revoke()}>{t('mg.ad.revokeBtn')}</button>
         </div>
       </Section>
