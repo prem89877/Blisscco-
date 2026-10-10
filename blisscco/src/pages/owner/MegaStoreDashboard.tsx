@@ -164,7 +164,7 @@ export default function MegaStoreDashboard() {
             <Section title={t('mg.redeem.title')}>
               <p className="text-sm text-ink/80">{t('mg.redeem.hint')}</p>
               <form onSubmit={openRedeem} className="flex gap-2">
-                <input aria-label={t('mg.redeem.code')} placeholder="MS-XXXXXXXX" className="input flex-1 font-mono uppercase" value={code} maxLength={16} onChange={(e) => setCode(e.target.value)} />
+                <input aria-label={t('mg.redeem.code')} placeholder="MS-XXXX-XXXX-XXXX-XXXX" className="input flex-1 font-mono uppercase" value={code} maxLength={24} onChange={(e) => setCode(e.target.value)} />
                 <button type="submit" className="btn-solid" disabled={!code.trim()}>{t('mg.redeem.open')}</button>
               </form>
             </Section>
