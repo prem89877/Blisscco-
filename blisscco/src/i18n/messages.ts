@@ -3394,9 +3394,57 @@ const mr34: M = {
 };
 const p34 = { en: en34, hi: hi34, mr: mr34 };
 
+// ============ Mega Store campaign-entry QR (migration 0041) ============
+const en35: M = {
+  'mg.cp.closed': 'This campaign has ended. New entries are closed.',
+  'mg.cp.expired': 'This campaign has ended. New entries are closed.',
+  'mg.cp.pausedNoEntry': 'This campaign is paused. New entries are closed for now. If you have already joined, your entry stays safe.',
+  'mg.cp.alreadyJoined': 'You have already joined this campaign.',
+  'mg.cp.enteredTitle': "You're in! You have entered the reward cycle.",
+  'mg.cp.enteredBody': 'Next step: book a service at one of the partner shops below. After the shop marks it complete, you earn a shopping reward for {store}.',
+  'mg.cp.loginFirst': 'Log in or create a Blisscco account to join this campaign. You will come back to this page afterwards.',
+  'mg.cp.verifyNote': 'New account? Open the verification link we e-mail you, then log in. You will return to this campaign.',
+  'mg.cp.acceptTerms': 'I accept the campaign terms.',
+  'mg.cp.scanNoReward': 'Scanning the QR or joining does not give a reward by itself. A reward is issued only after a completed service at a partner shop.',
+  'mg.cp.ruleOneEntry': 'One entry per customer account. Scanning again does not create another entry.',
+  'mg.err.terms_required': 'Please accept the campaign terms to join.',
+  'mg.err.terms_not_accepted': 'Please accept the campaign terms to join.',
+};
+const hi35: M = {
+  'mg.cp.closed': 'यह कैंपेन खत्म हो चुका है। नई एंट्री बंद है।',
+  'mg.cp.expired': 'यह कैंपेन खत्म हो चुका है। नई एंट्री बंद है।',
+  'mg.cp.pausedNoEntry': 'यह कैंपेन अभी रुका हुआ है। नई एंट्री फ़िलहाल बंद है। अगर आप पहले ही जुड़ चुकी हैं, तो आपकी एंट्री सुरक्षित है।',
+  'mg.cp.alreadyJoined': 'आप इस कैंपेन से पहले ही जुड़ चुकी हैं।',
+  'mg.cp.enteredTitle': 'आप शामिल हो गईं! आप रिवॉर्ड साइकिल में आ गई हैं।',
+  'mg.cp.enteredBody': 'अगला कदम: नीचे दी गई किसी पार्टनर दुकान में सर्विस बुक करें। दुकान उसे पूरा दर्ज करे, तो आपको {store} के लिए शॉपिंग रिवॉर्ड मिलता है।',
+  'mg.cp.loginFirst': 'इस कैंपेन से जुड़ने के लिए Blisscco में लॉग इन करें या नया खाता बनाएँ। उसके बाद आप इसी पेज पर वापस आ जाएँगी।',
+  'mg.cp.verifyNote': 'नया खाता? हम जो ई-मेल भेजते हैं, उसका वेरिफिकेशन लिंक खोलें, फिर लॉग इन करें। आप इस कैंपेन पर वापस आ जाएँगी।',
+  'mg.cp.acceptTerms': 'मैं कैंपेन की शर्तें स्वीकार करती हूँ।',
+  'mg.cp.scanNoReward': 'QR स्कैन करने या जुड़ने से अपने आप रिवॉर्ड नहीं मिलता। रिवॉर्ड तभी मिलता है जब पार्टनर दुकान में सर्विस पूरी हो जाए।',
+  'mg.cp.ruleOneEntry': 'हर ग्राहक खाते की एक ही एंट्री। दोबारा स्कैन करने से दूसरी एंट्री नहीं बनती।',
+  'mg.err.terms_required': 'जुड़ने के लिए कृपया कैंपेन की शर्तें स्वीकार करें।',
+  'mg.err.terms_not_accepted': 'जुड़ने के लिए कृपया कैंपेन की शर्तें स्वीकार करें।',
+};
+const mr35: M = {
+  'mg.cp.closed': 'ही मोहीम संपली आहे. नवीन प्रवेश बंद आहेत.',
+  'mg.cp.expired': 'ही मोहीम संपली आहे. नवीन प्रवेश बंद आहेत.',
+  'mg.cp.pausedNoEntry': 'ही मोहीम सध्या थांबवली आहे. नवीन प्रवेश सध्या बंद आहेत. तुम्ही आधीच सामील झाला असाल, तर तुमचा प्रवेश सुरक्षित आहे.',
+  'mg.cp.alreadyJoined': 'तुम्ही या मोहिमेत आधीच सामील झाला आहात.',
+  'mg.cp.enteredTitle': 'तुम्ही सामील झालात! तुम्ही रिवॉर्ड सायकलमध्ये आला आहात.',
+  'mg.cp.enteredBody': 'पुढची पायरी: खालील कोणत्याही पार्टनर दुकानात सेवा बुक करा. दुकानाने ती पूर्ण नोंदवली की तुम्हाला {store} साठी शॉपिंग रिवॉर्ड मिळतो.',
+  'mg.cp.loginFirst': 'या मोहिमेत सामील होण्यासाठी Blisscco मध्ये लॉग इन करा किंवा नवीन खाते तयार करा. त्यानंतर तुम्ही याच पानावर परत याल.',
+  'mg.cp.verifyNote': 'नवीन खाते? आम्ही पाठवलेल्या ई-मेलमधील व्हेरिफिकेशन लिंक उघडा, मग लॉग इन करा. तुम्ही या मोहिमेवर परत याल.',
+  'mg.cp.acceptTerms': 'मी मोहिमेच्या अटी मान्य करते.',
+  'mg.cp.scanNoReward': 'QR स्कॅन केल्याने किंवा सामील झाल्याने आपोआप रिवॉर्ड मिळत नाही. पार्टनर दुकानात सेवा पूर्ण झाल्यावरच रिवॉर्ड मिळतो.',
+  'mg.cp.ruleOneEntry': 'प्रत्येक ग्राहक खात्याचा एकच प्रवेश. पुन्हा स्कॅन केल्याने दुसरा प्रवेश तयार होत नाही.',
+  'mg.err.terms_required': 'सामील होण्यासाठी कृपया मोहिमेच्या अटी मान्य करा.',
+  'mg.err.terms_not_accepted': 'सामील होण्यासाठी कृपया मोहिमेच्या अटी मान्य करा.',
+};
+const p35 = { en: en35, hi: hi35, mr: mr35 };
+
 // ============ ALL LANGUAGES (later blocks override earlier ones, e.g. p12 replaces old p8 texts) ============
 export const messages: Record<Lang, Record<string, string>> = {
-  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en, ...p31.en, ...p32.en, ...p33.en, ...p34.en },
-  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi, ...p31.hi, ...p32.hi, ...p33.hi, ...p34.hi },
-  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr, ...p31.mr, ...p32.mr, ...p33.mr, ...p34.mr },
+  en: { ...en, ...p4.en, ...p5.en, ...p6.en, ...p7.en, ...p8.en, ...p9.en, ...p10.en, ...p11.en, ...p12.en, ...p13.en, ...p14.en, ...p15.en, ...p16.en, ...p17.en, ...p18.en, ...p19.en, ...p20.en, ...p21.en, ...p22.en, ...p23.en, ...p24.en, ...p25.en, ...p26.en, ...p27.en, ...p28.en, ...p29.en, ...p30.en, ...p31.en, ...p32.en, ...p33.en, ...p34.en, ...p35.en },
+  hi: { ...hi, ...p4.hi, ...p5.hi, ...p6.hi, ...p7.hi, ...p8.hi, ...p9.hi, ...p10.hi, ...p11.hi, ...p12.hi, ...p13.hi, ...p14.hi, ...p15.hi, ...p16.hi, ...p17.hi, ...p18.hi, ...p19.hi, ...p20.hi, ...p21.hi, ...p22.hi, ...p23.hi, ...p24.hi, ...p25.hi, ...p26.hi, ...p27.hi, ...p28.hi, ...p29.hi, ...p30.hi, ...p31.hi, ...p32.hi, ...p33.hi, ...p34.hi, ...p35.hi },
+  mr: { ...mr, ...p4.mr, ...p5.mr, ...p6.mr, ...p7.mr, ...p8.mr, ...p9.mr, ...p10.mr, ...p11.mr, ...p12.mr, ...p13.mr, ...p14.mr, ...p15.mr, ...p16.mr, ...p17.mr, ...p18.mr, ...p19.mr, ...p20.mr, ...p21.mr, ...p22.mr, ...p23.mr, ...p24.mr, ...p25.mr, ...p26.mr, ...p27.mr, ...p28.mr, ...p29.mr, ...p30.mr, ...p31.mr, ...p32.mr, ...p33.mr, ...p34.mr, ...p35.mr },
 };
