@@ -28,6 +28,7 @@ export default function Profile() {
         )}
       </div>
       <div className="flex flex-col gap-2">
+        {role === 'customer' && <Link to="/my-rewards" className="btn-secondary">{t('mg.my.title')}</Link>}
         {dash && <Link to={dash} className="btn-secondary">{t(role === 'admin' ? 'dash.admin' : 'dash.owner')}</Link>}
         <button type="button" onClick={() => void signOut()} className="btn-secondary">{t('nav.logout')}</button>
       </div>
