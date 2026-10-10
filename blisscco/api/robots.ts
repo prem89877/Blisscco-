@@ -13,6 +13,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     'Disallow: /owner/business/',
     'Disallow: /owner$',
     'Disallow: /my-bookings',
+    'Disallow: /my-rewards',
+    'Disallow: /mega/',
     'Disallow: /notifications',
     'Disallow: /refer',
     'Disallow: /post-login',
