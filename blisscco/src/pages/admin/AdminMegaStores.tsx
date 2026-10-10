@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AdminMegaLimits from '../../components/AdminMegaLimits';
 import { Msg, Section } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { fmtDate, rupees } from '../../lib/format';
@@ -72,6 +73,7 @@ export default function AdminMegaStores() {
           </div>
         </article>
       ))}
+      <AdminMegaLimits />
       <Section title={t('mg.ad.revokeTitle')}>
         <p className="text-sm text-ink/80">{t('mg.ad.revokeHint')}</p>
         <div className="flex gap-2">
